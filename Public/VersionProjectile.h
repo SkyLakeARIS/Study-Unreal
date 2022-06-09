@@ -1,56 +1,85 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-#include "SRPlayerState.h"
 #include "Version.h"
+#include "GameModeData.h"
+#include "SRPlayerState.h"
 #include "GameFramework/Actor.h"
 #include "VersionProjectile.generated.h"
+
+enum class EWeaponType : uint8;
 
 class USphereComponent;
 class UProjectileMovementComponent;
 
 DECLARE_DELEGATE(FOnHitTarget)
+DECLARE_DELEGATE(FOnUpdateKill)
+DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
+
+
+enum class EHitType : uint8
+{
+	Hit,
+	HeadShot,
+	Kill
+};
 
 UCLASS(config=Game)
 class AVersionProjectile : public AActor
 {
 	GENERATED_BODY()
 
-	/** Sphere collision component */
-	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	USphereComponent* CollisionComp;
-
-	/** Projectile movement component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
-
 public:
+
 	AVersionProjectile();
 
 	virtual void Tick(float DeltaTime) override;
 
-	/** called when projectile hits something */
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	void BindHitCheck(ASRPlayerState* playerState);
+	UFUNCTION()
+	void BindPlayerStateInfo(ASRPlayerState* playerState);
+
+	UFUNCTION()
+	void SetBulletType(EWeaponType gunType);
+
+	void SetStartLocation(FVector location);
+
+
+	void SetDebugMode(bool active);
+
 protected:
+
 	virtual void BeginPlay() override;
 
-	
-protected:	
-	/** Returns CollisionComp subobject **/
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
-	/** Returns ProjectileMovement subobject **/
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 
-	FOnHitTarget* GetHitDelegate();
-
+protected:
 	FOnHitTarget onHitAndUpdateAcc;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		class UParticleSystem* ImpactParticles;
+	UParticleSystem* ImpactParticles;
 
 private:
-	bool bIsCollision;
+
+	bool mbDebugMode;
+	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
+	USphereComponent* CollisionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* ProjectileMovement;
+
+	FVector mStartLocation;
+	FOnUpdateScore mOnUpdateScore;
+	FOnUpdateKill mOnUpdateKill;
+	FWeaponDamage mDamageTable;
+	EWeaponType mBulletType;
+	EHitType mHitType;
+	int32 mBulletDamage;
+	bool mbIsCollision;
+	bool mbIsHeadshot;
+	bool mbIsTargetHit;
 };
+

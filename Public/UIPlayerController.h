@@ -10,7 +10,6 @@
  * 
  */
 
-
 UCLASS()
 class VERSION_API AUIPlayerController : public APlayerController
 {
@@ -21,10 +20,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=UI)
-    TSubclassOf<class UUserWidget> UIWidgetClass;
+    TSubclassOf<UUserWidget> UIWidgetClass;
 	
 	UPROPERTY()
-	class UUserWidget* UIWidgetInstance;	// esc key == pause game
+	UUserWidget* UIWidgetInstance;	// esc key == pause game
 
 	
 };

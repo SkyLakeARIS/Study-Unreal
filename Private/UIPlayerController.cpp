@@ -2,7 +2,6 @@
 
 
 #include "UIPlayerController.h"
-
 #include "Blueprint/UserWidget.h"
 
 void AUIPlayerController::BeginPlay()
@@ -17,6 +16,4 @@ void AUIPlayerController::BeginPlay()
 	Mode.SetWidgetToFocus(UIWidgetInstance->GetCachedWidget());
 	SetInputMode(Mode);
 	bShowMouseCursor = true;
-
-	
 }

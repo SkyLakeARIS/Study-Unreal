@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UIHUDWidget.generated.h"
 
+enum class EWaeponFireMode : uint8;
 class UTextBlock;
 /**
  * 
@@ -22,8 +23,6 @@ public:
 	void UpdateAmmo(int32 newAmmo);
 	UFUNCTION()
 	void UpdateAccuracy(int32 accuracy);
-	//UFUNCTION()
-	//void UpdateKillCount();	// HUD에서는 킬카운트 x
 	UFUNCTION()
 	void UpdateFireMode(EWaeponFireMode newFireMode);
 	UFUNCTION()
@@ -36,25 +35,16 @@ protected:
 
 private:
 
-	
-	UPROPERTY()	// UPROPERTY( meta =(BindWidget))�� ����ϸ� NativeConstruct()���� ���� ���ε� �����൵��. �ٸ� �������� �������Ʈ�� �̸��� ���ƾ���.
+	UPROPERTY()
 	UTextBlock* RemainingTime;
-	
 	UPROPERTY()
 	UTextBlock* Accuracy;
-	
 	UPROPERTY()
 	UTextBlock* FireMode;
-	
 	UPROPERTY()
 	UTextBlock* RemainingAmmo;
-	//
-	//UPROPERTY()
-	//UTextBlock* KillCount;
-	
 	UPROPERTY()
 	UTextBlock* Score;
-
-	//UPROPERTY(meta = (BindWidget))
+	UPROPERTY()
 	UTextBlock* DisplayGameMode;
 };

@@ -3,7 +3,6 @@
 
 #include "UIHUDWidget.h"
 #include "Components/TextBlock.h"
-
 #include "VersionCharacter.h"
 
 
@@ -11,7 +10,6 @@ void UUIHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	Accuracy = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayAccuracy")));
-	//KillCount = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayKillCount")));
 	RemainingTime = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayTimeCountDown")));
 	FireMode = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayFireMode")));
 	RemainingAmmo = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayAmmo")));
@@ -32,11 +30,10 @@ void UUIHUDWidget::UpdateAmmo(int32 newAmmo)
 
 void UUIHUDWidget::UpdateAccuracy(int32 accuracy)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UI: Update Acc"));
 	Accuracy->SetText(FText::FromString(FString::FromInt(accuracy)+FString("%")));
 }
 
-void UUIHUDWidget::UpdateFireMode(enum EWaeponFireMode newFireMode)
+void UUIHUDWidget::UpdateFireMode(EWaeponFireMode newFireMode)
 {
 	FString DisplayFireMode;
 	switch(newFireMode)
@@ -63,8 +60,3 @@ void UUIHUDWidget::UpdateGameMode(FString newGameMode)
 {
 	DisplayGameMode->SetText(FText::FromString(newGameMode));
 }
-//
-//void UUIHUDWidget::UpdateKillCount()
-//{
-//	KillCount->SetText(FText::FromString(FString::FromInt(60)));
-//}

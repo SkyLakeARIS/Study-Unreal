@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "SelectWidget.generated.h"
 
+class UButton;
 /**
  * 
  */
@@ -17,17 +18,46 @@ protected:
 
 	virtual void NativeConstruct() override;
 
-	UPROPERTY()
-		class UButton* BtnDev;
+	//UFUNCTION(BlueprintCallable)
+	//void OnDevClicked();
+
+	UFUNCTION(BlueprintCallable)
+	void OnShortRangeClicked();
+
+	UFUNCTION(BlueprintCallable)
+	void OnMidRangeClicked();
+
+	UFUNCTION(BlueprintCallable)
+	void OnLongRangeClicked();
+
+
+	UFUNCTION(BlueprintCallable)
+	void OnMovableShortRangeClicked();
+
+	UFUNCTION(BlueprintCallable)
+	void OnMovableMidRangeClicked();
+
+	UFUNCTION(BlueprintCallable)
+	void OnMovableLongRangeClicked();
+
+protected:
+
+	//UPROPERTY()
+	//UButton* BtnDev;
 
 	UPROPERTY()
-	class UButton* BtnCombination;
+	UButton* BtnShortRange;
+	UPROPERTY()
+	UButton* BtnMidRange;
+	UPROPERTY()
+	UButton* BtnLongRange;
 
-private:
-	UFUNCTION()
-	void OnDevClicked();
+	UPROPERTY()
+	UButton* BtnMovableShortRange;
+	UPROPERTY()
+	UButton* BtnMovableMidRange;
+	UPROPERTY()
+	UButton* BtnMovableLongRange;
 
-	UFUNCTION()
-	void OnCombinationClicked();
 
 };

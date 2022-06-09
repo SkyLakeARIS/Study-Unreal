@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Version.h"
 #include "Blueprint/UserWidget.h"
 #include "UIResultWidget.generated.h"
 
-class ASRPlayerState;
 class UTextBlock;
 class UButton;
 /**
@@ -17,7 +16,9 @@ class VERSION_API UUIResultWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void UpdateStageInfo(ASRPlayerState* srPlayerState);
+
+	UFUNCTION()
+	void UpdateStageInfo(class ASRPlayerState* srPlayerState);
 		
 protected:
 
@@ -26,29 +27,24 @@ protected:
 private:
 	UFUNCTION()
 	void onRetryClicked();
-
 	UFUNCTION()
 	void onStageClicked();
-	
 	UFUNCTION()
 	void onMenuClicked();
+
 public:
 	
 	UPROPERTY()
 	UButton* mBtnRetry;
-
 	UPROPERTY()
 	UButton* mBtnStage;
-	
 	UPROPERTY()
 	UButton* mBtnMenu;
 
 	UPROPERTY()
 	UTextBlock* mScore;
-
 	UPROPERTY()
 	UTextBlock* mAccuracy;
-
 	UPROPERTY()
 	UTextBlock* mKill;
 };
