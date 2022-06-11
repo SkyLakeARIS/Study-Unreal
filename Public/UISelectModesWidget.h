@@ -11,7 +11,8 @@ DECLARE_DELEGATE_OneParam(FOnInitGameData, FGameModeData)
 
 class UButton;
 /*
- *		게임 시작전에 무기들과 게임모드를 선택하는 UI 클래스.
+ *	게임 시작전에 무기들과 게임모드를 선택하는 UI 클래스입니다.
+ *	무기, 조준경, 게임모드 타입, 타겟 타입
  */
 UCLASS()
 class VERSION_API UUISelectModesWidget : public UUserWidget
@@ -20,7 +21,7 @@ class VERSION_API UUISelectModesWidget : public UUserWidget
 
 public:
 
-	void BindCharacterInfo(class AVersionCharacter* character);
+	void BindCharacterInfo(class ASRPlayerCharacter* character);
 
 protected:
 

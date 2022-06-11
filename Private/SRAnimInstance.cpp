@@ -1,15 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ADAnimInstance.h"
-#include "CharacterPlayerController.h"
-#include "Camera/CameraComponent.h"
+#include "SRAnimInstance.h"
+#include "SRPlayerController.h"
 #include "Curves/CurveVector.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "VersionCharacter.h"
+#include "SRPlayerCharacter.h"
 
-UADAnimInstance::UADAnimInstance()
+USRAnimInstance::USRAnimInstance()
 {
 	AimAlpha = 0.0f;
 	bInterpAiming = false;
@@ -20,37 +18,13 @@ UADAnimInstance::UADAnimInstance()
 	FireRate = 0.1f;
 }
 
-void UADAnimInstance::NativeBeginPlay()
+void USRAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
 
-	//PlayerCharacter = Cast<AVersionCharacter>(TryGetPawnOwner());
-	//mPlayerController = Cast<ACharacterPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//if(PlayerCharacter)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Valid  PlayerCharacter"));
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("invalid  PlayerCharacter"));
-
-	//}
-
-	//if(PlayerCharacter)
-	//{
-	//	FTimerHandle TSetSightTransform;
-	//	FTimerHandle TSetRelativeHandTransform;
-
-	//	// 너무 빠르게 초기화를하면 mesh들이(부착물) nullptr이 될 가능성이 있으므로 딜레이를 줌.
-	//	GetWorld()->GetTimerManager().SetTimer(TSetSightTransform, this, &UADAnimInstance::SetSightTransform, 0.3f, false);
-	//	GetWorld()->GetTimerManager().SetTimer(TSetRelativeHandTransform, this, &UADAnimInstance::SetRelativeHandTransform, 0.3f, false);
-
-	//	OldRotation = PlayerCharacter->GetControlRotation();
-	//}
-
 }
 
-void UADAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
@@ -98,10 +72,10 @@ void UADAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	RecoilTick(DeltaSeconds);
 }
 
-void UADAnimInstance::UpdateSocketInfo()
+void USRAnimInstance::UpdateSocketInfo()
 {
-	PlayerCharacter = Cast<AVersionCharacter>(TryGetPawnOwner());
-	mPlayerController = Cast<ACharacterPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	PlayerCharacter = Cast<ASRPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	mPlayerController = Cast<ASRPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	SetSightTransform();
 	SetRelativeHandTransform();
@@ -110,7 +84,7 @@ void UADAnimInstance::UpdateSocketInfo()
 }
 
 // 조준시 부착물이 위치할 위치를 계산
-void UADAnimInstance::SetSightTransform()
+void USRAnimInstance::SetSightTransform()
 {
 	FTransform CamTransform = PlayerCharacter->GetFirstPersonCameraComponent()->GetComponentTransform();
 	FTransform MeshTransform = PlayerCharacter->GetMesh1P()->GetComponentTransform();
@@ -150,7 +124,7 @@ void UADAnimInstance::SetSightTransform()
 }
 
 // 조준시 손의 위치를 계산
-void UADAnimInstance::SetRelativeHandTransform()
+void USRAnimInstance::SetRelativeHandTransform()
 {
 	if (!PlayerCharacter->GetNewWeapon())
 	{
@@ -174,7 +148,7 @@ void UADAnimInstance::SetRelativeHandTransform()
 
 }
 
-void UADAnimInstance::SetFinalHandTransform()
+void USRAnimInstance::SetFinalHandTransform()
 {
 	FTransform OpticSocketTransform = FTransform();
 
@@ -191,7 +165,7 @@ void UADAnimInstance::SetFinalHandTransform()
 	FinalHandTransform = UKismetMathLibrary::MakeRelativeTransform(OpticSocketTransform, MeshTransform);
 }
 
-void UADAnimInstance::SetLeftHandIK()
+void USRAnimInstance::SetLeftHandIK()
 {
 	if(!PlayerCharacter->GetNewWeapon())
 	{
@@ -206,7 +180,7 @@ void UADAnimInstance::SetLeftHandIK()
 
 }
 
-void UADAnimInstance::InterpAiming(float DeltaSeconds)
+void USRAnimInstance::InterpAiming(float DeltaSeconds)
 {
 	AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, static_cast<float>(bIsAiming), DeltaSeconds, 10.0f);
 
@@ -216,7 +190,7 @@ void UADAnimInstance::InterpAiming(float DeltaSeconds)
 	}
 }
 
-void UADAnimInstance::InterpRelativeHand(float DeltaSeconds)
+void USRAnimInstance::InterpRelativeHand(float DeltaSeconds)
 {
 	RelativeHandTransform = UKismetMathLibrary::TInterpTo(RelativeHandTransform, FinalHandTransform, DeltaSeconds, 10.0f);
 	// 기존 부착물 위치에서 다른 부착물 위치로 손을 옮길때 보간하는데 보간이 끝나면(equals) false로.
@@ -226,7 +200,7 @@ void UADAnimInstance::InterpRelativeHand(float DeltaSeconds)
 	}
 }
 
-void UADAnimInstance::MoveVectorCurve(float DeltaSeconds)
+void USRAnimInstance::MoveVectorCurve(float DeltaSeconds)
 {
 	if(VectorCurve)
 	{
@@ -245,7 +219,7 @@ void UADAnimInstance::MoveVectorCurve(float DeltaSeconds)
 }
 
 // 화면을 움직일때 무기의 상하좌우 흔들림 구현 (타르코프)
-void UADAnimInstance::RotateWithRotation(float DeltaSeconds)
+void USRAnimInstance::RotateWithRotation(float DeltaSeconds)
 {
 	FRotator CurrentRotation = PlayerCharacter->GetControlRotation();
 	TurnRotation = UKismetMathLibrary::RInterpTo(TurnRotation, CurrentRotation - OldRotation, DeltaSeconds, 3.0f);
@@ -261,39 +235,39 @@ void UADAnimInstance::RotateWithRotation(float DeltaSeconds)
 	OldRotation = CurrentRotation;
 }
 
-void UADAnimInstance::InterpFinalRecoil(float DeltaSeconds)
+void USRAnimInstance::InterpFinalRecoil(float DeltaSeconds)
 {
 	// interp to zero
 	FinalRecoilTransform = UKismetMathLibrary::TInterpTo(FinalRecoilTransform, FTransform(), DeltaSeconds, 10.0f);
 }
 
-void UADAnimInstance::InterpRecoil(float DeltaSeconds)
+void USRAnimInstance::InterpRecoil(float DeltaSeconds)
 {
 	//interp to finalrecoiltransform
 	RecoilTransform =  UKismetMathLibrary::TInterpTo(RecoilTransform, FinalRecoilTransform, DeltaSeconds, 10.0f);
 }
 
-void UADAnimInstance::RecoilTimerFunction()
+void USRAnimInstance::RecoilTimerFunction()
 {
 	bRecoil = false;
 	GetWorld()->GetTimerManager().PauseTimer(FireTimer);
 }
 
-void UADAnimInstance::RecoveryStart()
+void USRAnimInstance::RecoveryStart()
 {
 	//if (mPlayerController->GetControlRotation().Pitch > RecoilStartRot.Pitch)
 	//{
 		bRecoilRecovery = true;
-		GetWorld()->GetTimerManager().SetTimer(RecoveryTimer, this, &UADAnimInstance::RecoveryTimerFunction, RecoveryTime, false);
+		GetWorld()->GetTimerManager().SetTimer(RecoveryTimer, this, &USRAnimInstance::RecoveryTimerFunction, RecoveryTime, false);
 	//}
 }
 
-void UADAnimInstance::RecoveryTimerFunction()
+void USRAnimInstance::RecoveryTimerFunction()
 {
 	bRecoilRecovery = false;
 }
 
-void UADAnimInstance::SetAiming(bool IsAiming)
+void USRAnimInstance::SetAiming(bool IsAiming)
 {
 	if(bIsAiming != IsAiming)
 	{
@@ -302,7 +276,7 @@ void UADAnimInstance::SetAiming(bool IsAiming)
 	}
 }
 
-void UADAnimInstance::SetFiring(bool isFiring)
+void USRAnimInstance::SetFiring(bool isFiring)
 {
 	bFiring = isFiring;
 	if(bFiring)
@@ -312,7 +286,7 @@ void UADAnimInstance::SetFiring(bool isFiring)
 }
 
 
-void UADAnimInstance::Reload()
+void USRAnimInstance::Reload()
 {
 	if(ReloadAlpha == 1.0f)
 	{
@@ -324,12 +298,12 @@ void UADAnimInstance::Reload()
 	}
 }
 
-void UADAnimInstance::StopReload()
+void USRAnimInstance::StopReload()
 {
 	ReloadAlpha = 1.0f;
 }
 
-void UADAnimInstance::Fire()
+void USRAnimInstance::Fire()
 {
 	FVector RecoilLoc;
 	FRotator RecoilRot;
@@ -414,7 +388,7 @@ void UADAnimInstance::Fire()
 	}
 }
 
-void UADAnimInstance::RecoilStart()
+void USRAnimInstance::RecoilStart()
 {
 
 	PlayerDeltaRot = FRotator(0.0f, 0.0f, 0.0f);
@@ -427,13 +401,13 @@ void UADAnimInstance::RecoilStart()
 	bFiring = true;
 
 	//Timer for the recoil: I have set it to 10s but dependeding how long it takes to empty the gun mag, you can increase the time.
-	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &UADAnimInstance::RecoilTimerFunction, 10.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &USRAnimInstance::RecoilTimerFunction, 10.0f, false);
 
 	bRecoil = true;
 	bRecoilRecovery = false;
 }
 
-void UADAnimInstance::RecoilTick(float DeltaTime)
+void USRAnimInstance::RecoilTick(float DeltaTime)
 {
 	if(PlayerCharacter->GetGameType() == EGameType::Tarkov)
 	{
@@ -540,8 +514,7 @@ void UADAnimInstance::RecoilTick(float DeltaTime)
 	}
 }
 
-void UADAnimInstance::RecoilStop()
+void USRAnimInstance::RecoilStop()
 {
 	bFiring = false;
-
 }

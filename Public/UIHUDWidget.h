@@ -8,9 +8,13 @@
 
 enum class EWaeponFireMode : uint8;
 class UTextBlock;
-/**
- * 
+
+
+/*
+ * HUD 클래스입니다.
+ * PlayerState의 값을 통해 화면에 정보를 보여줍니다.
  */
+
 UCLASS()
 class VERSION_API UUIHUDWidget : public UUserWidget
 {

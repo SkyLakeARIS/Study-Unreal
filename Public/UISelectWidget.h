@@ -3,11 +3,12 @@
 #pragma once
 #include "Version.h"
 #include "Blueprint/UserWidget.h"
-#include "SelectWidget.generated.h"
+#include "UISelectWidget.generated.h"
 
 class UButton;
-/**
- * 
+
+/*
+ *  맵을 선택하는 UI 클래스입니다.
  */
 UCLASS()
 class VERSION_API USelectWidget : public UUserWidget
@@ -17,9 +18,6 @@ class VERSION_API USelectWidget : public UUserWidget
 protected:
 
 	virtual void NativeConstruct() override;
-
-	//UFUNCTION(BlueprintCallable)
-	//void OnDevClicked();
 
 	UFUNCTION(BlueprintCallable)
 	void OnShortRangeClicked();
@@ -42,9 +40,6 @@ protected:
 
 protected:
 
-	//UPROPERTY()
-	//UButton* BtnDev;
-
 	UPROPERTY()
 	UButton* BtnShortRange;
 	UPROPERTY()
@@ -58,6 +53,5 @@ protected:
 	UButton* BtnMovableMidRange;
 	UPROPERTY()
 	UButton* BtnMovableLongRange;
-
 
 };

@@ -57,24 +57,11 @@ bool ASRSpawnPoint::IsCrouchable()
 
 ESpawnPointType ASRSpawnPoint::GetSpawnPointType()
 {
-
 	return mSpawnerType;
-}
-
-FVector ASRSpawnPoint::GetMovableEndLocation()
-{
-	return mMoveableEndLocation;
 }
 
 EMovableAxis ASRSpawnPoint::GetMovableAxis()
 {
 	return mMovableAxis;
 }
-
-//// Called every frame
-//void ASRSpawnPoint::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//
-//}
 

@@ -1,17 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TargetCharacter.h"
-#include "CharacterPlayerController.h"
-#include "SRPlayerState.h"
+#include "SRTargetCharacter.h"
+#include "SRPlayerController.h"
 #include "SRSpawnPoint.h"
 #include "SRTargetManager.h"
 
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-
 // Sets default values
-ATargetCharacter::ATargetCharacter()
+ASRTargetCharacter::ASRTargetCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you dont need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -104,7 +100,7 @@ ATargetCharacter::ATargetCharacter()
 }
 
 // Called when the game starts or when spawned
-void ATargetCharacter::BeginPlay()
+void ASRTargetCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -116,16 +112,15 @@ void ATargetCharacter::BeginPlay()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	mHead->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//GetMesh()->SetSkeletalMesh();
 }
 
-void ATargetCharacter::dead()
+void ASRTargetCharacter::dead()
 {
 	Destroy();
 }
 
 // Called every frame
-void ATargetCharacter::Tick(float DeltaTime)
+void ASRTargetCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if(mEndLocation != mStartLocation &&  mbIsMovable)
@@ -134,13 +129,10 @@ void ATargetCharacter::Tick(float DeltaTime)
 		{
 			auto pos = mEndLocation - GetActorLocation();
 			auto loss = pos;
-			UE_LOG(LogTemp, Warning, TEXT("ATargetCharacter - Tick out : %f"), loss.Size());
 			pos.Normalize();
 			SetActorLocation(GetActorLocation() + pos * mSpeedFactor);
 			if (loss.Size() < 10.0f)
 			{
-		//		UE_LOG(LogTemp, Warning, TEXT("ATargetCharacter - Tick in : %f"), loss.Size());
-
 				mbIsReturn = !mbIsReturn;
 			}
 		}
@@ -152,67 +144,21 @@ void ATargetCharacter::Tick(float DeltaTime)
 			SetActorLocation(GetActorLocation() - pos * mSpeedFactor);
 			if (loss.Size() < 10.0f)
 			{
-				//		UE_LOG(LogTemp, Warning, TEXT("ATargetCharacter - Tick in : %f"), loss.Size());
-
 				mbIsReturn = !mbIsReturn;
 			}
 		}
 
-
 	}
 
-	//static float sumDistance = 0.0f;
-	//if (mbIsMovable)
-	//{
-	//	if(mbIsReturn == false)
-	//	{
-
-	//		if (sumDistance >= mDistance)
-	//		{
-	//			sumDistance = 0.0f;
-	//			mbIsReturn = true;
-	//		}
-
-	//		SetActorLocation(GetActorLocation() + mDirection * mSpeedFactor);
-	//		//FVector equels(0.1f, 0.1f, 0.1f);
-	//		sumDistance += mDirection.Size() * mSpeedFactor;
-	//	}
-	//	else
-	//	{
-	//		if (sumDistance >= mDistance)
-	//		{
-	//			//UE_LOG(LogTemp, Warning, TEXT("arrived to startpoint"));
-	//			sumDistance = 0.0f;
-	//			mbIsReturn = false;
-	//		}
-
-	//		SetActorLocation(GetActorLocation() + mDirection * mSpeedFactor);
-	//		sumDistance += mDirection.Size() * mSpeedFactor;
-
-	//	}
-	//}
-
-	//if(GetActorLocation().X > 1500.0f)
-	//{
-	//	SetActorLocation(mStartLocation);
-	//}
 }
 
-//// Called to bind functionality to input
-//void ATargetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-//{
-//	Super::SetupPlayerInputComponent(PlayerInputComponent);
-//
-//}
-
-void ATargetCharacter::SetTargetType(bool isCharacterType)
+void ASRTargetCharacter::SetTargetType(bool isCharacterType)
 {
 	mbIsCharacterType = isCharacterType;
 	if(mbIsCharacterType)
 	{
 		GetMesh()->SetSkeletalMesh(mCharacterMesh);
 		mHead->SetSphereRadius(13.5f);
-		//mHead->SetRelativeLocation(FVector(2.041100f, 6.557510f, 163.0f));
 		mHead->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("S_Head"));
 		// 캐릭터 포즈가 앉을 수 있는 스폰포인트이면 랜덤으로 포즈를 정함.
 		if(mbCanCrouch)
@@ -228,7 +174,6 @@ void ATargetCharacter::SetTargetType(bool isCharacterType)
 	{
 		GetMesh()->SetSkeletalMesh(mPlateMesh);
 		mHead->SetSphereRadius(18.0f);
-	//	mHead->SetRelativeLocation(FVector(2.437271, 0.000015, 71.346024));
 		mHead->SetRelativeLocation(FVector(2.437271f, 0.000015f, 155.0f));
 	}
 	mHead->SetCollisionObjectType(ECC_Pawn);
@@ -237,7 +182,7 @@ void ATargetCharacter::SetTargetType(bool isCharacterType)
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
-void ATargetCharacter::ActiveTarget()
+void ASRTargetCharacter::ActiveTarget()
 {
 	mbIsDown = false;
 	mHP = 100;
@@ -265,15 +210,12 @@ void ATargetCharacter::ActiveTarget()
 
 }
 
-void ATargetCharacter::BindTargetManager(ASRTargetManager* targetManager)
+void ASRTargetCharacter::BindTargetManager(ASRTargetManager* targetManager)
 {
-	//mOnTargetDown.AddUObject(targetManager, &ASRTargetManager::RandomTargetActive);
 	mOnTargetDown.AddUObject(targetManager, &ASRTargetManager::RandomTargetSpawn);
-
-	
 }
 
-void ATargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
+void ASRTargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
 {
 	mOnTargetDown.AddUObject(spawnPoint, &ASRSpawnPoint::DeActive);
 }
@@ -284,14 +226,14 @@ void ATargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
  *	타겟이 다운되면 true, 그렇지 않으면 false를 반환합니다.
  *	타겟은 다운시 타겟매니저에게 알립니다.
  */
-bool ATargetCharacter::OnHit(int32 damage, int32* scoreOut)
+bool ASRTargetCharacter::OnHit(int32 damage, int32* scoreOut)
 {
 
 	if(mHP > 0)
 	{
 		mHP -= damage;
 		*scoreOut = mHitScore;
-		UE_LOG(LogTemp, Warning, TEXT("ATargetCharacter :OnHit HP[%d]"), mHP);
+		UE_LOG(LogTemp, Warning, TEXT("ASRTargetCharacter :OnHit HP[%d]"), mHP);
 
 		if (!mbIsCharacterType)
 		{
@@ -328,7 +270,7 @@ bool ATargetCharacter::OnHit(int32 damage, int32* scoreOut)
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		mHead->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		mOnTargetDown.Broadcast();
-		GetWorld()->GetTimerManager().SetTimer(mDeathTimer, this, &ATargetCharacter::dead, 3.0f, false,-1);
+		GetWorld()->GetTimerManager().SetTimer(mDeathTimer, this, &ASRTargetCharacter::dead, 3.0f, false,-1);
 
 		if(mbIsMovable)
 		{
@@ -340,7 +282,7 @@ bool ATargetCharacter::OnHit(int32 damage, int32* scoreOut)
 	return false;
 }
 
-int32 ATargetCharacter::GetHP()
+int32 ASRTargetCharacter::GetHP()
 {
 	return mHP;
 }
@@ -348,36 +290,35 @@ int32 ATargetCharacter::GetHP()
 /*
  * 타겟이 활성화 상태인지 아닌지를 반환합니다.
  */
-bool ATargetCharacter::IsActive()
+bool ASRTargetCharacter::IsActive()
 {
 	return !mbIsDown;
 }
 
-void ATargetCharacter::SetEndLocation(float distance, EMovableAxis direction)
+void ASRTargetCharacter::SetEndLocation(float distance, EMovableAxis direction)
 {
 	mDistance = distance;
 
 	if(direction == EMovableAxis::X)
 	{
 		mEndLocation.X += distance;
-		UE_LOG(LogTemp, Warning, TEXT("ATargetCharacter - SetEndLocation : X , distance %f"), mDistance);
+		UE_LOG(LogTemp, Warning, TEXT("ASRTargetCharacter - SetEndLocation : X , distance %f"), mDistance);
 	}
 	else
 	{
 		mEndLocation.Y += distance;
-		UE_LOG(LogTemp, Warning, TEXT("ATargetCharacter - SetEndLocation : Y , distance %f"), mDistance);
+		UE_LOG(LogTemp, Warning, TEXT("ASRTargetCharacter - SetEndLocation : Y , distance %f"), mDistance);
 	}
 	mDirection = mEndLocation - GetActorLocation();
 	mDirection.Normalize();
-	//UE_LOG(LogTemp, Warning, TEXT("ATargetCharacter - SetEndLocation : nomalize = %f %f %f"), a.X, a.Y, a.Z );
 }
 
-void ATargetCharacter::SetMovable(bool isMovable)
+void ASRTargetCharacter::SetMovable(bool isMovable)
 {
 	mbIsMovable = isMovable;
 }
 
-void ATargetCharacter::SetSpeed(float newSpeed)
+void ASRTargetCharacter::SetSpeed(float newSpeed)
 {
 	if(newSpeed >= 1.0f)
 	{
@@ -389,7 +330,7 @@ void ATargetCharacter::SetSpeed(float newSpeed)
 	}
 }
 
-void ATargetCharacter::SetCrouchable(bool canCrouch)
+void ASRTargetCharacter::SetCrouchable(bool canCrouch)
 {
 	mbCanCrouch = canCrouch;
 }

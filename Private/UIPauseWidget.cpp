@@ -2,9 +2,9 @@
 
 #include "UIPauseWidget.h"
 #include <string>
-#include "CharacterPlayerController.h"
+#include "SRPlayerController.h"
 #include "UIHUDWidget.h"
-#include "VersionCharacter.h"
+#include "SRPlayerCharacter.h"
 #include "Components/Button.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableText.h"
@@ -13,7 +13,7 @@
 
 void UUIPauseWidget::OnResumeClicked()
 {
-	auto playerController = Cast<ACharacterPlayerController>(GetOwningPlayer());
+	auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 
 	RemoveFromParent();
 	playerController->ChangeInputMode(true);
@@ -24,21 +24,21 @@ void UUIPauseWidget::OnResumeClicked()
 
 void UUIPauseWidget::OnRetryClicked()
 {
-	auto playerController = Cast<ACharacterPlayerController>(GetOwningPlayer());
+	auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->ClearCountDown();
 	playerController->RestartLevel();
 }
 
 void UUIPauseWidget::OnReturnMenuClicked()
 {
-	auto playerController = Cast<ACharacterPlayerController>(GetOwningPlayer());
+	auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->ClearCountDown();
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("MainMenu"));
 }
 
-void UUIPauseWidget::onChangeHipX(const FText& InText, ETextCommit::Type InCommitType)
+void UUIPauseWidget::onChangeHip_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
@@ -54,9 +54,9 @@ void UUIPauseWidget::onChangeHipX(const FText& InText, ETextCommit::Type InCommi
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
-void UUIPauseWidget::onChangeHipY(const FText& InText, ETextCommit::Type InCommitType)
+void UUIPauseWidget::onChangeHip_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
 	{
@@ -71,9 +71,9 @@ void UUIPauseWidget::onChangeHipY(const FText& InText, ETextCommit::Type InCommi
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
-void UUIPauseWidget::onChangeOpticX(const FText& InText, ETextCommit::Type InCommitType)
+void UUIPauseWidget::onChangeScope1X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
 	{
@@ -88,9 +88,9 @@ void UUIPauseWidget::onChangeOpticX(const FText& InText, ETextCommit::Type InCom
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
-void UUIPauseWidget::onChangeOpticY(const FText& InText, ETextCommit::Type InCommitType)
+void UUIPauseWidget::onChangeScope1X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue))
 	{
@@ -105,9 +105,9 @@ void UUIPauseWidget::onChangeOpticY(const FText& InText, ETextCommit::Type InCom
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
-void UUIPauseWidget::onChangeACOGX(const FText& InText, ETextCommit::Type InCommitType)
+void UUIPauseWidget::onChangeScope2dot5X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
 	{
@@ -122,9 +122,9 @@ void UUIPauseWidget::onChangeACOGX(const FText& InText, ETextCommit::Type InComm
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
-void UUIPauseWidget::onChangeACOGY(const FText& InText, ETextCommit::Type InCommitType)
+void UUIPauseWidget::onChangeScope2dot5X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
 	{
@@ -139,9 +139,9 @@ void UUIPauseWidget::onChangeACOGY(const FText& InText, ETextCommit::Type InComm
 
 }
 
-void UUIPauseWidget::onChangeScopeX(const FText& InText, ETextCommit::Type InCommitType)
+void UUIPauseWidget::onChangeScope6X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue))
 	{
@@ -155,9 +155,9 @@ void UUIPauseWidget::onChangeScopeX(const FText& InText, ETextCommit::Type InCom
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
-void UUIPauseWidget::onChangeScopeY(const FText& InText, ETextCommit::Type InCommitType)
+void UUIPauseWidget::onChangeScope6X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue))
 	{
@@ -174,7 +174,7 @@ void UUIPauseWidget::onChangeScopeY(const FText& InText, ETextCommit::Type InCom
 
 void UUIPauseWidget::onHoldClicked()
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	player->SetAimToggleOrHold(EAimingType::Hold);
 
 	btnHold->SetIsEnabled(false);
@@ -186,7 +186,7 @@ void UUIPauseWidget::onHoldClicked()
 
 void UUIPauseWidget::onToggleClicked()
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	player->SetAimToggleOrHold(EAimingType::Toggle);
 
 	btnHold->SetIsEnabled(true);
@@ -198,7 +198,7 @@ void UUIPauseWidget::onToggleClicked()
 
 void UUIPauseWidget::onDebugChecked(bool active)
 {
-	auto playerController = Cast<ACharacterPlayerController>(GetOwningPlayer());
+	auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->SetDebugMode(active);
 }
 
@@ -225,8 +225,8 @@ bool UUIPauseWidget::StringToInteger(const FText& InText, int32* int_Out)
 
 void UUIPauseWidget::UpdateInfoWhenOpen()
 {
-	auto player = Cast<AVersionCharacter>(GetOwningPlayerPawn());
-	auto playerController = Cast<ACharacterPlayerController>(GetOwningPlayer());
+	auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 
 	mHipX->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipX)));
 	mHipY->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipY)));
@@ -287,14 +287,14 @@ void UUIPauseWidget::NativeConstruct()
 	btnHold->OnClicked.AddDynamic(this, &UUIPauseWidget::onHoldClicked);
 	btnToggle->OnClicked.AddDynamic(this, &UUIPauseWidget::onToggleClicked);
 
-	mHipX->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeHipX);
-	mHipY->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeHipY);
-	mScope1X_X->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeOpticX);
-	mScope1X_Y->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeOpticY);
-	mScope2dot5X_X->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeACOGX);
-	mScope2dot5X_Y->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeACOGY);
-	mScope6X_X->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeScopeX);
-	mScope6X_Y->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeScopeY);
+	mHipX->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeHip_X);
+	mHipY->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeHip_Y);
+	mScope1X_X->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeScope1X_X);
+	mScope1X_Y->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeScope1X_Y);
+	mScope2dot5X_X->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeScope2dot5X_X);
+	mScope2dot5X_Y->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeScope2dot5X_Y);
+	mScope6X_X->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeScope6X_X);
+	mScope6X_Y->OnTextCommitted.AddDynamic(this, &UUIPauseWidget::onChangeScope6X_Y);
 
 	mDebugMode->OnCheckStateChanged.AddDynamic(this, &UUIPauseWidget::onDebugChecked);
 

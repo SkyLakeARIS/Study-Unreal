@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SelectWidget.h"
+#include "UISelectWidget.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -9,7 +9,6 @@
 void USelectWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	//BtnDev = Cast<UButton>(GetWidgetFromName(TEXT("Btn_Dev")));
 	BtnShortRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_ShortRange")));
 	BtnMidRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MidRange")));
 	BtnLongRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_LongRange")));
@@ -17,8 +16,6 @@ void USelectWidget::NativeConstruct()
 	BtnMovableShortRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableShortRange")));
 	BtnMovableMidRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableMidRange")));
 	BtnMovableLongRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableLongRange")));
-
-	//BtnDev->OnClicked.AddDynamic(this, &USelectWidget::OnDevClicked);
 
 	BtnShortRange->OnClicked.AddDynamic(this, &USelectWidget::OnShortRangeClicked);
 	BtnMidRange->OnClicked.AddDynamic(this, &USelectWidget::OnMidRangeClicked);

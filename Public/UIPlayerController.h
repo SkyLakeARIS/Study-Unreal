@@ -6,8 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "UIPlayerController.generated.h"
 
-/**
- * 
+
+/*
+ * 블루프린트 UI위젯에 사용되는 플레이어 컨트롤러 클래스입니다.
  */
 
 UCLASS()
@@ -25,5 +26,4 @@ protected:
 	UPROPERTY()
 	UUserWidget* UIWidgetInstance;	// esc key == pause game
 
-	
 };

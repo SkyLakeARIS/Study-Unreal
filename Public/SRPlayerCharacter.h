@@ -2,23 +2,27 @@
 
 #pragma once
 
-#include <atomic>
 #include "Version.h"
 #include "GameModeData.h"
 #include "GameFramework/Character.h"
-#include "VersionCharacter.generated.h"
+#include "SRPlayerCharacter.generated.h"
 
 
 
 enum class EHitType : uint8;
-class UADAnimInstance;
+class USRAnimInstance;
+
+/*
+ * 플레이어 캐릭터 클래스입니다.
+ */
+
 UCLASS(config=Game)
-class AVersionCharacter : public ACharacter
+class ASRPlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	AVersionCharacter();
+	ASRPlayerCharacter();
 
 	virtual void PossessedBy(AController* NewController) override;
 
@@ -50,7 +54,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsNeedBoltAction() const;
 	UFUNCTION(BlueprintPure)
-	bool IsFire() const;
+	bool IsFiring() const;
 	UFUNCTION(BlueprintPure)
 	bool IsEmptyMag() const;
 	UFUNCTION(BlueprintPure)
@@ -74,19 +78,7 @@ public:
 	void SaveInGameSetting();
 	void LoadInGameSetting();
 
-	UFUNCTION(BlueprintCallable)
-	void SetCanNotFire() {
-		mbCanFire = false;
-		atomic_thread_fence(std::memory_order_seq_cst);
-	}
 protected:
-
-	void boltactionDelay() {
-		mbCanFire = true;
-		atomic_thread_fence(std::memory_order_seq_cst);
-		mbNeedBoltAction = false;
-		atomic_thread_fence(std::memory_order_seq_cst);
-	}
 
 	virtual void BeginPlay() override;
 
@@ -108,6 +100,9 @@ protected:
 	void SetAim();
 	void SetHip();
 
+	void endBehaviorDelay();
+	void endWeaponDelay();
+
 	void MoveForward(float Val);
 	void MoveRight(float Val);
 	void TurnAtRate(float Rate);
@@ -115,7 +110,7 @@ protected:
 
 public:
 
-	FMouseSensitivity MouseSetting;
+	FMouseSensitivity MouseSetting;	// make getter, move protected
 
 protected:
 
@@ -125,12 +120,16 @@ protected:
 	UCameraComponent* mFirstPersonCameraComponent;
 
 	UPROPERTY(BlueprintReadOnly)
-	UADAnimInstance* mTutAnimInstance;
+	USRAnimInstance* mTutAnimInstance;
+
 	UPROPERTY()
-	class ACharacterPlayerController* mPlayerController;
+	class ASRPlayerController* mPlayerController;
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AVersionProjectile> mProjectileClass;
+	TSubclassOf<class ASRProjectile> mProjectileClass;
+
+
+	// UI
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
 	TSubclassOf<UUserWidget> mCrossHairClass;
@@ -153,12 +152,19 @@ protected:
 	UPROPERTY()
 	UUserWidget* mKillMark;
 
+	EHitType mCurrentMark;
+	FTimerHandle mHitMarkTimer;
 
-	FGameModeData mGameModeData;
 
 	/*
-	 *  Weapons and sights
+	 *  Weapon and scope
 	 */
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponData)
+	TSubclassOf<class ASRWeapon> mWeaponDataClass;
+	UPROPERTY()
+	ASRWeapon* mWeaponData;
+
 	UPROPERTY()
 	USkeletalMeshComponent* mWeapon;
 	UPROPERTY()
@@ -167,7 +173,7 @@ protected:
 	FString mScopeLocationSocketName;
 	FString mWeaponLocationSocketName;
 
-	// sounds
+	// sounds and effect
 	UPROPERTY()
 	USoundBase* mFireSound;
 	UPROPERTY()
@@ -178,51 +184,49 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon | Effect")
 	class UParticleSystem* mMuzzleParticles;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponData)
-	TSubclassOf<class ASRWeapon> mWeaponDataClass;
 
-	UPROPERTY()
-	ASRWeapon* mWeaponData;
-
-private:
+	// game mode data
+	FGameModeData mGameModeData;
 
 	EAimingType mAimingType;
 
-	// UI
-	EHitType mCurrentMark;
-	FTimerHandle mHitMarkTimer;
+
+	// character state
+	FTimerHandle mBehaviorDelayTimer;
+	const short CAN_BEHAVIOR = 1;
+	const short CAN_NOT_BEHAVIOR = 0;
+	short mBehaviorFlag;				// idle을 제외한 어떤 행동을 하고 있으면 다른 행동을 시도하는것을 막기 위한 flag입니다. flag : CAN_BEHAVIOR, CAN_NOT_BEHAVIOR
 
 	/*
 	 *  Gun state
 	 */
-	volatile bool mbNeedBoltAction;
-	volatile bool mbIsEmptyMag;		// full reload || reload
-	bool mbIsAiming;
-	volatile bool mbFiring;			// true - fire, false - non fire
-	std::atomic<bool> mbCanFire;			// false - reload  or need boltaction
-	volatile bool mbIsReload;
-	float mSumPitch;
+
+	const short CAN_FIRE = 1;
+	const short CAN_NOT_FIRE = 0;
+	short mFireFlag;		// 하나의 스레드만 접근하도록 하기위한  flag 변수입니다. flag : CAN_FIRE, CAN_NOT_FIRE
+	bool mbNeedBoltAction;	// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
+	bool mbIsEmptyMag;		// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
+	bool mbIsAiming;		// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
+	bool mbFiring;			// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
+	bool mbIsReload;		// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
+	EWaeponFireMode mFireMode;
+
 	/*
 	 *  Gun info
 	 */
+	FTimerHandle mFireDelayTimer;
+	FTimerHandle mBurstFireTimer;
+	const int FIRE_SWITCH_MODE = 3;
+	int32 mFireModeOffset;
 	int32 mMaxMagAmount;
 	int32 mRemainAmmo;
-	int32 CurrentBurst;
-	float mARFireRate;
+	int32 mCurrentBurst;
+	float mFireDelay;
 
 	// gun recoil
 	float mRecoilFactor;
 	bool mFirstShot;
 	int32 mContinuousShots;
-
-	FTimerHandle TimerHandle_BurstMode;
-	FTimerHandle TimerHandle_FullAutoMode;
-	FTimerHandle mBoltActionTimer;
-	FTimerHandle mReloadDelayTimer; // 애니메이션 추가전까지 임시로 사용하는 변수
-
-	EWaeponFireMode mCurrentFireMode;
-	int32 FIRE_SWITCH_MODE;
-	int32 FireModeOffset;
 
 };
 

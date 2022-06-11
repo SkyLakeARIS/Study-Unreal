@@ -4,17 +4,17 @@
 #include "Version.h"
 #include "GameModeData.h"
 #include "GameFramework/GameModeBase.h"
-#include "InGameMode.generated.h"
+#include "SRShortRangeGameMode.generated.h"
 
-/**
- * 
+/*
+ * ShortRange 고정형 맵을 선택할 때의 게임모드입니다.
  */
 UCLASS()
-class VERSION_API AInGameMode : public AGameModeBase
+class VERSION_API ASRShortRangeGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
-	AInGameMode();
+	ASRShortRangeGameMode();
 	
 	virtual void PostInitializeComponents() override;
 
@@ -27,5 +27,5 @@ private:
 private:
 	EGameModeType mGameModeType;
 	UPROPERTY()
-	class ACharacterPlayerController* playerController;
+	class ASRPlayerController* playerController;
 };

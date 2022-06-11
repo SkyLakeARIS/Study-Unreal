@@ -3,8 +3,6 @@
 
 #include "SRWeapon.h"
 
-#include "VersionCharacter.h"
-
 // Sets default values
 ASRWeapon::ASRWeapon()
 {

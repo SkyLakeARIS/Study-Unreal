@@ -7,6 +7,13 @@
 #include "GameFramework/Actor.h"
 #include "SRWeapon.generated.h"
 
+
+/*
+ * 무기 클래스입니다.
+ * 게임을 시작하기 전에 선택된 무기 정보를 통해서
+ * 해당 무기나 조준경등 게임모드를 통해서 적절한 데이터를 반환합니다.
+ */
+
 UCLASS()
 class VERSION_API ASRWeapon : public AActor
 {

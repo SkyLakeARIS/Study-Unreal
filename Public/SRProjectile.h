@@ -5,7 +5,8 @@
 #include "GameModeData.h"
 #include "SRPlayerState.h"
 #include "GameFramework/Actor.h"
-#include "VersionProjectile.generated.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "SRProjectile.generated.h"
 
 enum class EWeaponType : uint8;
 
@@ -24,14 +25,20 @@ enum class EHitType : uint8
 	Kill
 };
 
+
+/*
+ * 각 총알들의 부모 클래스입니다.
+ * 충돌처리, 점수처리는 부모에서 처리합니다.
+ */
+
 UCLASS(config=Game)
-class AVersionProjectile : public AActor
+class ASRProjectile : public AActor
 {
 	GENERATED_BODY()
 
 public:
 
-	AVersionProjectile();
+	ASRProjectile();
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -59,17 +66,21 @@ protected:
 protected:
 	FOnHitTarget onHitAndUpdateAcc;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UParticleSystem* ImpactParticles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UParticleSystem* mBulletTrace;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	USphereComponent* CollisionComp;
 
 private:
 
 	bool mbDebugMode;
-	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	USphereComponent* CollisionComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
 
 	FVector mStartLocation;
 	FOnUpdateScore mOnUpdateScore;

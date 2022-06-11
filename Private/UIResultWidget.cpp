@@ -2,7 +2,7 @@
 
 
 #include "UIResultWidget.h"
-#include "CharacterPlayerController.h"
+#include "SRPlayerController.h"
 #include "SRPlayerState.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -33,7 +33,7 @@ void UUIResultWidget::NativeConstruct()
 
 void UUIResultWidget::onRetryClicked()
 {
-	auto playerController = Cast<ACharacterPlayerController>(GetOwningPlayer());
+	auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->RestartLevel();
 }
 

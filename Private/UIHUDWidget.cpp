@@ -3,7 +3,7 @@
 
 #include "UIHUDWidget.h"
 #include "Components/TextBlock.h"
-#include "VersionCharacter.h"
+#include "SRPlayerCharacter.h"
 
 
 void UUIHUDWidget::NativeConstruct()

@@ -9,9 +9,14 @@ class UCheckBox;
 class UEditableText;
 class UTextBlock;
 class UButton;
-/**
- *   ESC�� ������ ����ϴ� Menu UI Ŭ���� - �������Ʈ ����
+
+
+/*
+ * 일시정지시 표시되는 UI 입니다.
+ * 인게임 설정을 할 수 있습니다.
+ * 조준경별 마우스 감도, 조준 설정(hold, toggle)
  */
+
 UCLASS()
 class VERSION_API UUIPauseWidget : public UUserWidget
 {
@@ -33,24 +38,24 @@ protected:
 	void OnReturnMenuClicked();
 
 	UFUNCTION()
-	void onChangeHipX(const FText& InText, ETextCommit::Type InCommitType);
+	void onChangeHip_X(const FText& InText, ETextCommit::Type InCommitType);
 	UFUNCTION()
-	void onChangeHipY(const FText& InText, ETextCommit::Type InCommitType);
+	void onChangeHip_Y(const FText& InText, ETextCommit::Type InCommitType);
 
 	UFUNCTION()
-	void onChangeOpticX(const FText& InText, ETextCommit::Type InCommitType);
+	void onChangeScope1X_X(const FText& InText, ETextCommit::Type InCommitType);
 	UFUNCTION()
-	void onChangeOpticY(const FText& InText, ETextCommit::Type InCommitType);
+	void onChangeScope1X_Y(const FText& InText, ETextCommit::Type InCommitType);
 
 	UFUNCTION()
-	void onChangeACOGX(const FText& InText, ETextCommit::Type InCommitType);
+	void onChangeScope2dot5X_X(const FText& InText, ETextCommit::Type InCommitType);
 	UFUNCTION()
-	void onChangeACOGY(const FText& InText, ETextCommit::Type InCommitType);
+	void onChangeScope2dot5X_Y(const FText& InText, ETextCommit::Type InCommitType);
 
 	UFUNCTION()
-	void onChangeScopeX(const FText& InText, ETextCommit::Type InCommitType);
+	void onChangeScope6X_X(const FText& InText, ETextCommit::Type InCommitType);
 	UFUNCTION()
-	void onChangeScopeY(const FText& InText, ETextCommit::Type InCommitType);
+	void onChangeScope6X_Y(const FText& InText, ETextCommit::Type InCommitType);
 
 	UFUNCTION()
 	void onHoldClicked();

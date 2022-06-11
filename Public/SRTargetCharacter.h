@@ -4,29 +4,31 @@
 
 #include "Version.h"
 #include "GameFramework/Character.h"
-#include "TargetCharacter.generated.h"
+#include "SRTargetCharacter.generated.h"
 
 
 enum class EMovableAxis : uint8;
 class ASRTargetManager;
 DECLARE_MULTICAST_DELEGATE(FOnTargetDown)
 
+
+/*
+ * 타겟 클래스입니다.
+ * 맵에 배치된 스폰 포인트에서 타겟 매니저에 의해 생성됩니다.
+ * 타겟 매니저가 주는 정보대로 초기화됩니다.
+ */
+
 UCLASS()
-class VERSION_API ATargetCharacter : public ACharacter
+class VERSION_API ASRTargetCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ATargetCharacter();
+	ASRTargetCharacter();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	//// Called to bind functionality to input
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	//virtual void PostInitializeComponents() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetTargetType(bool isCharacterType);
@@ -69,9 +71,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	USphereComponent* mHead;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector mStartLocation;
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector mEndLocation;
 
 	// character type

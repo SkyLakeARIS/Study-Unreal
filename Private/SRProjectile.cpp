@@ -1,16 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "VersionProjectile.h"
+#include "SRProjectile.h"
 
-#include "CharacterPlayerController.h"
+#include "SRPlayerController.h"
 #include "DrawDebugHelpers.h"
-#include "TargetCharacter.h"
-#include "VersionCharacter.h"
-
+#include "SRTargetCharacter.h"
+#include "SRPlayerCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
-AVersionProjectile::AVersionProjectile() 
+ASRProjectile::ASRProjectile() 
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -18,41 +17,44 @@ AVersionProjectile::AVersionProjectile()
 	CollisionComp->InitSphereRadius(1.0f);
 	CollisionComp->SetWorldScale3D(FVector(0.1f, 0.1f, 0.1f));
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentHit.AddDynamic(this, &AVersionProjectile::OnHit);		// set up a notification for when this component hits something blocking
+	CollisionComp->OnComponentHit.AddDynamic(this, &ASRProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
 
 	RootComponent = CollisionComp;
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 75000.f;
-	ProjectileMovement->MaxSpeed = 360000.f;
-	ProjectileMovement->bRotationFollowsVelocity = false;
-	ProjectileMovement->bShouldBounce = false;
-	// Die after 3 seconds by default
+
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> PS_TRACER(TEXT("/Game/MilitaryWeapDark/FX/P_Pistol_Tracer_01.P_Pistol_Tracer_01"));
+	if(PS_TRACER.Succeeded())
+	{
+		mBulletTrace = PS_TRACER.Object;
+	}
+
 	InitialLifeSpan = 10.0f;
 	mbIsCollision = false;
 	mbIsTargetHit = false;
 	mbDebugMode = false;
 }
 
-void AVersionProjectile::Tick(float DeltaTime)
+void ASRProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (mbIsCollision == false && mbDebugMode)
 	{
 		DrawDebugPoint(GetWorld(), GetActorLocation(), 5.0f, FColor::Green, false, 15.0f);
 	}
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), mBulletTrace, FTransform(GetActorRotation(), GetActorLocation()));
 }
 
-void AVersionProjectile::BeginPlay()
+void ASRProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-void AVersionProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	mbIsCollision = true;
 
@@ -67,11 +69,11 @@ void AVersionProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 		mHitType = EHitType::Hit;
 	}
 
-	AVersionCharacter* character = nullptr;
+	ASRPlayerCharacter* character = nullptr;
 	
 	if(mbIsTargetHit)
 	{
-		character = Cast<AVersionCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		character = Cast<ASRPlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 
 		// 1이 cm라는 가정하에 50미터마다 데미지가 1씩 감소합니다. 데미지 감소는 최솟값 미만이 되지 않습니다.
@@ -89,7 +91,7 @@ void AVersionProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 				mBulletDamage = FMath::Clamp(mBulletDamage, mDamageTable.HG_Min, mDamageTable.HG);
 				break;
 			default:
-				UE_LOG(LogTemp, Warning, TEXT("AVersionProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
+				UE_LOG(LogTemp, Warning, TEXT("ASRProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
 				break;
 		}
 		UE_LOG(LogTemp, Warning, TEXT("OnHit - distance: %f, bullet damage : %d"), distanceToHitPoint, mBulletDamage);
@@ -103,7 +105,7 @@ void AVersionProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 
 		}
 		int32 getScore = 0;
-		const auto targetCharacter = Cast<ATargetCharacter>(Hit.GetActor());
+		const auto targetCharacter = Cast<ASRTargetCharacter>(Hit.GetActor());
 		const bool bIsKill = targetCharacter->OnHit(mBulletDamage, &getScore);
 
 		getScore = mbIsHeadshot ? getScore * 1.5f : getScore;
@@ -124,7 +126,7 @@ void AVersionProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
  * playerstate와 정보를 바인드합니다.(delegate)
  * 대상 정보: Hit count, accuracy, score, kill count
  */
-void AVersionProjectile::BindPlayerStateInfo(ASRPlayerState* srPlayerState)
+void ASRProjectile::BindPlayerStateInfo(ASRPlayerState* srPlayerState)
 {
 	onHitAndUpdateAcc.BindUObject(srPlayerState, &ASRPlayerState::OnHitCount);
 	mOnUpdateScore.BindUObject(srPlayerState, &ASRPlayerState::OnAddScore);
@@ -135,7 +137,7 @@ void AVersionProjectile::BindPlayerStateInfo(ASRPlayerState* srPlayerState)
  * 발사된 총알의 타입을 무기타입으로부터 정하는 함수입니다.
  * 총알의 타입을 정하고 그에맞는 총알의 속도와 데미지를 정합니다.
  */
-void AVersionProjectile::SetBulletType(EWeaponType gunType)
+void ASRProjectile::SetBulletType(EWeaponType gunType)
 {
 	mBulletType = gunType;
 	switch(mBulletType)
@@ -157,12 +159,12 @@ void AVersionProjectile::SetBulletType(EWeaponType gunType)
 	ProjectileMovement->MaxSpeed = 10000.f;
 }
 
-void AVersionProjectile::SetStartLocation(FVector location)
+void ASRProjectile::SetStartLocation(FVector location)
 {
 	mStartLocation = location;
 }
 
-void AVersionProjectile::SetDebugMode(bool active)
+void ASRProjectile::SetDebugMode(bool active)
 {
 	mbDebugMode = active;
 }

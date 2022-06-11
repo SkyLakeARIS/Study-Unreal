@@ -2,8 +2,8 @@
 
 
 #include "UISelectModesWidget.h"
-#include "CharacterPlayerController.h"
-#include "VersionCharacter.h"
+#include "SRPlayerController.h"
+#include "SRPlayerCharacter.h"
 #include "SRTargetManager.h"
 #include "Components/Button.h"
 #include "Engine/AssetManager.h"
@@ -43,9 +43,9 @@ void UUISelectModesWidget::NativeConstruct()
 	mbCanClickStart = false;
 }
 
-void UUISelectModesWidget::BindCharacterInfo(AVersionCharacter* character)
+void UUISelectModesWidget::BindCharacterInfo(ASRPlayerCharacter* character)
 {
-	mOnGameData.BindUObject(character, &AVersionCharacter::InitGameMode);
+	mOnGameData.BindUObject(character, &ASRPlayerCharacter::InitGameMode);
 	UE_LOG(LogTemp, Warning, TEXT("UI-Char : Bind End"));
 	mbCanClickStart = true;
 }
@@ -173,7 +173,6 @@ void UUISelectModesWidget::clickedStart()
 {
 	if(mbCanClickStart == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("not bind wait "));
 		return;
 	}
 	if( mbIsSelectWeapon &&
@@ -183,7 +182,7 @@ void UUISelectModesWidget::clickedStart()
 		)
 	{
 
-		auto playerController = Cast<ACharacterPlayerController>(GetOwningPlayer());
+		auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 		mOnGameData.Execute(mSelectedModes);
 		playerController->ShowInGameHUDAndStartTimer();
 		playerController->GetTargetManager()->SetTargetType(mbIsCharacterType);

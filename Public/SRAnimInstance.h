@@ -3,22 +3,24 @@
 #pragma once
 #include "Version.h"
 #include "Animation/AnimInstance.h"
-#include "ADAnimInstance.generated.h"
+#include "SRAnimInstance.generated.h"
 
-/**
- * 
+/*
+ *  플레이어 캐릭터 애님인스턴스.
+ *	블루프린트에서 사용할 ADS, IK 값을 계산합니다.
+ *	무기의 반동(sway, recoil)도 계산됩니다.
  */
 
 class UCurveVector;
-class AVersionCharacter;
+class ASRPlayerCharacter;
 
 UCLASS()
-class VERSION_API UADAnimInstance : public UAnimInstance
+class VERSION_API USRAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
 public:
-	UADAnimInstance();
+	USRAnimInstance();
 
 	virtual void NativeBeginPlay() override;
 
@@ -31,24 +33,21 @@ public:
 
 	void SetFiring(bool isFiring);
 
-	UFUNCTION(BlueprintCallable, Category = TUTO)
+	UFUNCTION(BlueprintCallable)
 	void Fire();
 
 	void RecoilStart();
-	//Needs to be called on event tick to update the control rotation.
 	UFUNCTION(BlueprintCallable)
 	void RecoilTick(float DeltaTime);
 
-	//Called when firing stops
 	UFUNCTION(BlueprintCallable)
 	void RecoilStop();
 
 	void Reload();
 
-	UFUNCTION(BlueprintCallable, Category = TUTO)
+	UFUNCTION(BlueprintCallable)
 	void StopReload();
-	UFUNCTION(BlueprintPure, Category = TUTO)
-	AVersionCharacter* GetCharacter1() const { return PlayerCharacter; }
+
 	void SetSightTransform();
 	void SetRelativeHandTransform();
 	void SetFinalHandTransform();
@@ -83,47 +82,47 @@ protected:
 
 public:
 
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
-	AVersionCharacter* PlayerCharacter;
+	UPROPERTY(BlueprintReadOnly)
+	ASRPlayerCharacter* PlayerCharacter;
 
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	FTransform RelativeHandTransform;
 
 	FTransform FinalHandTransform;
 
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	FTransform SightTransform;
 
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	FTransform LeftHandTransform;
 
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	float AimAlpha;
 
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	float ReloadAlpha;
 
 	// sway
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCurveVector* VectorCurve;
 
 	// recoil pattern
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = TUTO)
-		UCurveVector* RecoilCurve;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UCurveVector* RecoilCurve;
 
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	FVector SwayLocation;
 
 	// turn sway
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	FRotator TurnRotation;
 	FRotator OldRotation;
 
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	FVector TurnLocation;
 
 	// weapon recoil
-	UPROPERTY(BlueprintReadOnly, Category = TUTO)
+	UPROPERTY(BlueprintReadOnly)
 	FTransform RecoilTransform;
 
 	FTransform FinalRecoilTransform;
@@ -172,7 +171,7 @@ public:
 
 	//Player controller reference
 	UPROPERTY(BlueprintReadWrite)
-	class ACharacterPlayerController* mPlayerController;
+	class ASRPlayerController* mPlayerController;
 
 	UPROPERTY(BlueprintReadWrite)
 		float FireRate;

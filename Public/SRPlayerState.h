@@ -9,8 +9,10 @@
 class UUIHUDWidget;
 DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
 DECLARE_DELEGATE_OneParam(FOnUpdateAccuray, int32)
-/**
- * 
+
+/*
+ * 한 게임 동안 플레이어의 기록을 저장하는 전적 클래스입니다.
+ * 이 클래스의 정보들이 HUD에 표시됩니다.
  */
 UCLASS()
 class VERSION_API ASRPlayerState : public APlayerState

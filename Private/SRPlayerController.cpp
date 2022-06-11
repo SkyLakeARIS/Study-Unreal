@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CharacterPlayerController.h"
+#include "SRPlayerController.h"
 #include "SRPlayerState.h"
 #include "SRSpawnPoint.h"
 #include "SRTargetManager.h"
@@ -10,7 +10,7 @@
 #include "UIResultWidget.h"
 #include "UISelectModesWidget.h"
 
-ACharacterPlayerController::ACharacterPlayerController()
+ASRPlayerController::ASRPlayerController()
 {
 	static ConstructorHelpers::FClassFinder<UUIPauseWidget> UI_INGAMEMENU(TEXT("/Game/UI/UI_PauseMenu.UI_PauseMenu_C"));
 	if (UI_INGAMEMENU.Succeeded())
@@ -36,20 +36,21 @@ ACharacterPlayerController::ACharacterPlayerController()
 	mTimeToReady = 5;
 	mSensitivity = 45.0f;
 	mbDebugMode = false;
+	mbStartGame = false;
 }
 
-void ACharacterPlayerController::PostInitializeComponents()
+void ASRPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
 }
 
-void ACharacterPlayerController::OnPossess(APawn* InPawn)
+void ASRPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 }
 
-void ACharacterPlayerController::ChangeInputMode(bool bIsGameMode)
+void ASRPlayerController::ChangeInputMode(bool bIsGameMode)
 {
 	if (bIsGameMode)
 	{
@@ -63,68 +64,71 @@ void ACharacterPlayerController::ChangeInputMode(bool bIsGameMode)
 	}
 }
 
-void ACharacterPlayerController::ResumeCountDown()
+void ASRPlayerController::ResumeCountDown()
 {
 	GetWorld()->GetTimerManager().UnPauseTimer(THCountDown);
 }
 
-void ACharacterPlayerController::ClearCountDown()
+void ASRPlayerController::ClearCountDown()
 {
 	GetWorld()->GetTimerManager().ClearTimer(THCountDown);
 }
 
-void ACharacterPlayerController::BindStatToUI()
+void ASRPlayerController::BindStatToUI()
 {
 	mPlayerState->BindHUD(InGameHUD);
 }
 
-void ACharacterPlayerController::ShowInGameHUDAndStartTimer()
+void ASRPlayerController::ShowInGameHUDAndStartTimer()
 {
 	ChangeInputMode(true);
 	InGameHUD->SetVisibility(ESlateVisibility::Visible);
-	GetWorld()->GetTimerManager().SetTimer(THCountDown, this, &ACharacterPlayerController::countReadyTime, 1.0f, true, 0.0f);
+	GetWorld()->GetTimerManager().SetTimer(THCountDown, this, &ASRPlayerController::countReadyTime, 1.0f, true, 0.0f);
 }
 
-void ACharacterPlayerController::SetDebugMode(bool active)
+void ASRPlayerController::SetDebugMode(bool active)
 {
 	mbDebugMode = active;
 }
 
-bool ACharacterPlayerController::IsDebugging() const
+bool ASRPlayerController::IsDebugging() const
 {
 	return mbDebugMode;
 }
 
-ASRPlayerState* ACharacterPlayerController::GetPlayerState() const
+// 게임을 시작 했는지 여부를 반환합니다. (false - 준비 시간, true - 게임 시작)
+bool ASRPlayerController::IsStartMainGame() const
+{
+	return mbStartGame;
+}
+
+ASRPlayerState* ASRPlayerController::GetPlayerState() const
 {
 	return mPlayerState;
 }
 
-UUIHUDWidget* ACharacterPlayerController::GetIngameHUD() const
+UUIHUDWidget* ASRPlayerController::GetIngameHUD() const
 {
 	return InGameHUD;
 }
 
-UUISelectModesWidget* ACharacterPlayerController::GetSelectModesWidget() const
+UUISelectModesWidget* ASRPlayerController::GetSelectModesWidget() const
 {
 	return mSelectModesWidget;
 }
 
-ASRTargetManager* ACharacterPlayerController::GetTargetManager() const
+ASRTargetManager* ASRPlayerController::GetTargetManager() const
 {
 	return mTargetManager;
 }
 
-void ACharacterPlayerController::SetupInputComponent()
+void ASRPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	InputComponent->BindAction(TEXT("Pause"), EInputEvent::IE_Pressed, this, &ACharacterPlayerController::PauseGame);
-
-
-
+	InputComponent->BindAction(TEXT("Pause"), EInputEvent::IE_Pressed, this, &ASRPlayerController::PauseGame);
 }
 
-void ACharacterPlayerController::BeginPlay()
+void ASRPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -148,29 +152,9 @@ void ACharacterPlayerController::BeginPlay()
 
 	BindStatToUI();
 	mTargetManager = GetWorld()->SpawnActor<ASRTargetManager>(ASRTargetManager::StaticClass(), FVector::ZeroVector,  FRotator::ZeroRotator);
-	//// test for checking target movement.
-	//TArray<AActor*> list;
-	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASRSpawnPoint::StaticClass(), list);
-	//for(auto a : list)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"),a->GetActorLocation().X, a->GetActorLocation().Y, a->GetActorLocation().Z);
-	//}
-
-	//TArray<AActor*> targetlist;
-
-	//UGameplayStatics::GetAllActorsOfClass(GetWorld(),ATargetCharacter::StaticClass(), targetlist);
-	//auto b = Cast<ATargetCharacter>(targetlist[0]);
-	//b->SetIsMovable(true);
-	//b->SetEndLocation(list[1]->GetActorLocation());
-
-	//auto c = Cast<ATargetCharacter>(targetlist[1]);
-	//c->SetIsMovable(true);
-	//c->SetEndLocation(list[0]->GetActorLocation());
-	//
-
 }
 
-void ACharacterPlayerController::PauseGame()
+void ASRPlayerController::PauseGame()
 {
 	UE_LOG(LogTemp, Warning, TEXT("GamePuaue"));
 	InGameHUD->SetVisibility(ESlateVisibility::Hidden);
@@ -182,7 +166,7 @@ void ACharacterPlayerController::PauseGame()
 }
 
 
-void ACharacterPlayerController::countDownMainTime()
+void ASRPlayerController::countDownMainTime()
 {
 	--remainingTime;
 	InGameHUD->UpdateRemainingTime(remainingTime);
@@ -193,7 +177,7 @@ void ACharacterPlayerController::countDownMainTime()
 	}
 }
 
-void ACharacterPlayerController::countReadyTime()
+void ASRPlayerController::countReadyTime()
 {
 	--mTimeToReady;
 	InGameHUD->UpdateRemainingTime(mTimeToReady);
@@ -201,13 +185,13 @@ void ACharacterPlayerController::countReadyTime()
 	{
 		mTargetManager->RandomTargetSpawn();
 		mTargetManager->RandomTargetSpawn();
-
+		mbStartGame = true;
 		GetWorld()->GetTimerManager().ClearTimer(THCountDown);
-		GetWorld()->GetTimerManager().SetTimer(THCountDown, this, &ACharacterPlayerController::countDownMainTime, 1.0f, true, 0.0f);
+		GetWorld()->GetTimerManager().SetTimer(THCountDown, this, &ASRPlayerController::countDownMainTime, 1.0f, true, 0.0f);
 	}
 }
 
-void ACharacterPlayerController::result()
+void ASRPlayerController::result()
 {
 	InGameHUD->SetVisibility(ESlateVisibility::Hidden);
 	mResultWidget = CreateWidget<UUIResultWidget>(this, mReusltWidgetClass);

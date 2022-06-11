@@ -3,16 +3,16 @@
 
 #include "SRTargetManager.h"
 
-#include "InGameMode.h"
+#include "SRShortRangeGameMode.h"
 #include "SRMidRangeGameMode.h"
 #include "SRSpawnPoint.h"
-#include "TargetCharacter.h"
+#include "SRTargetCharacter.h"
 
 // Sets default values
 ASRTargetManager::ASRTargetManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	mbMovableTargetMode = false;
 	// random_device 를 통해 난수 생성 엔진을 초기화 합니다.
 	mGen.seed(mRandomDevice());
@@ -28,14 +28,6 @@ void ASRTargetManager::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("ASRTargetManager : BeginPlay - spawnpoint amount : [ %d ]"), mSpawnPointList.Num());
 
 
-	/*UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetCharacter::StaticClass(), mTargetList);
-	UE_LOG(LogTemp, Warning, TEXT("ASRTargetManager : BeginPlay - Target amount : [ %d ]"), mTargetList.Num());*/
-
-	//FTimerHandle timer;
-	//GetWorld()->GetTimerManager().SetTimer(timer, this, &ASRTargetManager::setTarget, 1.0f, false, 0.0f);
-
-	// 여기서 movable, char type, plat type 분류하기
-
 	for(auto spawner :mSpawnPointList)
 	{
 		auto castSpawner = Cast<ASRSpawnPoint>(spawner);
@@ -47,14 +39,6 @@ void ASRTargetManager::BeginPlay()
 	 		case ESpawnPointType::PlateType:
 				mPlateSpawnPointList.Add(castSpawner);
 				break;
-	 	//	case ESpawnPointType::Movable_Character_X:
-			//case ESpawnPointType::Movable_Character_Y:
-			//	mMovableCharacterSpawnPointList.Add(castSpawner);
-			//	break;
-	 	//	case ESpawnPointType::Movable_Plate_X:
-	 	//	case ESpawnPointType::Movable_Plate_Y:
-			//	mMovablePlateSpawnPointList.Add(castSpawner);
-			//	break;
 	 		default:
 				UE_LOG(LogTemp, Warning, TEXT("ASRTargetManager : BeginPlay - ESpawnPointType 올바르지 않은 enum 타입입니다."));
 	 	}
@@ -62,43 +46,13 @@ void ASRTargetManager::BeginPlay()
 
 }
 
-//
-//void ASRTargetManager::RandomTargetActive()
-//{
-//	bool bComplete = false;
-//	ATargetCharacter* target = nullptr;
-//
-//	//std::random_device rd;
-//	//std::mt19937 gen(rd());
-//	std::uniform_int_distribution<int> RNG(0, mTargetList.Num() - 1);
-//	do
-//	{
-//		target = Cast<ATargetCharacter>(mTargetList[RNG(mGen)]);
-//
-//		if(!target->IsActive())
-//		{
-//			bComplete = true;
-//		}
-//	} while (!bComplete);
-//
-//	target->ActiveTarget();
-//	UE_LOG(LogTemp, Warning, TEXT("ASRTargetManager : RandomTargetActive - Target Active : [ %s]"), *target->GetName());
-//
-//	// mbMovableTargetMode이 활성화이면 스폰포인트 설정해주기
-//}
-
 void ASRTargetManager::RandomTargetSpawn()
 {
 	bool bComplete = false;
 	ASRSpawnPoint* spawnPoint = nullptr;
 
-	//std::random_device rd;
-	//std::mt19937 gen(rd());
-
 	int32 amountSpawnPoint = mbIsCharacterType ? mCharacterSpawnPointList.Num() - 1 : mPlateSpawnPointList.Num() - 1;
 	std::uniform_int_distribution<int> RNG(0, amountSpawnPoint);
-
-	//std::uniform_int_distribution<int> RNG(0, mSpawnPointList.Num()-1);
 
 	// 해당 스폰 포인트에 타겟이 생성되어 있으면 다른 스폰포인트를 고릅니다.
 	do
@@ -112,8 +66,6 @@ void ASRTargetManager::RandomTargetSpawn()
 			spawnPoint = Cast<ASRSpawnPoint>(mPlateSpawnPointList[RNG(mGen)]);
 		}
 
-		//spawnPoint = Cast<ASRSpawnPoint>(mSpawnPointList[RNG(mGen)]);
-
 		if (!spawnPoint->IsActive())
 		{
 			bComplete = true;
@@ -123,7 +75,7 @@ void ASRTargetManager::RandomTargetSpawn()
 
 	FActorSpawnParameters rules;
 	rules.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	const auto target = GetWorld()->SpawnActor<ATargetCharacter>(spawnPoint->GetActorLocation(), spawnPoint->GetActorRotation(), rules);
+	const auto target = GetWorld()->SpawnActor<ASRTargetCharacter>(spawnPoint->GetActorLocation(), spawnPoint->GetActorRotation(), rules);
 
 	target->SetCrouchable(spawnPoint->IsCrouchable());
 	target->SetActorRotation(spawnPoint->GetActorRotation());
@@ -148,10 +100,12 @@ void ASRTargetManager::RandomTargetSpawn()
 		UE_LOG(LogTemp, Warning, TEXT("ASRTargetManager : RandomTargetSpawn - ESpawnPointType 올바르지 않은 enum 타입입니다."));
 	}
 
+	// 타겟 모드가 이동형일 때 처리됩니다.
 	if(mbMovableTargetMode)
 	{
 		target->SetMovable(true);
 
+		// 랜덤으로 지정 범위 내 값만큼 이동 거리를 결정합니다.
 		float randomDistance = 0.0f;
 		switch(mGameModeType)
 		{
@@ -194,50 +148,8 @@ void ASRTargetManager::SetMovableTargetMode(EGameModeType mode)
 	}
 }
 
-//void ASRTargetManager::SetMovableTargetMode(bool isMovable)
-//{
-//	mbMovableTargetMode = isMovable;
-//
-//	TArray<ASRSpawnPoint*> targetPointList;
-//	if(mbIsCharacterType)
-//	{
-//		targetPointList = mCharacterSpawnPointList;
-//	}
-//	else
-//	{
-//		targetPointList = mPlateSpawnPointList;
-//	}
-//
-//	for (auto targetPoint : targetPointList)
-//	{
-//		FVector locTargetPoint = targetPoint->GetActorLocation();
-//		ASRSpawnPoint* selectedEndPoint = nullptr;
-//		float distance = 10000.0f;
-//		for(auto movablePoint : mMovableSpawnPointList)
-//		{
-//			FVector locMovablePoint = movablePoint->GetActorLocation();
-//			float newDistance = (locTargetPoint - locMovablePoint).Size();
-//			if(distance > newDistance)
-//			{
-//				distance = newDistance;
-//				selectedEndPoint = movablePoint;
-//			}
-//		}
-//
-//	//	targetPoint->SetMovableEndLocation(selectedEndPoint->GetActorLocation());
-//	}
-//}
-
 void ASRTargetManager::SetTargetType(bool isCharacter)
 {
 	mbIsCharacterType = isCharacter;
-}
-
-
-// Called every frame
-void ASRTargetManager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

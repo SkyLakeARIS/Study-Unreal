@@ -13,9 +13,4 @@ class AVersionGameMode : public AGameModeBase
 public:
 	AVersionGameMode();
 
-	//UFUNCTION(BlueprintCallable, Category=TUTO)
-	//void SelectButton1();
-
-	//UFUNCTION(BlueprintCallable, Category=TUTO)
-	//void SelectButton2();
 };

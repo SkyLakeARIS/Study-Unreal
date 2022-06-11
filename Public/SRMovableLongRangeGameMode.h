@@ -7,8 +7,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "SRMovableLongRangeGameMode.generated.h"
 
-/**
- * 
+/*
+ * LongRange 이동형 맵을 선택할 때의 게임모드입니다.
  */
 UCLASS()
 class VERSION_API ASRMovableLongRangeGameMode : public AGameModeBase
@@ -28,5 +28,5 @@ private:
 private:
 	EGameModeType mGameModeType;
 	UPROPERTY()
-	class ACharacterPlayerController* playerController;
+	class ASRPlayerController* playerController;
 };

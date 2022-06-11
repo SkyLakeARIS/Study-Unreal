@@ -7,8 +7,10 @@
 #include "GameFramework/SaveGame.h"
 #include "SRInGameSetting.generated.h"
 
-/**
- * 
+/*
+ * 플레이어의 인게임 설정을 저장하는 클래스입니다.
+ * 조준 방식(hold, toggle), 조준경별 마우스 감도를 저장합니다.
+ * 슬롯이름과 번호는 고정되어 있습니다.
  */
 UCLASS()
 class VERSION_API USRInGameSetting : public USaveGame
@@ -25,6 +27,7 @@ public:
 	UPROPERTY()
 	FMouseSensitivity MouseSensitivity;
 
+	UPROPERTY()
 	EAimingType AimingType;
 
 private:

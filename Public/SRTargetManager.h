@@ -10,6 +10,13 @@
 enum class EGameModeType : uint8;
 class ASRSpawnPoint;
 
+
+/*
+ * 타겟 매니저 클래스입니다.
+ * 스폰 포인트와 게임모드 클래스의 정보를 통해서
+ * 타겟을 적절하게 생성합니다.
+ */
+
 UCLASS()
 class VERSION_API ASRTargetManager : public AActor
 {
@@ -19,10 +26,6 @@ public:
 	// Sets default values for this actor's properties
 	ASRTargetManager();
 
-	virtual void Tick(float DeltaTime) override;
-
-	//UFUNCTION()
-	//void RandomTargetActive();
 
 	UFUNCTION()
 	void RandomTargetSpawn();
@@ -37,8 +40,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-//	void setTarget();
-
 private:
 	UPROPERTY()
 	TArray<AActor*> mSpawnPointList;
@@ -46,21 +47,14 @@ private:
 	UPROPERTY()
 	TArray<ASRSpawnPoint*> mMovableSpawnPointList;
 
-	//UPROPERTY()
-	//TArray<ASRSpawnPoint*> mMovablePlateSpawnPointList;
-
 	UPROPERTY()
 	TArray<ASRSpawnPoint*> mPlateSpawnPointList;
 
 	UPROPERTY()
 	TArray<ASRSpawnPoint*> mCharacterSpawnPointList;
 
-	//// spawn 방식을 변경해서 불필요.
-	//UPROPERTY()
-	//TArray<AActor*> mTargetList;
-
 	UPROPERTY()
-	TArray<class ATargetCharacter*> mSpawnedTargetList;
+	TArray<class ASRTargetCharacter*> mSpawnedTargetList;
 
 	EGameModeType mGameModeType;
 

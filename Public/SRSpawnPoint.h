@@ -19,6 +19,13 @@ enum class EMovableAxis : uint8
 	Y
 };
 
+
+/*
+ * 맵에 배치되는 스폰 포인트 클래스입니다.
+ * 타겟 매니저가 타겟을 스폰 시킬 때 해당 클래스 개체의 정보를 사용합니다.
+ * 타겟 유형, 이동할 수 있는 축(X, Y)
+ */
+
 UCLASS()
 class VERSION_API ASRSpawnPoint : public AActor
 {
@@ -41,8 +48,6 @@ public:
 	bool IsCrouchable();
 
 	ESpawnPointType GetSpawnPointType();
-
-	FVector GetMovableEndLocation();
 
 	EMovableAxis GetMovableAxis();
 
@@ -67,6 +72,4 @@ private:
 	UStaticMeshComponent* mPointMesh;
 
 	bool mbActive;
-
-	FVector mMoveableEndLocation;
 };

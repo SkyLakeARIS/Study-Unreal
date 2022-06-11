@@ -1,31 +1,27 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "VersionCharacter.h"
-#include "ADAnimInstance.h"
-#include "VersionProjectile.h"
-#include "Animation/AnimInstance.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "SRPlayerCharacter.h"
+#include "SRPlayerController.h"
+#include "SRAnimInstance.h"
+#include "SRProjectile.h"
 #include "Components/InputComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "CharacterPlayerController.h"
 #include "DrawDebugHelpers.h"
+#include "SRHandGunBullet.h"
 #include "SRInGameSetting.h"
+#include "SRRifleBullet.h"
+#include "SRSniperBullet.h"
 #include "SRWeapon.h"
 #include "UIHUDWidget.h"
 #include "UISelectModesWidget.h"
 #include "Components/SceneCaptureComponent2D.h"
-#include "GameFramework/SaveGame.h"
-#include "Kismet/KismetMathLibrary.h"
-#include <string>
 
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
-// AVersionCharacter
+// ASRPlayerCharacter
 
-AVersionCharacter::AVersionCharacter()
+ASRPlayerCharacter::ASRPlayerCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(10.f, 96.0f);
@@ -73,21 +69,24 @@ AVersionCharacter::AVersionCharacter()
 		mKillMarkClass = UI_KillMark.Class;
 	}
 
+	// 실제 게임 시작시 InitGameMode에서 초기화 됩니다.
+	// character state
+	mBehaviorFlag = CAN_BEHAVIOR;
+
 	// 무기관련
-	FIRE_SWITCH_MODE = 3;
-	FireModeOffset = 2;
+	mFireModeOffset = 2;
 	mRemainAmmo = 30;
-	mARFireRate = 0.1f;
-	CurrentBurst = 0;
-	mCurrentFireMode  = EWaeponFireMode::FULL_AUTO;
+	mFireDelay = 0.1f;
+	mCurrentBurst = 0;
+	mFireMode  = EWaeponFireMode::FULL_AUTO;
 
 	// 무기 상태 관련
 	mbIsAiming = false;
 	mbIsEmptyMag = false;
 	mbFiring = false;
 	mbNeedBoltAction = false;
-	mbCanFire = true;
 	mbIsReload = false;
+	mFireFlag = CAN_FIRE;
 
 	// 무기 반동
 	mRecoilFactor = 0.0f;
@@ -99,17 +98,17 @@ AVersionCharacter::AVersionCharacter()
 	mWeaponLocationSocketName = FString("S_HandR_Rifle");
 }
 
-void AVersionCharacter::PossessedBy(AController* NewController)
+void ASRPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 }
 
-void AVersionCharacter::PostInitializeComponents()
+void ASRPlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 }
 
-void AVersionCharacter::SetAimToggleOrHold(EAimingType newType)
+void ASRPlayerCharacter::SetAimToggleOrHold(EAimingType newType)
 {
 	mAimingType = newType;
 }
@@ -121,69 +120,66 @@ void AVersionCharacter::SetAimToggleOrHold(EAimingType newType)
  *	false - 총 소켓을 원상복귀합니다.
  *	추가적으로 mbNeedBoltAction변수를 false, mbCanFire변수를 true로 설정합니다. 
  */
-void AVersionCharacter::SniperMoveSocket(bool active)
+void ASRPlayerCharacter::SniperMoveSocket(bool active)
 {
 	if(mGameModeData.weapon != EWeaponType::SR)
 	{
 		return;
 	}
 
-
 	if(active)
 	{
 		mWeapon->AttachToComponent(mMesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), FName("ik_hand"));
-		//atomic_thread_fence(std::memory_order_seq_cst);
-		//mbCanFire = false;
-
-		//atomic_thread_fence(std::memory_order_seq_cst);
-		UE_LOG(LogTemp, Warning, TEXT("SniperMoveSocket change to new "));
-
 	}
 	else
 	{
 		mWeapon->AttachToComponent(mMesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), *mWeaponLocationSocketName);
-		//atomic_thread_fence(std::memory_order_seq_cst);
-		//mbCanFire = true;
-		//atomic_thread_fence(std::memory_order_seq_cst);
-		//mbNeedBoltAction = false;
-		//atomic_thread_fence(std::memory_order_seq_cst);
-	UE_LOG(LogTemp, Warning, TEXT("SniperMoveSocket change to original"));
-
 	}
 }
 
 // 볼트 액션이 동작이 끝나고 다시 사격이 가능해지면 호출됩니다. SniperAnimInstacne에서 호출됩니다.
-void AVersionCharacter::NotifyBoltActionEnd()
+void ASRPlayerCharacter::NotifyBoltActionEnd()
 {
-	mbCanFire = true;
-	//atomic_thread_fence(std::memory_order_seq_cst);
 	mbNeedBoltAction = false;
-	atomic_thread_fence(std::memory_order_seq_cst);
+	SniperMoveSocket(false);
+
+	// 동작간에 딜레이를 주어서 애니메이션이 제대로 종료되고, 변수들이 제대로 동작하도록합니다.
+	FTimerHandle behaviorTimer;
+	FTimerHandle weaponTimer;
+	GetWorldTimerManager().SetTimer(behaviorTimer, this, &ASRPlayerCharacter::endBehaviorDelay, 0.5f, false);
+	GetWorldTimerManager().SetTimer(weaponTimer, this, &ASRPlayerCharacter::endWeaponDelay, 0.3f, false);
 }
 
 // 재장전 액션이 동작이 끝나고 다시 사격이 가능해지면 호출됩니다. 캐릭터AnimInstacne들에서 호출됩니다.
-void AVersionCharacter::NotifyReloadEnd()
+void ASRPlayerCharacter::NotifyReloadEnd()
 {
 	mRemainAmmo = mMaxMagAmount;
 	mPlayerController->GetIngameHUD()->UpdateAmmo(mRemainAmmo);
 
-	mbCanFire = true;
-	atomic_thread_fence(std::memory_order_seq_cst);
-
 	mbNeedBoltAction = false;
-	atomic_thread_fence(std::memory_order_seq_cst);
 
 	mbIsEmptyMag = false;
 	mbIsReload = false;
+
+	if(mGameModeData.weapon == EWeaponType::SR)
+	{
+		SniperMoveSocket(false);
+	}
+	// 동작간에 딜레이를 주어서 애니메이션이 제대로 종료되고, 변수들이 제대로 동작하도록합니다.
+	FTimerHandle behaviorTimer;
+	FTimerHandle weaponTimer;
+	GetWorldTimerManager().SetTimer(behaviorTimer, this, &ASRPlayerCharacter::endBehaviorDelay, 0.5f, false);
+	GetWorldTimerManager().SetTimer(weaponTimer, this, &ASRPlayerCharacter::endWeaponDelay, 0.3f, false);
 }
 
 
-void AVersionCharacter::BeginPlay()
+void ASRPlayerCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
 
-	mPlayerController = Cast<ACharacterPlayerController>(GetController());
+	mPlayerController = Cast<ASRPlayerController>(GetController());
+
 	EnableInput(mPlayerController);
 
 	mWeaponData = GetWorld()->SpawnActor<ASRWeapon>(mWeaponDataClass);
@@ -192,7 +188,6 @@ void AVersionCharacter::BeginPlay()
 	{
 		mCrossHair = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mCrossHairClass);
 	}
-
 
 	mHitMark = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mHitMarkClass);
 	mHeadshotMark = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mHeadshotMarkClass);
@@ -203,18 +198,18 @@ void AVersionCharacter::BeginPlay()
 
 	// 다른 클래스들의 초기화를 위해서 약간의 딜레이 후 데이터를 초기화 합니다.
 	FTimerHandle bindTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(bindTimerHandle, this, &AVersionCharacter::tryBindSelectModesUI, 1.0f, false, 1.0f);
+	GetWorld()->GetTimerManager().SetTimer(bindTimerHandle, this, &ASRPlayerCharacter::tryBindSelectModesUI, 1.0f, false, 1.0f);
 	FTimerHandle loadTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(loadTimerHandle, this, &AVersionCharacter::LoadInGameSetting, 1.0f, false, 1.0f);
+	GetWorld()->GetTimerManager().SetTimer(loadTimerHandle, this, &ASRPlayerCharacter::LoadInGameSetting, 1.0f, false, 1.0f);
 }
 
-void AVersionCharacter::tryBindSelectModesUI()
+void ASRPlayerCharacter::tryBindSelectModesUI()
 {
 	mPlayerController->GetSelectModesWidget()->BindCharacterInfo(this);
 }
 
 // 타이머에 의해 호출되는 히트마크를 지우는 함수입니다.
-void AVersionCharacter::clearHitMark()
+void ASRPlayerCharacter::clearHitMark()
 {
 	switch (mCurrentMark)
 	{
@@ -231,7 +226,7 @@ void AVersionCharacter::clearHitMark()
 	GetWorld()->GetTimerManager().ClearTimer(mHitMarkTimer);
 }
 
-void AVersionCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void ASRPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
@@ -241,40 +236,40 @@ void AVersionCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AVersionCharacter::StartFire);
-	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AVersionCharacter::StopFire);
-	PlayerInputComponent->BindAction("SwitchFireMode", IE_Pressed, this, &AVersionCharacter::SwitchFireMode);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASRPlayerCharacter::StartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASRPlayerCharacter::StopFire);
+	PlayerInputComponent->BindAction("SwitchFireMode", IE_Pressed, this, &ASRPlayerCharacter::SwitchFireMode);
 
-	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AVersionCharacter::Reload);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ASRPlayerCharacter::Reload);
 
-	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AVersionCharacter::SetAim);
-	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AVersionCharacter::SetHip);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ASRPlayerCharacter::SetAim);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ASRPlayerCharacter::SetHip);
 
-	//PlayerInputComponent->BindAxis("MoveForward", this, &AVersionCharacter::MoveForward);
-	//PlayerInputComponent->BindAxis("MoveRight", this, &AVersionCharacter::MoveRight);
+	//PlayerInputComponent->BindAxis("MoveForward", this, &ASRPlayerCharacter::MoveForward);
+	//PlayerInputComponent->BindAxis("MoveRight", this, &ASRPlayerCharacter::MoveRight);
 
-	PlayerInputComponent->BindAxis("Turn", this,&AVersionCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &AVersionCharacter::LookUpAtRate);
+	PlayerInputComponent->BindAxis("Turn", this,&ASRPlayerCharacter::TurnAtRate);
+	PlayerInputComponent->BindAxis("LookUp", this, &ASRPlayerCharacter::LookUpAtRate);
 }
 
-EWeaponType AVersionCharacter::GetWeaponType() const
+EWeaponType ASRPlayerCharacter::GetWeaponType() const
 {
 	return mGameModeData.weapon;
 }
 
-EScopeType AVersionCharacter::GetScopeType() const
+EScopeType ASRPlayerCharacter::GetScopeType() const
 {
 	return mGameModeData.scope;
 }
 
-EGameType AVersionCharacter::GetGameType() const
+EGameType ASRPlayerCharacter::GetGameType() const
 {
 	return mGameModeData.game;
 }
 
 // 타겟에 적중시 적절한 히트마크를 크로스헤어가 위치하는 곳에 표시하는 함수입니다.
 // 표시할 히트마크의 유형은 projectile 개체가 전달해줍니다.
-void AVersionCharacter::AddViewPortHitMark(EHitType hitType)
+void ASRPlayerCharacter::AddViewPortHitMark(EHitType hitType)
 {
 	mCurrentMark = hitType;
 	// 이미 히트마크가 존재하는것은 지우고 새로 갱신합니다.
@@ -293,57 +288,48 @@ void AVersionCharacter::AddViewPortHitMark(EHitType hitType)
 			mKillMark->AddToViewport(1);
 			break;
 		default:
-			UE_LOG(LogTemp, Display, TEXT("AVersionCharacter - AddViewPortHitMark : 올바르지 않은 EHitType 타입입니다."));
+			UE_LOG(LogTemp, Display, TEXT("ASRPlayerCharacter - AddViewPortHitMark : 올바르지 않은 EHitType 타입입니다."));
 			break;
 	}
-	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &AVersionCharacter::clearHitMark, 0.5f, false, -1.0f);
+	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &ASRPlayerCharacter::clearHitMark, 0.5f, false, -1.0f);
 }
 
-bool AVersionCharacter::IsAimimg() const
+bool ASRPlayerCharacter::IsAimimg() const
 {
-	atomic_thread_fence(std::memory_order_seq_cst);
-
 	return mbIsAiming;
 }
 
-EAimingType AVersionCharacter::GetAimingType() const
+EAimingType ASRPlayerCharacter::GetAimingType() const
 {
-	atomic_thread_fence(std::memory_order_seq_cst);
 	return mAimingType;
 }
 
-bool AVersionCharacter::IsCanFire() const
+bool ASRPlayerCharacter::IsCanFire() const
 {
-	atomic_thread_fence(std::memory_order_seq_cst);
-
-	return mbCanFire;
+	if(mFireFlag == CAN_FIRE)
+	{
+		return true;
+	}
+	return false;
 }
 
-bool AVersionCharacter::IsNeedBoltAction() const
+bool ASRPlayerCharacter::IsNeedBoltAction() const
 {
-	atomic_thread_fence(std::memory_order_seq_cst);
-
 	return mbNeedBoltAction;
 }
 
-bool AVersionCharacter::IsFire() const
+bool ASRPlayerCharacter::IsFiring() const
 {
-	atomic_thread_fence(std::memory_order_seq_cst);
-
 	return mbFiring;
 }
 
-bool AVersionCharacter::IsEmptyMag() const
+bool ASRPlayerCharacter::IsEmptyMag() const
 {
-	atomic_thread_fence(std::memory_order_seq_cst);
-
 	return mbIsEmptyMag;
 }
 
-bool AVersionCharacter::IsReload() const
+bool ASRPlayerCharacter::IsReload() const
 {
-	atomic_thread_fence(std::memory_order_seq_cst);
-
 	return mbIsReload;
 }
 
@@ -351,7 +337,7 @@ bool AVersionCharacter::IsReload() const
  *  맵 선택 UI에서 인게임으로 들어올 때 무기와(총, 조준경) 게임모드를 선택하는 UI로부터
  *	데이터를 넘겨받아 캐릭터 데이터를 업데이트하는 함수입니다.
  */
-void AVersionCharacter::InitGameMode(FGameModeData modeData)
+void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 {
 	mGameModeData = modeData;
 
@@ -361,23 +347,12 @@ void AVersionCharacter::InitGameMode(FGameModeData modeData)
 	{
 	case EGameType::Battlefield:
 	{
-		if(mGameModeData.weapon != EWeaponType::SR)
-		{
-			mCrossHair->SetVisibility(ESlateVisibility::Visible);
-		}
-
-
 		UE_LOG(LogTemp, Display, TEXT("InitGameMode : battlefield mode is applied"));
 		DisplayMode = "battlefield mode";
 		break;
 	}
 	case EGameType::RainbowSix:
 	{
-		if (mGameModeData.weapon != EWeaponType::SR)
-		{
-			mCrossHair->SetVisibility(ESlateVisibility::Visible);
-		}
-
 		UE_LOG(LogTemp, Display, TEXT("InitGameMode : rainbow six:siege mode is applied"));
 		DisplayMode = "rainbow six:siege mode";
 		break;
@@ -389,7 +364,7 @@ void AVersionCharacter::InitGameMode(FGameModeData modeData)
 		break;
 	}
 	default:
-		UE_LOG(LogTemp, Warning, TEXT("AVersionCharacter - InitGameMode : 올바르지 않은 enum EGameType 데이터입니다."));
+		UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter - InitGameMode : 올바르지 않은 enum EGameType 데이터입니다."));
 		break;
 	}
 
@@ -408,6 +383,11 @@ void AVersionCharacter::InitGameMode(FGameModeData modeData)
 		default:
 			UE_LOG(LogTemp, Warning, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EScopeType 데이터입니다."));
 			break;
+	}
+
+	if(mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
+	{
+		mCrossHair->SetVisibility(ESlateVisibility::Visible);
 	}
 
 	// 총에 맞는 소켓 위치를 결정합니다.
@@ -447,7 +427,7 @@ void AVersionCharacter::InitGameMode(FGameModeData modeData)
 		if (mGameModeData.scope == EScopeType::Scope6X)
 		{
 			sceneCapture->FOVAngle = 2.0f;
-			mScope->GetChildActor()->SetActorRotation(mScope->GetChildActor()->GetActorRotation() + FRotator(-0.2f, 0.0f, 0.0f));
+			mScope->GetChildActor()->SetActorRotation(mScope->GetChildActor()->GetActorRotation() + FRotator(-0.4f, 0.0f, 0.0f));
 		}
 		else if (mGameModeData.scope == EScopeType::Scope2dot5X)
 		{
@@ -478,8 +458,9 @@ void AVersionCharacter::InitGameMode(FGameModeData modeData)
 			{
 				mMaxMagAmount = EWeaponMagSize::AR;
 				mRemainAmmo = mMaxMagAmount;
-
-				mCurrentFireMode = EWaeponFireMode::FULL_AUTO;
+				mFireDelay = 0.1f;
+				mFireMode = EWaeponFireMode::FULL_AUTO;
+				mProjectileClass = ASRRifleBullet::StaticClass();
 
 				mSwitchFireModeSound = mWeaponData->GetSwtichFireModeSound();
 				break;
@@ -488,16 +469,19 @@ void AVersionCharacter::InitGameMode(FGameModeData modeData)
 			{
 				mMaxMagAmount = EWeaponMagSize::HG;
 				mRemainAmmo = mMaxMagAmount;
+				mFireDelay = 0.3f;
+				mFireMode = EWaeponFireMode::SINGLE_FIRE;
+				mProjectileClass = ASRHandGunBullet::StaticClass();
 
-				mCurrentFireMode = EWaeponFireMode::SINGLE_FIRE;
 				break;
 			}
 		case EWeaponType::SR:
 			{
 				mMaxMagAmount = EWeaponMagSize::SR;
 				mRemainAmmo = mMaxMagAmount;
-
-				mCurrentFireMode = EWaeponFireMode::SINGLE_FIRE;
+				mFireDelay = 2.0f;
+				mFireMode = EWaeponFireMode::SINGLE_FIRE;
+				mProjectileClass = ASRSniperBullet::StaticClass();
 
 				// 저격총의 경우 조준경의 크기가 비정상적으로 커지는 문제로 인해서 강제로 크기를 조정합니다.
 				mScope->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
@@ -508,26 +492,30 @@ void AVersionCharacter::InitGameMode(FGameModeData modeData)
 			break;
 	}
 
-
-
 	// 초기화된 데이터들을 업데이트 합니다.
-	mTutAnimInstance = Cast<UADAnimInstance>(mMesh1P->GetAnimInstance());
+	mTutAnimInstance = Cast<USRAnimInstance>(mMesh1P->GetAnimInstance());
 	mTutAnimInstance->UpdateSocketInfo();
 
 	mPlayerController->GetIngameHUD()->UpdateGameMode(DisplayMode);
-	mPlayerController->GetIngameHUD()->UpdateFireMode(mCurrentFireMode);
+	mPlayerController->GetIngameHUD()->UpdateFireMode(mFireMode);
 	mPlayerController->GetIngameHUD()->UpdateAmmo(mRemainAmmo);
+
+	mFireFlag = CAN_FIRE;
+	mBehaviorFlag = CAN_BEHAVIOR;
 }
 
 // 재장전 함수. AnimNotify에 의해서 다시 사격가능한 상태가 됩니다.
-void AVersionCharacter::Reload()
+void ASRPlayerCharacter::Reload()
 {
-	atomic_thread_fence(std::memory_order_seq_cst);
-	mbCanFire = false;
-	atomic_thread_fence(std::memory_order_seq_cst);
-	mbIsReload = true;
-	atomic_thread_fence(std::memory_order_seq_cst);
-
+	if(_InterlockedCompareExchange16(&mBehaviorFlag, CAN_NOT_BEHAVIOR, CAN_BEHAVIOR) == CAN_BEHAVIOR)
+	{
+		if(mbIsAiming)
+		{
+			mbIsAiming = false;
+			mTutAnimInstance->SetAiming(mbIsAiming);
+		}
+		mbIsReload = true;
+	}
 }
 
 /*
@@ -535,28 +523,26 @@ void AVersionCharacter::Reload()
  *  권총과 저격총의 경우 Single모드 하나만 존재하므로
  *	소총만 발사모드가 작동됨.
  */
-void AVersionCharacter::SwitchFireMode()
+void ASRPlayerCharacter::SwitchFireMode()
 {
 	if(mGameModeData.weapon == EWeaponType::AR)
 	{
+		// 이전 발사 모드의 타이머가 남아있을 수 있으므로 제거합니다.
+		GetWorld()->GetTimerManager().ClearTimer(mFireDelayTimer);
 		EWaeponFireMode modes[] = { EWaeponFireMode::SINGLE_FIRE, EWaeponFireMode::BURST_FIRE,EWaeponFireMode::FULL_AUTO };
-		FireModeOffset = (FireModeOffset + 1) % FIRE_SWITCH_MODE;
-		mCurrentFireMode  = modes[FireModeOffset];
+		mFireModeOffset = (mFireModeOffset + 1) % FIRE_SWITCH_MODE;
+		mFireMode  = modes[mFireModeOffset];
 
 		UGameplayStatics::PlaySoundAtLocation(this, mSwitchFireModeSound, GetActorLocation());
-		mPlayerController->GetIngameHUD()->UpdateFireMode(mCurrentFireMode);
+		mPlayerController->GetIngameHUD()->UpdateFireMode(mFireMode);
 	}
 }
 
-void AVersionCharacter::StartFire()
+void ASRPlayerCharacter::StartFire()
 {
 
-		// Montage_GetIsStopped
-		//;mTutAnimInstance->IsAnyMontagePlaying()
-		
-	
-	atomic_thread_fence(std::memory_order_seq_cst);
-	if (!mbCanFire)
+	// just read
+	if (mBehaviorFlag == CAN_NOT_BEHAVIOR)
 	{
 		return;
 	}
@@ -567,66 +553,86 @@ void AVersionCharacter::StartFire()
 		return;
 	}
 
+	// 빠르게 호출되는것을 막고, 무기별 사격간 딜레이를(부가 효과) 제공해준다.
+	if(_InterlockedCompareExchange16(&mFireFlag, CAN_NOT_FIRE, CAN_FIRE) != CAN_FIRE)
+	{
+		return;
+	}
+
 	mbFiring = true;
 
-	switch (mCurrentFireMode )
+	switch (mFireMode )
 	{
 		case EWaeponFireMode::SINGLE_FIRE:
 			FireShot();
+			if(mGameModeData.weapon != EWeaponType::SR)
+			{
+				GetWorld()->GetTimerManager().SetTimer(mFireDelayTimer, this, &ASRPlayerCharacter::endWeaponDelay, mFireDelay, false);
+			}
 			break;
 		case EWaeponFireMode::BURST_FIRE:
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle_BurstMode, this, &AVersionCharacter::BurstFire, mARFireRate, true, 0.0f);
+			GetWorld()->GetTimerManager().SetTimer(mBurstFireTimer, this, &ASRPlayerCharacter::BurstFire, mFireDelay, true, 0.0f);
 			break;
 		case EWaeponFireMode::FULL_AUTO:
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle_FullAutoMode, this, &AVersionCharacter::FireShot, mARFireRate, true, 0.0f);
+			GetWorld()->GetTimerManager().SetTimer(mFireDelayTimer, this, &ASRPlayerCharacter::FireShot, mFireDelay, true, 0.0f);
 			break;
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("AVersionCharacter- StartFire : 올바르지 않은 enum EWaeponFireMode 데이터입니다."));
+			UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter- StartFire : 올바르지 않은 enum EWaeponFireMode 데이터입니다."));
 			break;
 	}
 }
 
-void AVersionCharacter::StopFire()
+void ASRPlayerCharacter::StopFire()
 {
-	GetWorldTimerManager().ClearTimer(TimerHandle_FullAutoMode);
+	if(mFireMode == EWaeponFireMode::FULL_AUTO)
+	{
+		// flag를 끄고, 내부 타이머로 발사했으므로 점사가 끝나면 다시 flag를 켜준다.
+		// SINGLE_FIRE의 timer 변수와 동일하므로 ClearTimer는 X.
+		endWeaponDelay();
+	}
 	mRecoilFactor = 0.0f;
 	mbFiring = false;
 	mTutAnimInstance->SetFiring(false);
 	mFirstShot = true;
 }
 
-void AVersionCharacter::BurstFire()
+void ASRPlayerCharacter::BurstFire()
 {
-	if (CurrentBurst < 3)
+	if (mCurrentBurst < 3)
 	{
 		FireShot();
-		CurrentBurst++;
+		mCurrentBurst++;
 	}
-	else
+	else // 총알이 1 이상으로 정상적으로 점사가 완료된 경우.
 	{
-		CurrentBurst = 0;
-		GetWorldTimerManager().ClearTimer(TimerHandle_BurstMode);
+		mCurrentBurst = 0;
+		GetWorldTimerManager().ClearTimer(mBurstFireTimer);
+		mTutAnimInstance->SetFiring(false);
+
+		// flag를 끄고, 내부 타이머로 발사했으므로 점사가 끝나면 다시 flag를 켜준다.
+		endWeaponDelay();
 	}
 }
 
-void AVersionCharacter::FireShot()
+void ASRPlayerCharacter::FireShot()
 {
 	--mRemainAmmo;
-	if(mRemainAmmo < 0)
-	{
-		return;
-	}
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), mMuzzleParticles, mWeapon->GetSocketTransform(FName("S_Muzzle")).GetLocation(), mWeapon->GetSocketTransform(FName("S_Muzzle")).GetRotation().Rotator());
 
 	mTutAnimInstance->SetFiring(true);
-	mPlayerController->GetPlayerState()->OnAddFireShots(1);
+
+	// 준비 기간에는 전적 및 정확도를 기록하지 않습니다.
+	if(mPlayerController->IsStartMainGame())
+	{
+		mPlayerController->GetPlayerState()->OnAddFireShots(1);
+	}
+
 	mTutAnimInstance->Fire();
 
 	// 반동 계수입니다. 스프레이의 반지름에 곱해집니다.
 	// 0.1~1.0 사이로, 총알이 연속으로 발사될수록 계수가 높아집니다.
 	// 권총은 계수가 그대로 유지됩니다.
-
 
 	if(mFirstShot)
 	{
@@ -635,7 +641,7 @@ void AVersionCharacter::FireShot()
 	}
 	else
 	{
-		if(mCurrentFireMode == EWaeponFireMode::SINGLE_FIRE)
+		if(mFireMode == EWaeponFireMode::SINGLE_FIRE)
 		{
 			mRecoilFactor = 0.15f;
 			if(mGameModeData.weapon == EWeaponType::SR)
@@ -656,7 +662,7 @@ void AVersionCharacter::FireShot()
 	FHitResult Hit;
 	FActorSpawnParameters rules;
 	rules.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AVersionProjectile* projectile = nullptr;
+	ASRProjectile* projectile = nullptr;
 	switch(mGameModeData.game)
 	{
 		case EGameType::Battlefield:
@@ -677,11 +683,11 @@ void AVersionCharacter::FireShot()
 				y = FMath::RandRange(-5.0f * mRecoilFactor, 5.0f * mRecoilFactor);
 
 			}
-
 			FRotator randSpread(y, x, 0.0f);
 			MuzzleLocation = mFirstPersonCameraComponent->GetComponentLocation() + (mFirstPersonCameraComponent->GetForwardVector()*100.0f);
-			projectile = GetWorld()->SpawnActor<AVersionProjectile>(mProjectileClass, MuzzleLocation, GetControlRotation()+ randSpread, rules);
+			projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, MuzzleLocation, GetControlRotation()+ randSpread, rules);
 			break;
+			//ASRHandGunBullet::StaticClass()
 		}
 		case EGameType::RainbowSix:
 		{
@@ -693,16 +699,12 @@ void AVersionCharacter::FireShot()
 			FVector2D randSpread = FMath::RandPointInCircle(spreadRadius);
 			FVector spread(randSpread.X, 0.0f, randSpread.Y);
 
-	//		float x = FMath::RandRange(0.0f, 1.0f) * FMath::Cos(FMath::FRandRange(0.0f, 0.0f));
-	//		float y = FMath::RandRange(0.0f, 1.0f) * FMath::Exp(0.5) * FMath::Sin(FMath::FRandRange(0.0f, 0.0f));
-	//		FVector randSpread(x, 0, y);
- //+ randSpread)
 			MuzzleLocation = mScope->GetChildComponent(0)->GetSocketLocation(FName("S_Aim"));
 			EndTrace = MuzzleLocation+ (mFirstPersonCameraComponent->GetForwardVector() + spread) * 10000.0f;
 
 			if (GetWorld()->LineTraceSingleByChannel(Hit, MuzzleLocation, EndTrace, ECC_EngineTraceChannel3, QueryParams))
 			{
-				projectile = GetWorld()->SpawnActor<AVersionProjectile>(mProjectileClass, Hit.Location, GetControlRotation(), rules);
+				projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, Hit.Location, GetControlRotation(), rules);
 				projectile->SetLifeSpan(2.0f);
 				if (mPlayerController->IsDebugging())
 				{
@@ -713,17 +715,15 @@ void AVersionCharacter::FireShot()
 		}
 		case EGameType::Tarkov:
 		{
-			
 			// 총알이 총구에서 나가는 방식입니다.
-
 			MuzzleLocation = mWeapon->GetSocketTransform(FName("S_Muzzle")).GetLocation();
 			FRotator MuzzleRotation =mWeapon->GetSocketTransform(FName("S_Muzzle")).Rotator();
 
-			projectile = GetWorld()->SpawnActor<AVersionProjectile>(mProjectileClass, MuzzleLocation, MuzzleRotation, rules);
+			projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, MuzzleLocation, MuzzleRotation, rules);
 			break;
 		}
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("AVersionCharacter- FireShot : 올바르지 않은 enum gametype 데이터입니다."));
+			UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter- FireShot : 올바르지 않은 enum gametype 데이터입니다."));
 			break;
 	}
 	// R6S 방식에서 ray가 아무것도 충돌을 감지하지 못하면 projectile이 생성되지 않으므로
@@ -740,13 +740,27 @@ void AVersionCharacter::FireShot()
 
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), mFireSound, GetActorLocation());
 
+
+	if(mFireMode == EWaeponFireMode::SINGLE_FIRE)
+	{
+		mTutAnimInstance->SetFiring(false);
+	}
+
 	if(mRemainAmmo <= 0)
 	{
-		GetWorldTimerManager().ClearTimer(TimerHandle_BurstMode);
+		// 탄이 다 떨어지면 재장전을 해야하므로, flag들을 키는 타이머를 초기화 해야합니다.
+		if(mFireMode == EWaeponFireMode::BURST_FIRE)
+		{
+			GetWorldTimerManager().ClearTimer(mBurstFireTimer);
+		}
+		else
+		{
+			GetWorldTimerManager().ClearTimer(mFireDelayTimer);
+		}
+
+		mFireFlag = CAN_NOT_FIRE;
 		mbIsEmptyMag = true;
-		atomic_thread_fence(std::memory_order_seq_cst);
-		//mbCanFire = false;
-		//atomic_thread_fence(std::memory_order_seq_cst);
+
 		mTutAnimInstance->SetFiring(false);
 	}
 	else
@@ -754,27 +768,35 @@ void AVersionCharacter::FireShot()
 		// 저격총은 볼트액션식이므로 해당 변수를 true로 변경 합니다.
 		if (mGameModeData.weapon == EWeaponType::SR)
 		{
-			//mbCanFire = false;
-		//	atomic_thread_fence(std::memory_order_seq_cst);
 			mbNeedBoltAction = true;
-			atomic_thread_fence(std::memory_order_seq_cst);
+			mBehaviorFlag = CAN_NOT_BEHAVIOR;
+			//GetWorld()->GetTimerManager().SetTimer(mFireDelayTimer, this, &ASRPlayerCharacter::endWeaponDelay, mFireDelay, false);
 
-		//	FTimerHandle delay;
-		//	GetWorld()->GetTimerManager().SetTimer(delay, this, &AVersionCharacter::boltactionDelay, 1.2f, false);
 		}
 	}
 }
 
-void AVersionCharacter::SetAim()
+void ASRPlayerCharacter::SetAim()
 {
-	if(mbIsReload)
+
+	if(mBehaviorFlag == CAN_NOT_BEHAVIOR)
 	{
+		// 저격총을 골랐을때 토글 모드에서 줌 상태에서 사격을 했을때 볼트 액션을 해야하지만
+		// 조준모드를 해제할 수 없어 볼트액션 동작도 할 수 없으므로 별도 처리.
+		// (재장전은 문제없음.)
+		if (mGameModeData.weapon == EWeaponType::SR && mbIsAiming && mAimingType == EAimingType::Toggle)
+		{
+			mbIsAiming = false;
+			mTutAnimInstance->SetAiming(mbIsAiming);
+			mFirstPersonCameraComponent->SetFieldOfView(90.0f);
+		}
+
 		return;
 	}
 
 	if (mAimingType == EAimingType::Toggle)
 	{
-		mbIsAiming = !mbIsAiming;
+		mbIsAiming = mbIsAiming ? false : true;
 		mTutAnimInstance->SetAiming(mbIsAiming);
 		ESlateVisibility crosshairVisibility = mbIsAiming ? ESlateVisibility::Hidden : ESlateVisibility::Visible;
 		if (mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
@@ -824,27 +846,36 @@ void AVersionCharacter::SetAim()
 	}
 }
 
-void AVersionCharacter::SetHip()
+void ASRPlayerCharacter::SetHip()
 {
 	// hold의 경우. toggle방식은 SetAim함수에서 전부 처리되었습니다.
 	if (mAimingType == EAimingType::Hold)
 	{
 		mbIsAiming = false;
 		mTutAnimInstance->SetAiming(false);
+		mFirstPersonCameraComponent->SetFieldOfView(90.0f);
 
-		if(mGameModeData.game != EGameType::Tarkov)
+		if(mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
 		{
 			mCrossHair->SetVisibility(ESlateVisibility::Visible);
-
-			if (mGameModeData.scope != EScopeType::Scope1X)
-			{
-				mFirstPersonCameraComponent->SetFieldOfView(90.0f);
-			}
 		}
 	}
 }
 
-void AVersionCharacter::MoveForward(float Value)
+// idle을 제외한 현재 동작이 끝나고 다른동작을 할 수 있도록 flag를 CAN_BEHAVIOR로 설정하는 함수입니다.
+void ASRPlayerCharacter::endBehaviorDelay()
+{
+	mBehaviorFlag = CAN_BEHAVIOR;
+}
+
+// 재장전, 볼트액션 동작 후, 총을 발사할 수 있도록 flag를 CAN_FIRE로 설정하는 함수입니다.
+void ASRPlayerCharacter::endWeaponDelay()
+{
+	mFireFlag = CAN_FIRE;
+	GetWorld()->GetTimerManager().ClearTimer(mFireDelayTimer);
+}
+
+void ASRPlayerCharacter::MoveForward(float Value)
 {
 	if (Value != 0.0f)
 	{
@@ -852,7 +883,7 @@ void AVersionCharacter::MoveForward(float Value)
 	}
 }
 
-void AVersionCharacter::MoveRight(float Value)
+void ASRPlayerCharacter::MoveRight(float Value)
 {
 	if (Value != 0.0f)
 	{
@@ -860,7 +891,7 @@ void AVersionCharacter::MoveRight(float Value)
 	}
 }
 
-void AVersionCharacter::TurnAtRate(float Rate)
+void ASRPlayerCharacter::TurnAtRate(float Rate)
 {
 	if(mbIsAiming)
 	{
@@ -882,7 +913,7 @@ void AVersionCharacter::TurnAtRate(float Rate)
 				break;
 			}
 			default:
-				UE_LOG(LogTemp, Warning, TEXT("AVersionCharacter- TurnAtRate : 올바르지 않은 enum EScopeType 데이터입니다."));
+				UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter- TurnAtRate : 올바르지 않은 enum EScopeType 데이터입니다."));
 				break;
 		}
 	}
@@ -892,7 +923,7 @@ void AVersionCharacter::TurnAtRate(float Rate)
 	}
 }
 
-void AVersionCharacter::LookUpAtRate(float Rate)
+void ASRPlayerCharacter::LookUpAtRate(float Rate)
 {
 
 	if (mbIsAiming)
@@ -915,7 +946,7 @@ void AVersionCharacter::LookUpAtRate(float Rate)
 				break;
 			}
 			default:
-				UE_LOG(LogTemp, Warning, TEXT("AVersionCharacter- LookUpAtRate : 올바르지 않은 enum EScopeType 데이터입니다."));
+				UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter- LookUpAtRate : 올바르지 않은 enum EScopeType 데이터입니다."));
 				break;
 		}
 	}
@@ -926,7 +957,7 @@ void AVersionCharacter::LookUpAtRate(float Rate)
 }
 
 
-void AVersionCharacter::SaveInGameSetting()
+void ASRPlayerCharacter::SaveInGameSetting()
 {
 	auto settingData = Cast<USRInGameSetting>(UGameplayStatics::CreateSaveGameObject(USRInGameSetting::StaticClass()));
 	settingData->MouseSensitivity = MouseSetting;
@@ -934,7 +965,7 @@ void AVersionCharacter::SaveInGameSetting()
 	UGameplayStatics::SaveGameToSlot(settingData, settingData->GetSlotName(), settingData->GetSlotIndex());
 }
 
-void AVersionCharacter::LoadInGameSetting()
+void ASRPlayerCharacter::LoadInGameSetting()
 {
 	auto settingData = Cast<USRInGameSetting>(UGameplayStatics::CreateSaveGameObject(USRInGameSetting::StaticClass()));
 
