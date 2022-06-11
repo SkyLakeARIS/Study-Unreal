@@ -6,10 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "UIPlayerController.generated.h"
 
-/**
- * 
- */
 
+/*
+ * 블루프린트 UI위젯에 사용되는 플레이어 컨트롤러 클래스입니다.
+ */
 
 UCLASS()
 class VERSION_API AUIPlayerController : public APlayerController
@@ -21,10 +21,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=UI)
-    TSubclassOf<class UUserWidget> UIWidgetClass;
+    TSubclassOf<UUserWidget> UIWidgetClass;
 	
 	UPROPERTY()
-	class UUserWidget* UIWidgetInstance;	// esc key == pause game
+	UUserWidget* UIWidgetInstance;	// esc key == pause game
 
-	
 };

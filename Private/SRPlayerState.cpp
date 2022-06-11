@@ -2,7 +2,6 @@
 
 
 #include "SRPlayerState.h"
-
 #include "UIHUDWidget.h"
 
 ASRPlayerState::ASRPlayerState()
@@ -18,15 +17,12 @@ void ASRPlayerState::BindHUD(UUIHUDWidget* HUD)
 {
 	mOnUpdateScore.BindUObject(HUD, &UUIHUDWidget::UpdateScore);
 	mOnUpdateAccuracy.BindUObject(HUD, &UUIHUDWidget::UpdateAccuracy);
-	//mOnupdateKillCount.BindUObject(HUD, &UUIHUDWidget::UpdateKillCount);
 }
 
 void ASRPlayerState::OnAddScore(int32 getScore)
 {
 	mScore += getScore;
 	mOnUpdateScore.Execute(mScore);
-	UE_LOG(LogTemp, Warning, TEXT("score added: %d"), getScore);
-
 }
 
 void ASRPlayerState::OnAddFireShots(int32 shots)
@@ -39,7 +35,6 @@ void ASRPlayerState::OnHitCount()
 {
 	mHits += 1;
 	calcAccuracy();
-	UE_LOG(LogTemp, Warning, TEXT("Accuracy : %f"), mAccuracy);
 }
 
 void ASRPlayerState::OnKill()
@@ -47,17 +42,17 @@ void ASRPlayerState::OnKill()
 	mKill += 1;
 }
 
-int32 ASRPlayerState::GetScore()
+int32 ASRPlayerState::GetScore() const
 {
 	return mScore;
 }
 
-int32 ASRPlayerState::GetAccuracy()
+int32 ASRPlayerState::GetAccuracy() const
 {
 	return mAccuracy;
 }
 
-int32 ASRPlayerState::GetKillCount()
+int32 ASRPlayerState::GetKillCount() const
 {
 	return mKill;
 }

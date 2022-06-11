@@ -6,10 +6,15 @@
 #include "Blueprint/UserWidget.h"
 #include "UIHUDWidget.generated.h"
 
+enum class EWaeponFireMode : uint8;
 class UTextBlock;
-/**
- * 
+
+
+/*
+ * HUD Å¬·¡½ºÀÔ´Ï´Ù.
+ * PlayerStateÀÇ °ªÀ» ÅëÇØ È­¸é¿¡ Á¤º¸¸¦ º¸¿©Áİ´Ï´Ù.
  */
+
 UCLASS()
 class VERSION_API UUIHUDWidget : public UUserWidget
 {
@@ -22,8 +27,6 @@ public:
 	void UpdateAmmo(int32 newAmmo);
 	UFUNCTION()
 	void UpdateAccuracy(int32 accuracy);
-	//UFUNCTION()
-	//void UpdateKillCount();	// HUDì—ì„œëŠ” í‚¬ì¹´ìš´íŠ¸ x
 	UFUNCTION()
 	void UpdateFireMode(EWaeponFireMode newFireMode);
 	UFUNCTION()
@@ -36,25 +39,16 @@ protected:
 
 private:
 
-	
-	UPROPERTY()	// UPROPERTY( meta =(BindWidget))ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ NativeConstruct()ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½àµµï¿½ï¿½. ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Æ¾ï¿½ï¿½ï¿½.
+	UPROPERTY()
 	UTextBlock* RemainingTime;
-	
 	UPROPERTY()
 	UTextBlock* Accuracy;
-	
 	UPROPERTY()
 	UTextBlock* FireMode;
-	
 	UPROPERTY()
 	UTextBlock* RemainingAmmo;
-	//
-	//UPROPERTY()
-	//UTextBlock* KillCount;
-	
 	UPROPERTY()
 	UTextBlock* Score;
-
-	//UPROPERTY(meta = (BindWidget))
+	UPROPERTY()
 	UTextBlock* DisplayGameMode;
 };
