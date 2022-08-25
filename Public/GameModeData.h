@@ -135,6 +135,7 @@ struct FMouseSensitivity
 UENUM(BlueprintType)
 enum class EGameModeType : uint8
 {
+	None,
 	Static_ShortRange,
 	Static_MidRange,
 	Static_LongRange,

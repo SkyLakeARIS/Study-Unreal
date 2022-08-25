@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SRPlayerController.h"
 #include "SRPlayerState.h"
 #include "SRSpawnPoint.h"
@@ -147,6 +145,8 @@ void ASRPlayerController::BeginPlay()
 
 	ChangeInputMode(false);
 	mSelectModesWidget->AddToViewport();
+
+	InGameHUD->InitializeWidgets();
 	InGameHUD->AddToViewport();
 	InGameHUD->SetVisibility(ESlateVisibility::Hidden);
 

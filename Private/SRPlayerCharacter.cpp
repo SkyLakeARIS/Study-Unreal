@@ -1,5 +1,4 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "SRPlayerCharacter.h"
 #include "SRPlayerController.h"
 #include "SRAnimInstance.h"
@@ -44,30 +43,6 @@ ASRPlayerCharacter::ASRPlayerCharacter()
 	mWeaponData = CreateDefaultSubobject<ASRWeapon>(TEXT("WeaponData"));
 	mWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	mScope = CreateDefaultSubobject<UChildActorComponent>(TEXT("Scope6X"));
-
-
-	// UI 초기화
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> UI_Crosshair(TEXT("/Game/UI/UI_Crosshair.UI_Crosshair_C"));
-	if (UI_Crosshair.Succeeded())
-	{
-		mCrossHairClass = UI_Crosshair.Class;
-	}
-	static ConstructorHelpers::FClassFinder<UUserWidget> UI_HitMark(TEXT("/Game/UI/UI_HitMark.UI_HitMark_C"));
-	if (UI_HitMark.Succeeded())
-	{
-		mHitMarkClass = UI_HitMark.Class;
-	}
-	static ConstructorHelpers::FClassFinder<UUserWidget> UI_HeadshotMark(TEXT("/Game/UI/UI_HeadshotMark.UI_HeadshotMark_C"));
-	if (UI_HeadshotMark.Succeeded())
-	{
-		mHeadshotMarkClass = UI_HeadshotMark.Class;
-	}
-	static ConstructorHelpers::FClassFinder<UUserWidget> UI_KillMark(TEXT("/Game/UI/UI_KillMark.UI_KillMark_C"));
-	if (UI_KillMark.Succeeded())
-	{
-		mKillMarkClass = UI_KillMark.Class;
-	}
 
 	// 실제 게임 시작시 InitGameMode에서 초기화 됩니다.
 	// character state
@@ -184,18 +159,6 @@ void ASRPlayerCharacter::BeginPlay()
 
 	mWeaponData = GetWorld()->SpawnActor<ASRWeapon>(mWeaponDataClass);
 
-	if (mCrossHairClass)
-	{
-		mCrossHair = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mCrossHairClass);
-	}
-
-	mHitMark = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mHitMarkClass);
-	mHeadshotMark = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mHeadshotMarkClass);
-	mKillMark = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mKillMarkClass);
-
-	mCrossHair->AddToViewport();
-	mCrossHair->SetVisibility(ESlateVisibility::Hidden);
-
 	// 다른 클래스들의 초기화를 위해서 약간의 딜레이 후 데이터를 초기화 합니다.
 	FTimerHandle bindTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(bindTimerHandle, this, &ASRPlayerCharacter::tryBindSelectModesUI, 1.0f, false, 1.0f);
@@ -206,24 +169,6 @@ void ASRPlayerCharacter::BeginPlay()
 void ASRPlayerCharacter::tryBindSelectModesUI()
 {
 	mPlayerController->GetSelectModesWidget()->BindCharacterInfo(this);
-}
-
-// 타이머에 의해 호출되는 히트마크를 지우는 함수입니다.
-void ASRPlayerCharacter::clearHitMark()
-{
-	switch (mCurrentMark)
-	{
-	case EHitType::Hit:
-		mHitMark->RemoveFromParent();
-		break;
-	case EHitType::HeadShot:
-		mHeadshotMark->RemoveFromParent();
-		break;
-	case EHitType::Kill:
-		mKillMark->RemoveFromParent();
-		break;
-	}
-	GetWorld()->GetTimerManager().ClearTimer(mHitMarkTimer);
 }
 
 void ASRPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -265,33 +210,6 @@ EScopeType ASRPlayerCharacter::GetScopeType() const
 EGameType ASRPlayerCharacter::GetGameType() const
 {
 	return mGameModeData.game;
-}
-
-// 타겟에 적중시 적절한 히트마크를 크로스헤어가 위치하는 곳에 표시하는 함수입니다.
-// 표시할 히트마크의 유형은 projectile 개체가 전달해줍니다.
-void ASRPlayerCharacter::AddViewPortHitMark(EHitType hitType)
-{
-	mCurrentMark = hitType;
-	// 이미 히트마크가 존재하는것은 지우고 새로 갱신합니다.
-	mHitMark->RemoveFromParent();
-	mHeadshotMark->RemoveFromParent();
-	mKillMark->RemoveFromParent();
-	switch(mCurrentMark)
-	{
-		case EHitType::Hit:
-			mHitMark->AddToViewport(1);
-			break;
-		case EHitType::HeadShot:
-			mHeadshotMark->AddToViewport(1);
-			break;
-		case EHitType::Kill:
-			mKillMark->AddToViewport(1);
-			break;
-		default:
-			UE_LOG(LogTemp, Display, TEXT("ASRPlayerCharacter - AddViewPortHitMark : 올바르지 않은 EHitType 타입입니다."));
-			break;
-	}
-	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &ASRPlayerCharacter::clearHitMark, 0.5f, false, -1.0f);
 }
 
 bool ASRPlayerCharacter::IsAimimg() const
@@ -341,6 +259,8 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 {
 	mGameModeData = modeData;
 
+	mOnCrossHairVisibility.BindUObject(mPlayerController->GetIngameHUD(), &UUIHUDWidget::SetCrosshairVisibility);
+
 	// 게임 모드 데이터를 초기화 합니다.
 	FString DisplayMode;
 	switch (mGameModeData.game)
@@ -368,7 +288,7 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 		break;
 	}
 
-	// 조준경에 따른 소켓 위치를 결정합니다..
+	// 조준경에 따른 소켓 위치를 결정합니다.
 	switch(mGameModeData.scope)
 	{
 		case EScopeType::Scope1X:
@@ -387,7 +307,7 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 
 	if(mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
 	{
-		mCrossHair->SetVisibility(ESlateVisibility::Visible);
+		mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
 	}
 
 	// 총에 맞는 소켓 위치를 결정합니다.
@@ -469,10 +389,9 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 			{
 				mMaxMagAmount = EWeaponMagSize::HG;
 				mRemainAmmo = mMaxMagAmount;
-				mFireDelay = 0.3f;
+				mFireDelay = 0.15f;
 				mFireMode = EWaeponFireMode::SINGLE_FIRE;
 				mProjectileClass = ASRHandGunBullet::StaticClass();
-
 				break;
 			}
 		case EWeaponType::SR:
@@ -488,9 +407,10 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 				break;
 			}
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EWeaponType 데이터입니다."));
+			UE_LOG(LogTemp, Error, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EWeaponType 데이터입니다."));
 			break;
 	}
+
 
 	// 초기화된 데이터들을 업데이트 합니다.
 	mTutAnimInstance = Cast<USRAnimInstance>(mMesh1P->GetAnimInstance());
@@ -553,7 +473,7 @@ void ASRPlayerCharacter::StartFire()
 		return;
 	}
 
-	// 빠르게 호출되는것을 막고, 무기별 사격간 딜레이를(부가 효과) 제공해준다.
+	// 빠르게 호출되는 것을 막고, 무기별 사격간 딜레이를(부가 효과) 제공해준다.
 	if(_InterlockedCompareExchange16(&mFireFlag, CAN_NOT_FIRE, CAN_FIRE) != CAN_FIRE)
 	{
 		return;
@@ -577,7 +497,7 @@ void ASRPlayerCharacter::StartFire()
 			GetWorld()->GetTimerManager().SetTimer(mFireDelayTimer, this, &ASRPlayerCharacter::FireShot, mFireDelay, true, 0.0f);
 			break;
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter- StartFire : 올바르지 않은 enum EWaeponFireMode 데이터입니다."));
+			UE_LOG(LogTemp, Error, TEXT("ASRPlayerCharacter- StartFire : 올바르지 않은 enum EWaeponFireMode 데이터입니다."));
 			break;
 	}
 }
@@ -681,13 +601,12 @@ void ASRPlayerCharacter::FireShot()
 			{
 				x = FMath::RandRange(-5.0f * mRecoilFactor, 5.0f * mRecoilFactor);
 				y = FMath::RandRange(-5.0f * mRecoilFactor, 5.0f * mRecoilFactor);
-
 			}
+
 			FRotator randSpread(y, x, 0.0f);
 			MuzzleLocation = mFirstPersonCameraComponent->GetComponentLocation() + (mFirstPersonCameraComponent->GetForwardVector()*100.0f);
 			projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, MuzzleLocation, GetControlRotation()+ randSpread, rules);
 			break;
-			//ASRHandGunBullet::StaticClass()
 		}
 		case EGameType::RainbowSix:
 		{
@@ -734,6 +653,7 @@ void ASRPlayerCharacter::FireShot()
 		projectile->SetDebugMode(mPlayerController->IsDebugging());
 		projectile->SetBulletType(mGameModeData.weapon);
 		projectile->BindPlayerStateInfo(mPlayerController->GetPlayerState());
+		projectile->BindHUDWidget(mPlayerController->GetIngameHUD());
 	}
 
 	mPlayerController->GetIngameHUD()->UpdateAmmo(mRemainAmmo);
@@ -798,10 +718,10 @@ void ASRPlayerCharacter::SetAim()
 	{
 		mbIsAiming = mbIsAiming ? false : true;
 		mTutAnimInstance->SetAiming(mbIsAiming);
-		ESlateVisibility crosshairVisibility = mbIsAiming ? ESlateVisibility::Hidden : ESlateVisibility::Visible;
+		ESlateVisibility visibility = mbIsAiming ? ESlateVisibility::Hidden : ESlateVisibility::Visible;
 		if (mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
 		{
-			mCrossHair->SetVisibility(crosshairVisibility);
+			mOnCrossHairVisibility.Execute(visibility);
 		}
 
 		if(mbIsAiming)
@@ -830,7 +750,7 @@ void ASRPlayerCharacter::SetAim()
 	{
 		mbIsAiming = true;
 		mTutAnimInstance->SetAiming(true);
-		mCrossHair->SetVisibility(ESlateVisibility::Hidden);
+		mOnCrossHairVisibility.Execute(ESlateVisibility::Hidden);
 
 		if(mGameModeData.game != EGameType::Tarkov)
 		{
@@ -857,7 +777,7 @@ void ASRPlayerCharacter::SetHip()
 
 		if(mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
 		{
-			mCrossHair->SetVisibility(ESlateVisibility::Visible);
+			mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
 		}
 	}
 }

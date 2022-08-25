@@ -1,11 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "SRProjectile.h"
-
 #include "SRPlayerController.h"
 #include "DrawDebugHelpers.h"
 #include "SRTargetCharacter.h"
 #include "SRPlayerCharacter.h"
+#include "UIHUDWidget.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -58,10 +57,7 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 {
 	mbIsCollision = true;
 
-	if (ImpactParticles)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(Hit.ImpactNormal.Rotation(), Hit.ImpactPoint));
-	}
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(Hit.ImpactNormal.Rotation(), Hit.ImpactPoint));
 
 	if (Hit.GetActor()->GetName().Contains(FString("TargetCharacter")))
 	{
@@ -91,10 +87,9 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 				mBulletDamage = FMath::Clamp(mBulletDamage, mDamageTable.HG_Min, mDamageTable.HG);
 				break;
 			default:
-				UE_LOG(LogTemp, Warning, TEXT("ASRProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
+				UE_LOG(LogTemp, Error, TEXT("ASRProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
 				break;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("OnHit - distance: %f, bullet damage : %d"), distanceToHitPoint, mBulletDamage);
 
 		if (Hit.GetComponent()->GetName().Contains(FString("Head")))
 		{
@@ -102,8 +97,8 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 			mBulletDamage *= 1.5f;
 			mbIsHeadshot = true;
 			mHitType = EHitType::HeadShot;
-
 		}
+
 		int32 getScore = 0;
 		const auto targetCharacter = Cast<ASRTargetCharacter>(Hit.GetActor());
 		const bool bIsKill = targetCharacter->OnHit(mBulletDamage, &getScore);
@@ -117,7 +112,7 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 			mHitType = EHitType::Kill;
 			mOnUpdateKill.Execute();
 		}
-		character->AddViewPortHitMark(mHitType);
+		mHitmark.Execute(mHitType);
 	}
 	Destroy();
 }
@@ -131,6 +126,15 @@ void ASRProjectile::BindPlayerStateInfo(ASRPlayerState* srPlayerState)
 	onHitAndUpdateAcc.BindUObject(srPlayerState, &ASRPlayerState::OnHitCount);
 	mOnUpdateScore.BindUObject(srPlayerState, &ASRPlayerState::OnAddScore);
 	mOnUpdateKill.BindUObject(srPlayerState, &ASRPlayerState::OnKill);
+}
+
+/*
+ * player controller와 정보를 바인드합니다.(delegate)
+ * 대상 정보: HUDWidget
+ */
+void ASRProjectile::BindHUDWidget(UUIHUDWidget* hud)
+{
+	mHitmark.BindUObject(hud, &UUIHUDWidget::AddViewPortHitMark);
 }
 
 /*

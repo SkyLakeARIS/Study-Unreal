@@ -2,9 +2,7 @@
 
 
 #include "SRTargetManager.h"
-
-#include "SRShortRangeGameMode.h"
-#include "SRMidRangeGameMode.h"
+#include "SRGameMode.h"
 #include "SRSpawnPoint.h"
 #include "SRTargetCharacter.h"
 
