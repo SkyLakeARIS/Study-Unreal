@@ -423,7 +423,7 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 		//Calculation of control rotation to update 
 		recoiltime = GetWorld()->GetTimerManager().GetTimerElapsed(FireTimer);
 		RecoilVec = RecoilCurve->GetVectorValue(recoiltime);
-		const float PitchLimit = 10.0f;
+		const float PitchLimit = 20.0f;
 		Del.Roll = 0;
 
 		if(PlayerCharacter->GetGameType() == EGameType::Battlefield)
@@ -509,7 +509,7 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 		FRotator tmprot = mPlayerController->GetControlRotation();
 
 		mPlayerController->SetControlRotation(UKismetMathLibrary::RInterpTo(originalRotator, originalRotator - RecoilDeltaRot, DeltaTime, 5.0f));
-		sumRecoil = UKismetMathLibrary::FInterpTo(sumRecoil, 0.0f, DeltaTime, 10.0f);
+		sumRecoil = UKismetMathLibrary::FInterpTo(sumRecoil, 0.0f, DeltaTime, 5.0f);
 		RecoilDeltaRot = RecoilDeltaRot + (mPlayerController->GetControlRotation() - tmprot);
 	}
 }

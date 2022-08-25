@@ -1,5 +1,4 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 #include "Version.h"
 #include "GameModeData.h"
@@ -8,7 +7,15 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "SRProjectile.generated.h"
 
+class ASRPlayerController;
 enum class EWeaponType : uint8;
+UENUM(BlueprintType)
+enum class EHitType : uint8
+{
+	Hit,
+	HeadShot,
+	Kill
+};
 
 class USphereComponent;
 class UProjectileMovementComponent;
@@ -16,14 +23,7 @@ class UProjectileMovementComponent;
 DECLARE_DELEGATE(FOnHitTarget)
 DECLARE_DELEGATE(FOnUpdateKill)
 DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
-
-
-enum class EHitType : uint8
-{
-	Hit,
-	HeadShot,
-	Kill
-};
+DECLARE_DELEGATE_OneParam(FOnHitmark, EHitType)
 
 
 /*
@@ -47,6 +47,9 @@ public:
 
 	UFUNCTION()
 	void BindPlayerStateInfo(ASRPlayerState* playerState);
+
+	UFUNCTION()
+	void BindHUDWidget(UUIHUDWidget* hud);
 
 	UFUNCTION()
 	void SetBulletType(EWeaponType gunType);
@@ -81,7 +84,10 @@ protected:
 private:
 
 	bool mbDebugMode;
+	// UI
+	FOnHitmark mHitmark;
 
+	// Datas
 	FVector mStartLocation;
 	FOnUpdateScore mOnUpdateScore;
 	FOnUpdateKill mOnUpdateKill;
@@ -92,5 +98,7 @@ private:
 	bool mbIsCollision;
 	bool mbIsHeadshot;
 	bool mbIsTargetHit;
+
 };
+
 

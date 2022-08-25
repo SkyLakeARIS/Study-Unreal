@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "SRPlayerCharacter.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnCrossHairVisibility, ESlateVisibility);
 
 
 enum class EHitType : uint8;
@@ -70,8 +71,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void NotifyReloadEnd();
 
-	void AddViewPortHitMark(EHitType hitType);
-
 	UFUNCTION()
 	void InitGameMode(FGameModeData modeData);
 
@@ -85,8 +84,6 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 	void tryBindSelectModesUI();
-
-	void clearHitMark();
 
 	void StartFire();
 	void StopFire();
@@ -128,33 +125,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class ASRProjectile> mProjectileClass;
 
-
 	// UI
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
-	TSubclassOf<UUserWidget> mCrossHairClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
-	TSubclassOf<UUserWidget> mHitMarkClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
-	TSubclassOf<UUserWidget> mHeadshotMarkClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
-	TSubclassOf<UUserWidget> mKillMarkClass;
-
-	UPROPERTY()
-	UUserWidget* mCrossHair;
-	UPROPERTY()
-	UUserWidget* mHitMark;
-	UPROPERTY()
-	UUserWidget* mHeadshotMark;
-	UPROPERTY()
-	UUserWidget* mKillMark;
-
-	EHitType mCurrentMark;
-	FTimerHandle mHitMarkTimer;
-
+	FOnCrossHairVisibility mOnCrossHairVisibility;
 
 	/*
 	 *  Weapon and scope
@@ -184,7 +156,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon | Effect")
 	class UParticleSystem* mMuzzleParticles;
 
-
 	// game mode data
 	FGameModeData mGameModeData;
 
@@ -204,11 +175,12 @@ protected:
 	const short CAN_FIRE = 1;
 	const short CAN_NOT_FIRE = 0;
 	short mFireFlag;		// 하나의 스레드만 접근하도록 하기위한  flag 변수입니다. flag : CAN_FIRE, CAN_NOT_FIRE
-	bool mbNeedBoltAction;	// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
-	bool mbIsEmptyMag;		// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
-	bool mbIsAiming;		// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
-	bool mbFiring;			// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
-	bool mbIsReload;		// 애님인스턴스의 스테이트머신에서 이 값을 감지합니다.
+	// 애님인스턴스의 스테이트머신에서 아래 5개 변수의 값을 감지합니다.
+	bool mbNeedBoltAction;
+	bool mbIsEmptyMag;
+	bool mbIsAiming;
+	bool mbFiring;
+	bool mbIsReload;
 	EWaeponFireMode mFireMode;
 
 	/*

@@ -5,7 +5,6 @@
 #include "GameFramework/PlayerController.h"
 #include "SRPlayerController.generated.h"
 
-
 class ASRPlayerState;
 class UUISelectModesWidget;
 class UUIResultWidget;
@@ -81,7 +80,7 @@ private:
 	UPROPERTY()
 	UUIHUDWidget* InGameHUD;
 	UPROPERTY()
-	UUIPauseWidget* mPauseWidget;	// esc 키 UI (current tap key)
+	UUIPauseWidget* mPauseWidget;
 	UPROPERTY()
 	UUIResultWidget* mResultWidget;
 	UPROPERTY()
