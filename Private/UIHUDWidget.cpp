@@ -33,6 +33,9 @@ void UUIHUDWidget::InitializeWidgets()
 	mHeadshotMark->SetVisibility(ESlateVisibility::Hidden);
 	mKillMark->SetVisibility(ESlateVisibility::Hidden);
 	mCrossHair->SetVisibility(ESlateVisibility::Hidden);
+
+	// 임의의 값으로 지정해둡니다.
+	mCurrentMark = mHitMark;
 }
 
 void UUIHUDWidget::UpdateRemainingTime(int32 remainingTime)
@@ -91,46 +94,34 @@ void UUIHUDWidget::SetCrosshairVisibility(ESlateVisibility option)
 // 표시할 히트마크의 유형은 projectile 개체가 전달해줍니다.
 void UUIHUDWidget::AddViewPortHitMark(EHitType hitType)
 {
-	// 포인터로 변경하여 코드 줄이기.
-	mCurrentMark = hitType;
-	// 새로운 히트마크를 표시하기 위해 일단 모든 히트마크를 뷰포트에서 숨깁니다.
-	mHitMark->SetVisibility(ESlateVisibility::Hidden);
-	mHeadshotMark->SetVisibility(ESlateVisibility::Hidden);
-	mKillMark->SetVisibility(ESlateVisibility::Hidden);
+	// 이전에 보여진 히트마크를 뷰포트에서 숨깁니다.
+	mCurrentMark->SetVisibility(ESlateVisibility::Hidden);
 
-	switch (mCurrentMark)
+	switch (hitType)
 	{
 	case EHitType::Hit:
-		mHitMark->SetVisibility(ESlateVisibility::Visible);
-
+		mCurrentMark = mHitMark;
 		break;
 	case EHitType::HeadShot:
-		mHeadshotMark->SetVisibility(ESlateVisibility::Visible);
+		mCurrentMark = mHeadshotMark;
 		break;
-		case EHitType::Kill:
-		mKillMark->SetVisibility(ESlateVisibility::Visible);
+	case EHitType::Kill:
+		mCurrentMark = mKillMark;
 		break;
 	default:
 		UE_LOG(LogTemp, Display, TEXT("UUIHUDWidget - AddViewPortHitMark : 올바르지 않은 EHitType 타입입니다."));
 		break;
 	}
+
+	mCurrentMark->SetVisibility(ESlateVisibility::Visible);
+
 	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &UUIHUDWidget::clearHitMark, 0.5f, false, -1.0f);
 }
 
 // 타이머에 의해 호출되는 히트마크를 지우는 함수입니다.
 void UUIHUDWidget::clearHitMark()
 {
-	switch (mCurrentMark)
-	{
-	case EHitType::Hit:
-		mHitMark->SetVisibility(ESlateVisibility::Hidden);
-		break;
-	case EHitType::HeadShot:
-		mHeadshotMark->SetVisibility(ESlateVisibility::Hidden);
-		break;
-	case EHitType::Kill:
-		mKillMark->SetVisibility(ESlateVisibility::Hidden);
-		break;
-	}
+	mCurrentMark->SetVisibility(ESlateVisibility::Hidden);
+
 	GetWorld()->GetTimerManager().ClearTimer(mHitMarkTimer);
 }

@@ -18,7 +18,6 @@ ASRProjectile::ASRProjectile()
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &ASRProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
-
 	RootComponent = CollisionComp;
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
@@ -50,7 +49,6 @@ void ASRProjectile::Tick(float DeltaTime)
 void ASRProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -59,61 +57,64 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(Hit.ImpactNormal.Rotation(), Hit.ImpactPoint));
 
-	if (Hit.GetActor()->GetName().Contains(FString("TargetCharacter")))
+	// 타겟에 적중한 경우 외에는 별도의 충돌 처리를 하지 않습니다.
+	if (!Hit.GetActor()->GetName().Contains(FString("TargetCharacter")))
 	{
-		mbIsTargetHit = true;
-		mHitType = EHitType::Hit;
+		Destroy();
+		return;
 	}
 
-	ASRPlayerCharacter* character = nullptr;
+	mHitType = EHitType::Hit;
+
+
+	const float distanceToHitPoint = (GetActorLocation() - mStartLocation).Size();
+	//mBulletDamage -= (distanceToHitPoint / 5000.0f);
+
+	// 총알 타입에 맞는 데미지 테이블을 참고하여 거리에 따른 최종 데미지를 계산합니다.
+	// 1이 cm라는 가정하에 50미터마다 데미지가 1씩 감소합니다. 데미지 감소는 최솟값 미만이 되지 않습니다.
+	switch(mBulletType)
+	{
+		case EWeaponType::AR:
+			mBulletDamage = FMath::Clamp(mDamageTable.AR - static_cast<int32>(distanceToHitPoint / 5000.0f), mDamageTable.AR_Min, mDamageTable.AR);
+			break;
+		case EWeaponType::SR:
+			mBulletDamage = FMath::Clamp(mDamageTable.SR - static_cast<int32>(distanceToHitPoint / 5000.0f), mDamageTable.SR_Min, mDamageTable.SR);
+			break;
+		case EWeaponType::HG:
+			mBulletDamage = FMath::Clamp(mDamageTable.HG - static_cast<int32>(distanceToHitPoint / 5000.0f), mDamageTable.HG_Min, mDamageTable.HG);
+			break;
+		default:
+			UE_LOG(LogTemp, Error, TEXT("ASRProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
+			break;
+	}
+
+	if (Hit.GetComponent()->GetName().Contains(FString("Head")))
+	{
+		mBulletDamage *= 1.5f;
+		mbIsHeadshot = true;
+		mHitType = EHitType::HeadShot;
+	}
+
+	int32 getScore = 0;
+	const auto targetCharacter = Cast<ASRTargetCharacter>(Hit.GetActor());
+	const bool bIsKill = targetCharacter->OnHit(mBulletDamage, &getScore);
+
+	getScore = mbIsHeadshot ? getScore * 1.5f : getScore;
+	onHitAndUpdateAcc.Execute();
+
+	if(bIsKill)
+	{
+		// 저격총의 경우에 타겟을 쓰러트렸을 때 거리에 따른 추가 점수를 얻습니다.
+		if(mBulletType == EWeaponType::SR)
+		{
+			getScore += static_cast<int32>(distanceToHitPoint);
+		}
+		mHitType = EHitType::Kill;
+		mOnUpdateKill.Execute();
+	}
+	mOnUpdateScore.Execute(getScore);
+	mHitmark.Execute(mHitType);
 	
-	if(mbIsTargetHit)
-	{
-		character = Cast<ASRPlayerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-
-
-		// 1이 cm라는 가정하에 50미터마다 데미지가 1씩 감소합니다. 데미지 감소는 최솟값 미만이 되지 않습니다.
-		const float distanceToHitPoint = (GetActorLocation() - mStartLocation).Size();
-		mBulletDamage -= (distanceToHitPoint / 500.0f);
-		switch(mBulletType)
-		{
-			case EWeaponType::AR:
-				mBulletDamage =  FMath::Clamp(mBulletDamage, mDamageTable.AR_Min, mDamageTable.AR);
-				break;
-			case EWeaponType::SR:
-				mBulletDamage = FMath::Clamp(mBulletDamage, mDamageTable.SR_Min, mDamageTable.SR);
-				break;
-			case EWeaponType::HG:
-				mBulletDamage = FMath::Clamp(mBulletDamage, mDamageTable.HG_Min, mDamageTable.HG);
-				break;
-			default:
-				UE_LOG(LogTemp, Error, TEXT("ASRProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
-				break;
-		}
-
-		if (Hit.GetComponent()->GetName().Contains(FString("Head")))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("headshot!"));
-			mBulletDamage *= 1.5f;
-			mbIsHeadshot = true;
-			mHitType = EHitType::HeadShot;
-		}
-
-		int32 getScore = 0;
-		const auto targetCharacter = Cast<ASRTargetCharacter>(Hit.GetActor());
-		const bool bIsKill = targetCharacter->OnHit(mBulletDamage, &getScore);
-
-		getScore = mbIsHeadshot ? getScore * 1.5f : getScore;
-
-		onHitAndUpdateAcc.Execute();
-		mOnUpdateScore.Execute(getScore);
-		if(bIsKill)
-		{
-			mHitType = EHitType::Kill;
-			mOnUpdateKill.Execute();
-		}
-		mHitmark.Execute(mHitType);
-	}
 	Destroy();
 }
 
@@ -139,28 +140,10 @@ void ASRProjectile::BindHUDWidget(UUIHUDWidget* hud)
 
 /*
  * 발사된 총알의 타입을 무기타입으로부터 정하는 함수입니다.
- * 총알의 타입을 정하고 그에맞는 총알의 속도와 데미지를 정합니다.
  */
 void ASRProjectile::SetBulletType(EWeaponType gunType)
 {
 	mBulletType = gunType;
-	switch(mBulletType)
-	{
-		case EWeaponType::AR:
-			mBulletDamage = mDamageTable.AR;
-			break;
-		case EWeaponType::HG:
-			mBulletDamage = mDamageTable.HG;
-			break;
-		case EWeaponType::SR:
-			mBulletDamage = mDamageTable.SR;
-			break;
-		default:
-			UE_LOG(LogTemp, Warning, TEXT("SetBulletType : gunType - 잘못된 enum 데이터 입니다."));
-			_ASSERT(false);
-	}
-	ProjectileMovement->InitialSpeed = 750.f;
-	ProjectileMovement->MaxSpeed = 10000.f;
 }
 
 void ASRProjectile::SetStartLocation(FVector location)

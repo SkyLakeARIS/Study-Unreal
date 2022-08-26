@@ -512,7 +512,7 @@ void ASRPlayerCharacter::StopFire()
 	}
 	mRecoilFactor = 0.0f;
 	mbFiring = false;
-	mTutAnimInstance->SetFiring(false);
+	mTutAnimInstance->SetRecoil(false);
 	mFirstShot = true;
 }
 
@@ -527,7 +527,7 @@ void ASRPlayerCharacter::BurstFire()
 	{
 		mCurrentBurst = 0;
 		GetWorldTimerManager().ClearTimer(mBurstFireTimer);
-		mTutAnimInstance->SetFiring(false);
+		mTutAnimInstance->SetRecoil(false);
 
 		// flag를 끄고, 내부 타이머로 발사했으므로 점사가 끝나면 다시 flag를 켜준다.
 		endWeaponDelay();
@@ -540,7 +540,7 @@ void ASRPlayerCharacter::FireShot()
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), mMuzzleParticles, mWeapon->GetSocketTransform(FName("S_Muzzle")).GetLocation(), mWeapon->GetSocketTransform(FName("S_Muzzle")).GetRotation().Rotator());
 
-	mTutAnimInstance->SetFiring(true);
+	mTutAnimInstance->SetRecoil(true);
 
 	// 준비 기간에는 전적 및 정확도를 기록하지 않습니다.
 	if(mPlayerController->IsStartMainGame())
@@ -663,7 +663,7 @@ void ASRPlayerCharacter::FireShot()
 
 	if(mFireMode == EWaeponFireMode::SINGLE_FIRE)
 	{
-		mTutAnimInstance->SetFiring(false);
+		mTutAnimInstance->SetRecoil(false);
 	}
 
 	if(mRemainAmmo <= 0)
@@ -681,7 +681,7 @@ void ASRPlayerCharacter::FireShot()
 		mFireFlag = CAN_NOT_FIRE;
 		mbIsEmptyMag = true;
 
-		mTutAnimInstance->SetFiring(false);
+		mTutAnimInstance->SetRecoil(false);
 	}
 	else
 	{
@@ -690,15 +690,12 @@ void ASRPlayerCharacter::FireShot()
 		{
 			mbNeedBoltAction = true;
 			mBehaviorFlag = CAN_NOT_BEHAVIOR;
-			//GetWorld()->GetTimerManager().SetTimer(mFireDelayTimer, this, &ASRPlayerCharacter::endWeaponDelay, mFireDelay, false);
-
 		}
 	}
 }
 
 void ASRPlayerCharacter::SetAim()
 {
-
 	if(mBehaviorFlag == CAN_NOT_BEHAVIOR)
 	{
 		// 저격총을 골랐을때 토글 모드에서 줌 상태에서 사격을 했을때 볼트 액션을 해야하지만
@@ -718,7 +715,7 @@ void ASRPlayerCharacter::SetAim()
 	{
 		mbIsAiming = mbIsAiming ? false : true;
 		mTutAnimInstance->SetAiming(mbIsAiming);
-		ESlateVisibility visibility = mbIsAiming ? ESlateVisibility::Hidden : ESlateVisibility::Visible;
+		const ESlateVisibility visibility = mbIsAiming ? ESlateVisibility::Hidden : ESlateVisibility::Visible;
 		if (mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
 		{
 			mOnCrossHairVisibility.Execute(visibility);

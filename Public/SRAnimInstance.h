@@ -31,7 +31,7 @@ public:
 
 	void SetAiming(bool IsAiming);
 
-	void SetFiring(bool isFiring);
+	void SetRecoil(bool isFiring);
 
 	UFUNCTION(BlueprintCallable)
 	void Fire();
@@ -45,8 +45,8 @@ public:
 
 	void Reload();
 
-	UFUNCTION(BlueprintCallable)
-	void StopReload();
+	//UFUNCTION(BlueprintCallable)
+	//void StopReload();
 
 	void SetSightTransform();
 	void SetRelativeHandTransform();

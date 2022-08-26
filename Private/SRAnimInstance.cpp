@@ -21,7 +21,6 @@ USRAnimInstance::USRAnimInstance()
 void USRAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
-
 }
 
 void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -118,7 +117,6 @@ void USRAnimInstance::SetSightTransform()
 			}
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("ADSdistance :   %f"), ADSdistance);
 
 	SightTransform.SetLocation(SightTransform.GetLocation() + SightTransform.GetRotation().Vector() * ADSdistance);
 }
@@ -145,7 +143,6 @@ void USRAnimInstance::SetRelativeHandTransform()
 	FTransform MeshTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("hand_r"));
 
 	RelativeHandTransform = UKismetMathLibrary::MakeRelativeTransform(OpticSocketTransform, MeshTransform);
-
 }
 
 void USRAnimInstance::SetFinalHandTransform()
@@ -177,7 +174,6 @@ void USRAnimInstance::SetLeftHandIK()
 
 	// mesh(팔)을 총에 있는 그립 소켓에 맞는 위치를 계산해줌.
 	LeftHandTransform = UKismetMathLibrary::MakeRelativeTransform(GunSocketTransform, MeshSocketTransform);
-
 }
 
 void USRAnimInstance::InterpAiming(float DeltaSeconds)
@@ -215,7 +211,6 @@ void USRAnimInstance::MoveVectorCurve(float DeltaSeconds)
 		SwayLocation = UKismetMathLibrary::VInterpTo(SwayLocation, NewVec, DeltaSeconds, 1.8f)*Velocity;
 		SwayLocation *= Velocity;
 	}
-	
 }
 
 // 화면을 움직일때 무기의 상하좌우 흔들림 구현 (타르코프)
@@ -255,11 +250,8 @@ void USRAnimInstance::RecoilTimerFunction()
 
 void USRAnimInstance::RecoveryStart()
 {
-	//if (mPlayerController->GetControlRotation().Pitch > RecoilStartRot.Pitch)
-	//{
-		bRecoilRecovery = true;
-		GetWorld()->GetTimerManager().SetTimer(RecoveryTimer, this, &USRAnimInstance::RecoveryTimerFunction, RecoveryTime, false);
-	//}
+	bRecoilRecovery = true;
+	GetWorld()->GetTimerManager().SetTimer(RecoveryTimer, this, &USRAnimInstance::RecoveryTimerFunction, RecoveryTime, false);
 }
 
 void USRAnimInstance::RecoveryTimerFunction()
@@ -276,9 +268,9 @@ void USRAnimInstance::SetAiming(bool IsAiming)
 	}
 }
 
-void USRAnimInstance::SetFiring(bool isFiring)
+void USRAnimInstance::SetRecoil(bool isStart)
 {
-	bFiring = isFiring;
+	bFiring = isStart;
 	if(bFiring)
 	{
 		RecoilStart();
@@ -298,16 +290,16 @@ void USRAnimInstance::Reload()
 	}
 }
 
-void USRAnimInstance::StopReload()
-{
-	ReloadAlpha = 1.0f;
-}
+//void USRAnimInstance::StopReload()
+//{
+//	ReloadAlpha = 1.0f;
+//}
 
 void USRAnimInstance::Fire()
 {
-	FVector RecoilLoc;
-	FRotator RecoilRot;
-	bFiring = true;
+	FVector RecoilLoc = FVector::ZeroVector;
+	FRotator RecoilRot = FRotator::ZeroRotator;
+
 	switch(PlayerCharacter->GetWeaponType())
 	{
 		case EWeaponType::AR:
