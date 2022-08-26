@@ -20,13 +20,11 @@ ASRSniperBullet::ASRSniperBullet()
 void ASRSniperBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ASRSniperBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 

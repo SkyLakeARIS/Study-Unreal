@@ -40,7 +40,6 @@ ASRPlayerController::ASRPlayerController()
 void ASRPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
 }
 
 void ASRPlayerController::OnPossess(APawn* InPawn)
@@ -156,7 +155,6 @@ void ASRPlayerController::BeginPlay()
 
 void ASRPlayerController::PauseGame()
 {
-	UE_LOG(LogTemp, Warning, TEXT("GamePuaue"));
 	InGameHUD->SetVisibility(ESlateVisibility::Hidden);
 	mPauseWidget = CreateWidget<UUIPauseWidget>(this, mPauseWidgetClass);
 	mPauseWidget->AddToViewport(3);

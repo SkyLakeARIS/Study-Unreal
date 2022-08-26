@@ -20,13 +20,11 @@ ASRRifleBullet::ASRRifleBullet()
 void ASRRifleBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ASRRifleBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 

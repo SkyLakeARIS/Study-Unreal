@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UISelectWidget.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
@@ -44,17 +42,14 @@ void USelectWidget::OnLongRangeClicked()
 void USelectWidget::OnMovableShortRangeClicked()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("MovableShortRange"));
-
 }
 
 void USelectWidget::OnMovableMidRangeClicked()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("MovableMidRange"));
-
 }
 
 void USelectWidget::OnMovableLongRangeClicked()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("MovableLongRange"));
-
 }

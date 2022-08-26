@@ -20,13 +20,11 @@ ASRHandGunBullet::ASRHandGunBullet()
 void ASRHandGunBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ASRHandGunBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
