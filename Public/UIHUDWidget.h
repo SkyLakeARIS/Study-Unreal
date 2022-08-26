@@ -83,6 +83,8 @@ protected:
 	UPROPERTY()
 	UUserWidget* mKillMark;
 
-	EHitType mCurrentMark;
+	UPROPERTY()
+	UUserWidget* mCurrentMark;
+
 	FTimerHandle mHitMarkTimer;
 };
