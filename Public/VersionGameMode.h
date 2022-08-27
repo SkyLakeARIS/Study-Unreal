@@ -1,5 +1,4 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 #include "Version.h"
 #include "GameFramework/GameModeBase.h"

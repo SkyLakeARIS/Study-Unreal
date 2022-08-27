@@ -1,6 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "UISelectModesWidget.h"
 #include "SRPlayerController.h"
 #include "SRPlayerCharacter.h"
@@ -59,7 +57,7 @@ void UUISelectModesWidget::clickedAR()
 	mSelectedModes.weapon = EWeaponType::AR;
 	mbIsSelectWeapon = true;
 
-	// ARÀÇ °æ¿ì¿¡´Â ¸ðµç Á¶ÁØ°æÀ» ÀåÂøÇÒ ¼ö ÀÖÀ½.
+	// ARì˜ ê²½ìš°ì—ëŠ” ëª¨ë“  ì¡°ì¤€ê²½ì„ ìž¥ì°©í•  ìˆ˜ ìžˆìŒ.
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(true);
 }
@@ -71,7 +69,7 @@ void UUISelectModesWidget::clickedHG()
 	mBtnSR->SetIsEnabled(true);
 	mbIsSelectWeapon = true;
 
-	// HGÀÇ °æ¿ì 1¹èÀ² Á¶ÁØ°æ¸¸ ÀåÂø °¡´ÉÇÏµµ·Ï Á¦ÇÑ
+	// HGì˜ ê²½ìš° 1ë°°ìœ¨ ì¡°ì¤€ê²½ë§Œ ìž¥ì°© ê°€ëŠ¥í•˜ë„ë¡ ì œí•œ
 	mBtn1X->SetIsEnabled(false);
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(true);
@@ -92,7 +90,7 @@ void UUISelectModesWidget::clickedSR()
 	mSelectedModes.weapon = EWeaponType::SR;
 	mbIsSelectWeapon = true;
 
-	// SRÀÇ °æ¿ì¿¡´Â ¸ðµç Á¶ÁØ°æÀ» ÀåÂøÇÒ ¼ö ÀÖÀ½.
+	// SRì˜ ê²½ìš°ì—ëŠ” ëª¨ë“  ì¡°ì¤€ê²½ì„ ìž¥ì°©í•  ìˆ˜ ìžˆìŒ.
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(true);
 }
@@ -187,13 +185,9 @@ void UUISelectModesWidget::clickedStart()
 		playerController->ShowInGameHUDAndStartTimer();
 		playerController->GetTargetManager()->SetTargetType(mbIsCharacterType);
 		RemoveFromParent();
-		UE_LOG(LogTemp, Warning, TEXT("start "));
 	}
 	else
 	{
 		mBtnStart->SetColorAndOpacity(FLinearColor::Red);
-
-		// need select all button
-		UE_LOG(LogTemp, Warning, TEXT("Need select "));
 	}
 }

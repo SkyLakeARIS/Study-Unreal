@@ -50,17 +50,17 @@ protected:
 protected:
 
 	UPROPERTY()
-	UTextBlock* RemainingTime;
+	UTextBlock* mRemainingTime;
 	UPROPERTY()
-	UTextBlock* Accuracy;
+	UTextBlock* mAccuracy;
 	UPROPERTY()
-	UTextBlock* FireMode;
+	UTextBlock* mFireMode;
 	UPROPERTY()
-	UTextBlock* RemainingAmmo;
+	UTextBlock* mRemainingAmmo;
 	UPROPERTY()
-	UTextBlock* Score;
+	UTextBlock* mScore;
 	UPROPERTY()
-	UTextBlock* DisplayGameMode;
+	UTextBlock* mDisplayGameMode;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
 	TSubclassOf<UUserWidget> mCrossHairClass;

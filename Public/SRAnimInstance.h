@@ -1,5 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 #include "Version.h"
 #include "Animation/AnimInstance.h"
@@ -45,9 +44,6 @@ public:
 
 	void Reload();
 
-	//UFUNCTION(BlueprintCallable)
-	//void StopReload();
-
 	void SetSightTransform();
 	void SetRelativeHandTransform();
 	void SetFinalHandTransform();
@@ -64,11 +60,9 @@ public:
 
 protected:
 
-
 	//Automatically called in RecoilStart(), no need to call this explicitly
 	UFUNCTION()
 	void RecoilTimerFunction();
-
 
 	//This function is automatically called, no need to call this. It is inside the Tick function
 	UFUNCTION()
@@ -77,8 +71,6 @@ protected:
 	//This function too is automatically called from the recovery start function.
 	UFUNCTION()
 	void RecoveryTimerFunction();
-
-
 
 public:
 
@@ -133,46 +125,46 @@ public:
 
 	// recoil
 	UPROPERTY(BlueprintReadWrite)
-		bool bRecoil;
+	bool bRecoil;
 	UPROPERTY(BlueprintReadWrite)
-		bool bFiring;
+	bool bFiring;
 	UPROPERTY(BlueprintReadWrite)
-		bool bRecoilRecovery;
+	bool bRecoilRecovery;
 
 	//Timer Handles
 	UPROPERTY(BlueprintReadwrite)
-		FTimerHandle FireTimer;
+	FTimerHandle FireTimer;
 	UPROPERTY(BlueprintReadwrite)
-		FTimerHandle RecoveryTimer;
+	FTimerHandle RecoveryTimer;
 
 	/*Optional variables to customize how fast the recoil resets and what is the max time
 		upto which the recovery can last */
 
 	UPROPERTY(BlueprintReadWrite)
-		float RecoveryTime = 3.0f;
+	float RecoveryTime = 3.0f;
 	UPROPERTY(BlueprintReadWrite)
-		float RecoverySpeed = 10.0f;
+	float RecoverySpeed = 10.0f;
 	float sumRecoil = 0.0f;
 
 	UPROPERTY()
-		FRotator oldRotation;
+	FRotator oldRotation;
 	//Control rotation at the start of the recoil
 	UPROPERTY()
-		FRotator RecoilStartRot;
+	FRotator RecoilStartRot;
 	//Control rotation change due to recoil
 	UPROPERTY()
-		FRotator RecoilDeltaRot;
+	FRotator RecoilDeltaRot;
 	//Control rotation chnage due to player moving the mouse
 	UPROPERTY()
-		FRotator PlayerDeltaRot;
+	FRotator PlayerDeltaRot;
 	//Temporary variable used in tick
 	UPROPERTY(BlueprintReadWrite)
-		FRotator Del;
+	FRotator Del;
 
 	//Player controller reference
 	UPROPERTY(BlueprintReadWrite)
 	class ASRPlayerController* mPlayerController;
 
 	UPROPERTY(BlueprintReadWrite)
-		float FireRate;
+	float FireRate;
 };

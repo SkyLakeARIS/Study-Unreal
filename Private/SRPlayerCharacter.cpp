@@ -177,8 +177,8 @@ void ASRPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	check(PlayerInputComponent);
 
 	// Bind jump events
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASRPlayerCharacter::StartFire);
@@ -284,7 +284,7 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 		break;
 	}
 	default:
-		UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter - InitGameMode : 올바르지 않은 enum EGameType 데이터입니다."));
+		checkf(false, TEXT("ASRPlayerCharacter - InitGameMode : 올바르지 않은 enum EGameType 데이터입니다."));
 		break;
 	}
 
@@ -301,7 +301,7 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 			mScopeLocationSocketName = FString("S_Scope6X");
 			break;
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EScopeType 데이터입니다."));
+			checkf(false, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EScopeType 데이터입니다."));
 			break;
 	}
 
@@ -323,7 +323,7 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 			mWeaponLocationSocketName = FString("S_HandR_Sniper");
 			break;
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EWeaponType 데이터입니다."));
+			checkf(false, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EWeaponType 데이터입니다."));
 			break;
 	}
 
@@ -375,39 +375,39 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 	switch(modeData.weapon)
 	{
 		case EWeaponType::AR:
-			{
-				mMaxMagAmount = EWeaponMagSize::AR;
-				mRemainAmmo = mMaxMagAmount;
-				mFireDelay = 0.1f;
-				mFireMode = EWaeponFireMode::FULL_AUTO;
-				mProjectileClass = ASRRifleBullet::StaticClass();
+		{
+			mMaxMagAmount = EWeaponMagSize::AR;
+			mRemainAmmo = mMaxMagAmount;
+			mFireDelay = 0.1f;
+			mFireMode = EWaeponFireMode::FULL_AUTO;
+			mProjectileClass = ASRRifleBullet::StaticClass();
 
-				mSwitchFireModeSound = mWeaponData->GetSwtichFireModeSound();
-				break;
-			}
+			mSwitchFireModeSound = mWeaponData->GetSwtichFireModeSound();
+			break;
+		}
 		case EWeaponType::HG:
-			{
-				mMaxMagAmount = EWeaponMagSize::HG;
-				mRemainAmmo = mMaxMagAmount;
-				mFireDelay = 0.15f;
-				mFireMode = EWaeponFireMode::SINGLE_FIRE;
-				mProjectileClass = ASRHandGunBullet::StaticClass();
-				break;
-			}
+		{
+			mMaxMagAmount = EWeaponMagSize::HG;
+			mRemainAmmo = mMaxMagAmount;
+			mFireDelay = 0.12f;
+			mFireMode = EWaeponFireMode::SINGLE_FIRE;
+			mProjectileClass = ASRHandGunBullet::StaticClass();
+			break;
+		}
 		case EWeaponType::SR:
-			{
-				mMaxMagAmount = EWeaponMagSize::SR;
-				mRemainAmmo = mMaxMagAmount;
-				mFireDelay = 2.0f;
-				mFireMode = EWaeponFireMode::SINGLE_FIRE;
-				mProjectileClass = ASRSniperBullet::StaticClass();
+		{
+			mMaxMagAmount = EWeaponMagSize::SR;
+			mRemainAmmo = mMaxMagAmount;
+			mFireDelay = 2.0f;
+			mFireMode = EWaeponFireMode::SINGLE_FIRE;
+			mProjectileClass = ASRSniperBullet::StaticClass();
 
-				// 저격총의 경우 조준경의 크기가 비정상적으로 커지는 문제로 인해서 강제로 크기를 조정합니다.
-				mScope->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
-				break;
-			}
+			// 저격총의 경우 조준경의 크기가 비정상적으로 커지는 문제로 인해서 강제로 크기를 조정합니다.
+			mScope->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
+			break;
+		}
 		default:
-			UE_LOG(LogTemp, Error, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EWeaponType 데이터입니다."));
+			checkf(false, TEXT("InitGameMode : InitGameMode - 올바르지 않은 enum EWeaponType 데이터입니다."));
 			break;
 	}
 
@@ -481,7 +481,7 @@ void ASRPlayerCharacter::StartFire()
 
 	mbFiring = true;
 
-	switch (mFireMode )
+	switch (mFireMode)
 	{
 		case EWaeponFireMode::SINGLE_FIRE:
 			FireShot();
@@ -642,7 +642,7 @@ void ASRPlayerCharacter::FireShot()
 			break;
 		}
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter- FireShot : 올바르지 않은 enum gametype 데이터입니다."));
+			checkf(false, TEXT("ASRPlayerCharacter- FireShot : 올바르지 않은 enum gametype 데이터입니다."));
 			break;
 	}
 	// R6S 방식에서 ray가 아무것도 충돌을 감지하지 못하면 projectile이 생성되지 않으므로
@@ -830,7 +830,7 @@ void ASRPlayerCharacter::TurnAtRate(float Rate)
 				break;
 			}
 			default:
-				UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter- TurnAtRate : 올바르지 않은 enum EScopeType 데이터입니다."));
+				checkf(false, TEXT("ASRPlayerCharacter- TurnAtRate : 올바르지 않은 enum EScopeType 데이터입니다."));
 				break;
 		}
 	}
@@ -863,7 +863,7 @@ void ASRPlayerCharacter::LookUpAtRate(float Rate)
 				break;
 			}
 			default:
-				UE_LOG(LogTemp, Warning, TEXT("ASRPlayerCharacter- LookUpAtRate : 올바르지 않은 enum EScopeType 데이터입니다."));
+				checkf(false, TEXT("ASRPlayerCharacter- LookUpAtRate : 올바르지 않은 enum EScopeType 데이터입니다."));
 				break;
 		}
 	}

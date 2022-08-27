@@ -1,7 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
-
 #include "Version.h"
 #include "GameModeData.h"
 #include "GameFramework/Character.h"
@@ -199,6 +197,5 @@ protected:
 	float mRecoilFactor;
 	bool mFirstShot;
 	int32 mContinuousShots;
-
 };
 
