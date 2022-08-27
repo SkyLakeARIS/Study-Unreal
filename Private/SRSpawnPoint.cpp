@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SRSpawnPoint.h"
 
 // Sets default values
@@ -31,6 +29,8 @@ bool ASRSpawnPoint::IsActive() const
 	return mbActive;
 }
 
+// true이면 해당 위치에 타겟이 있으므로 스폰이 불가능합니다.
+// false이면 타겟을 스폰할 수 있습니다.
 void ASRSpawnPoint::Active()
 {
 	mbActive = true;
@@ -42,7 +42,6 @@ void ASRSpawnPoint::BeginPlay()
 	Super::BeginPlay();
 	mPointMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	mPointMesh->SetCollisionObjectType(ECC_Visibility);
-
 }
 
 void ASRSpawnPoint::DeActive()
