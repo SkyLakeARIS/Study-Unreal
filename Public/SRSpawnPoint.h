@@ -1,10 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "Version.h"
 #include "GameFramework/Actor.h"
 #include "SRSpawnPoint.generated.h"
+
 UENUM(BlueprintType)
 enum class ESpawnPointType : uint8
 {

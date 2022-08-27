@@ -1,16 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "Version.h"
 #include "GameFramework/Character.h"
 #include "SRTargetCharacter.generated.h"
 
-
 enum class EMovableAxis : uint8;
 class ASRTargetManager;
 DECLARE_MULTICAST_DELEGATE(FOnTargetDown)
-
 
 /*
  * 타겟 클래스입니다.
@@ -31,7 +27,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetTargetType(bool isCharacterType);
+	void SetTarget(bool isCharacterType, bool isMovable, bool isCrouchable);
 
 	void ActiveTarget();
 
@@ -40,28 +36,15 @@ public:
 
 	void BindSpawnPoint(class ASRSpawnPoint* spawnPoint);
 
-
 	bool OnHit(int32 damage, int32* scoreOut);
-	
-	UFUNCTION(BlueprintCallable)
-	int32 GetHP();
 
-	bool IsActive();
-
-	void SetEndLocation(float distance, EMovableAxis direction);
-
-	void SetMovable(bool isMovable);
-
-	void SetSpeed(float newSpeed);
-
-	void SetCrouchable(bool canCrouch);
+	void initializeMovement(FVector endLocation, float speedFactor);
 
 protected:
 
 	virtual void BeginPlay() override;
 
-	void dead();
-
+	void changeCollisionEnabled(ECollisionEnabled::Type newType);
 protected:
 
 	// common
@@ -70,9 +53,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	USphereComponent* mHead;
-
-	FVector mStartLocation;
-	FVector mEndLocation;
 
 	// character type
 	UPROPERTY()
@@ -89,9 +69,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterCrouchDeadAnimation;
-
-	bool mbIsStandPose;
-
 
 	// plate type
 	UPROPERTY()
@@ -113,19 +90,27 @@ protected:
 	USoundBase* mPlateHitSound;
 
 private:
-	FOnTargetDown mOnTargetDown;
-	FTimerHandle mDeathTimer;
-	bool mbIsCharacterType;
-	bool mbIsDown;
-	bool mbIsMovable;
-	bool mbIsReturn;
-	bool mbCanCrouch;
-	FVector mDirection;
-	float mSpeedFactor;
-	float mDistance;
+	// const
+	const int32 MAX_HP = 100;
+	const int32 MIN_HP = 0;
+
+	const int32 HIT_SCORE = 100;
+	const int32 KILL_SCORE = 1000;
+
+	// target data
 	int32 mHP;
-	int32 mHitScore;
-	int32 mKillScore;
+	FVector mStartLocation;
+	FVector mEndLocation;
+	FVector mDistanceToMoveEveryTime;
+
+	// target state
+	bool mbIsCharacterType;
+	bool mbIsMovable;
+	bool mbToEndLocation;
+	bool mbIsCrouchable;
+	bool mbIsCrouching;
+
+	FOnTargetDown mOnTargetDown;
 };
 
 

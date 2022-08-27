@@ -1,7 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "Version.h"
 #include <random>
 #include "GameFramework/Actor.h"
@@ -25,7 +23,6 @@ class VERSION_API ASRTargetManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ASRTargetManager();
-
 
 	UFUNCTION()
 	void RandomTargetSpawn();
@@ -63,5 +60,4 @@ private:
 
 	std::random_device mRandomDevice;
 	std::mt19937 mGen;
-
 };

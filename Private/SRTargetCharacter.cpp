@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SRTargetCharacter.h"
 #include "SRPlayerController.h"
 #include "SRSpawnPoint.h"
@@ -28,20 +26,15 @@ ASRTargetCharacter::ASRTargetCharacter()
 	mHead = CreateDefaultSubobject<USphereComponent>(TEXT("Head"));
 	mHead->SetupAttachment(GetMesh());
 
-	// common init
-	mHP =100;
-	mHitScore = 100;
-	mKillScore = 1000;
+	// common initialize
+	mHP = MAX_HP;
+
 	mbIsCharacterType = true;
 	mEndLocation = FVector::ZeroVector;
-	mbIsReturn = false;
-	mSpeedFactor = 2.0f;
-	mDistance = 0.0f;
-	// character type init
-	mbIsStandPose = false;
-	// plate type init
-	mbIsDown = true;
+	mbIsCrouching = false;
+	mbToEndLocation = true;
 
+	// character type assets load
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CharacterMesh(TEXT("/Game/Assets/Target/HumanType/Meshes/MW_Style2_Male.MW_Style2_Male"));
 	if(SK_CharacterMesh.Succeeded())
 	{
@@ -68,7 +61,7 @@ ASRTargetCharacter::ASRTargetCharacter()
 		mCharacterCrouchDeadAnimation = AS_CharacterCrouchDeadPose.Object;
 	}
 
-
+	// plate type assets load
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PlateMesh(TEXT("/Game/Assets/Target/PlateType/Meshes/SK_Target.SK_Target"));
 	if (SK_PlateMesh.Succeeded())
 	{
@@ -95,7 +88,6 @@ ASRTargetCharacter::ASRTargetCharacter()
 	{
 		mPlateDownAnimation = AS_PlateDownAnimation.Object;
 	}
-	
 
 }
 
@@ -105,70 +97,53 @@ void ASRTargetCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	mStartLocation = GetActorLocation();
-	mEndLocation = GetActorLocation();
+	mEndLocation = FVector::ZeroVector;
 
 	GetMesh()->PlayAnimation(mPlateDownAnimation, false);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	mHead->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	changeCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void ASRTargetCharacter::dead()
+void ASRTargetCharacter::changeCollisionEnabled(ECollisionEnabled::Type newType)
 {
-	Destroy();
+	mHead->SetCollisionEnabled(newType);
+	GetMesh()->SetCollisionEnabled(newType);
 }
 
 // Called every frame
 void ASRTargetCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(mEndLocation != mStartLocation &&  mbIsMovable)
+	if (mbIsMovable == false)
 	{
-		if (mbIsReturn == false)
-		{
-			auto pos = mEndLocation - GetActorLocation();
-			auto loss = pos;
-			pos.Normalize();
-			SetActorLocation(GetActorLocation() + pos * mSpeedFactor);
-			if (loss.Size() < 10.0f)
-			{
-				mbIsReturn = !mbIsReturn;
-			}
-		}
-		else
-		{
-			auto pos = GetActorLocation() - mStartLocation;
-			auto loss = pos;
-			pos.Normalize();
-			SetActorLocation(GetActorLocation() - pos * mSpeedFactor);
-			if (loss.Size() < 10.0f)
-			{
-				mbIsReturn = !mbIsReturn;
-			}
-		}
-
+		return;
 	}
 
+	if((mEndLocation - GetActorLocation()).Size() < 10.0f && mbToEndLocation)
+	{
+		mDistanceToMoveEveryTime = -mDistanceToMoveEveryTime;
+		mbToEndLocation = false;
+	}
+	else if((mStartLocation - GetActorLocation()).Size() < 10.0f && mbToEndLocation == false)
+	{
+		mDistanceToMoveEveryTime = -mDistanceToMoveEveryTime;
+		mbToEndLocation = true;
+	}
+	SetActorLocation(GetActorLocation() + mDistanceToMoveEveryTime);
 }
 
-void ASRTargetCharacter::SetTargetType(bool isCharacterType)
+void ASRTargetCharacter::SetTarget(bool isCharacterType, bool isMovable, bool isCrouchable)
 {
 	mbIsCharacterType = isCharacterType;
+	mbIsMovable = isMovable;
+	mbIsCrouchable = isCrouchable;
+
 	if(mbIsCharacterType)
 	{
 		GetMesh()->SetSkeletalMesh(mCharacterMesh);
 		mHead->SetSphereRadius(13.5f);
 		mHead->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("S_Head"));
-		// 캐릭터 포즈가 앉을 수 있는 스폰포인트이면 랜덤으로 포즈를 정함.
-		if(mbCanCrouch)
-		{
-			mbIsStandPose = FMath::RandBool();
-		}
-		else
-		{
-			mbIsStandPose = true;
-		}
 	}
 	else
 	{
@@ -176,38 +151,37 @@ void ASRTargetCharacter::SetTargetType(bool isCharacterType)
 		mHead->SetSphereRadius(18.0f);
 		mHead->SetRelativeLocation(FVector(2.437271f, 0.000015f, 155.0f));
 	}
+
 	mHead->SetCollisionObjectType(ECC_Pawn);
-	mHead->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionObjectType(ECC_Pawn);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
+// 타겟을 실제로 맞추고 처리할 수 있는 상태가 됩니다.
 void ASRTargetCharacter::ActiveTarget()
 {
-	mbIsDown = false;
-	mHP = 100;
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	mHead->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	mHP = MAX_HP;
+
+	changeCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
 	if(mbIsCharacterType)
 	{
-		if (mbIsStandPose)
+		// 캐릭터 포즈가 앉을 수 있는(스폰포인트이면) 상태이면 랜덤으로 포즈를 정함.
+		if (mbIsCrouchable && FMath::RandBool())
 		{
-			GetMesh()->PlayAnimation(mCharacterStandPoseAnimation, true);
-
+			GetMesh()->PlayAnimation(mCharacterCrouchPoseAnimation, true);
+			mbIsCrouching = true;
 		}
 		else
 		{
-			GetMesh()->PlayAnimation(mCharacterCrouchPoseAnimation, true);
+			GetMesh()->PlayAnimation(mCharacterStandPoseAnimation, true);
 		}
-		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), mPlateUpSound, GetActorLocation());
-
 	}
 	else
 	{
 		GetMesh()->PlayAnimation(mPlateUpAnimation, false);
-		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), mPlateUpSound, GetActorLocation());
 	}
 
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), mPlateUpSound, GetActorLocation());
 }
 
 void ASRTargetCharacter::BindTargetManager(ASRTargetManager* targetManager)
@@ -228,50 +202,46 @@ void ASRTargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
  */
 bool ASRTargetCharacter::OnHit(int32 damage, int32* scoreOut)
 {
+	checkf(scoreOut != nullptr, TEXT("ASRTargetCharacter-OnHit scoreOut이 null입니다."));
+	checkf(damage > 0, TEXT("ASRTargetCharacter-OnHit damage가 0이하 입니다."));
 
-	if(mHP > 0)
+	if(mHP > MIN_HP)
 	{
 		mHP -= damage;
-		*scoreOut = mHitScore;
-		UE_LOG(LogTemp, Warning, TEXT("ASRTargetCharacter :OnHit HP[%d]"), mHP);
-
-		if (!mbIsCharacterType)
-		{
-			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), mPlateHitSound, GetActorLocation());
-		}
+		*scoreOut = HIT_SCORE;
 	}
 
-	if(mHP <= 0)
+	if (!mbIsCharacterType)
 	{
-		/*
-		 *  play dead anim and sound(if its plate
-		 */
-		*scoreOut = mKillScore;
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), mPlateHitSound, GetActorLocation());
+	}
+
+	if(mHP <= MIN_HP)
+	{
+		*scoreOut = KILL_SCORE;
 
 		if(mbIsCharacterType)
 		{
-			if(mbIsStandPose)
+			if(mbIsCrouching)
 			{
-				GetMesh()->PlayAnimation(mCharacterStandDeadAnimation, false);
+				GetMesh()->PlayAnimation(mCharacterCrouchDeadAnimation, false);
 			}
 			else
 			{
-				GetMesh()->PlayAnimation(mCharacterCrouchDeadAnimation, false);
+				GetMesh()->PlayAnimation(mCharacterStandDeadAnimation, false);
 			}
 		}
 		else
 		{
 			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), mPlateDownSound, GetActorLocation());
-			mbIsDown = true;
 			GetMesh()->PlayAnimation(mPlateDownAnimation, false);
-			mEndLocation = FVector::ZeroVector;
 		}
 
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		mHead->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		mOnTargetDown.Broadcast();
-		GetWorld()->GetTimerManager().SetTimer(mDeathTimer, this, &ASRTargetCharacter::dead, 3.0f, false,-1);
+		changeCollisionEnabled(ECollisionEnabled::NoCollision);
 
+		mOnTargetDown.Broadcast();
+		
+		SetLifeSpan(3.0f);
 		if(mbIsMovable)
 		{
 			mbIsMovable = false;
@@ -282,57 +252,14 @@ bool ASRTargetCharacter::OnHit(int32 damage, int32* scoreOut)
 	return false;
 }
 
-int32 ASRTargetCharacter::GetHP()
+void ASRTargetCharacter::initializeMovement(FVector endLocation, float speedFactor)
 {
-	return mHP;
-}
+	checkf(speedFactor >= 1.0f, TEXT("ASRTargetCharacter - SetEndLocation : speedFactor는 1.0f이상이어야 합니다."));
 
-/*
- * 타겟이 활성화 상태인지 아닌지를 반환합니다.
- */
-bool ASRTargetCharacter::IsActive()
-{
-	return !mbIsDown;
-}
-
-void ASRTargetCharacter::SetEndLocation(float distance, EMovableAxis direction)
-{
-	mDistance = distance;
-
-	if(direction == EMovableAxis::X)
-	{
-		mEndLocation.X += distance;
-		UE_LOG(LogTemp, Warning, TEXT("ASRTargetCharacter - SetEndLocation : X , distance %f"), mDistance);
-	}
-	else
-	{
-		mEndLocation.Y += distance;
-		UE_LOG(LogTemp, Warning, TEXT("ASRTargetCharacter - SetEndLocation : Y , distance %f"), mDistance);
-	}
-	mDirection = mEndLocation - GetActorLocation();
-	mDirection.Normalize();
-}
-
-void ASRTargetCharacter::SetMovable(bool isMovable)
-{
-	mbIsMovable = isMovable;
-}
-
-void ASRTargetCharacter::SetSpeed(float newSpeed)
-{
-	if(newSpeed >= 1.0f)
-	{
-		mSpeedFactor = newSpeed;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("SetSpeed : newSpeed less than 1.0f, %f"), newSpeed);
-	}
-}
-
-void ASRTargetCharacter::SetCrouchable(bool canCrouch)
-{
-	mbCanCrouch = canCrouch;
+	mEndLocation = endLocation;
+	mDistanceToMoveEveryTime = mEndLocation - mStartLocation;
+	mDistanceToMoveEveryTime.Normalize();
+	mDistanceToMoveEveryTime *= speedFactor;
 }
 
 
