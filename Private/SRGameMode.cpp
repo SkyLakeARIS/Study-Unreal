@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SRGameMode.h"
 #include "SRPlayerController.h"
 #include "SRPlayerState.h"
@@ -24,6 +22,7 @@ void ASRGameMode::PostInitializeComponents()
 void ASRGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
+
 	playerController = Cast<ASRPlayerController>(NewPlayer);
 	FTimerHandle initTarget;
 	GetWorld()->GetTimerManager().SetTimer(initTarget, this, &ASRGameMode::initTargetManagerMode, 0.5f, false);
@@ -31,6 +30,6 @@ void ASRGameMode::PostLogin(APlayerController* NewPlayer)
 
 void ASRGameMode::initTargetManagerMode()
 {
-	_ASSERT(mGameModeType == EGameModeType::None);
+	checkf(mGameModeType != EGameModeType::None, TEXT("ASRGameMode : initTargetManagerMode - EGameModeType None 타입이 될 수 없습니다."));
 	playerController->GetTargetManager()->SetMovableTargetMode(mGameModeType);
 }

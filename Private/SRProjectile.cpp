@@ -68,7 +68,6 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 
 
 	const float distanceToHitPoint = (GetActorLocation() - mStartLocation).Size();
-	//mBulletDamage -= (distanceToHitPoint / 5000.0f);
 
 	// 총알 타입에 맞는 데미지 테이블을 참고하여 거리에 따른 최종 데미지를 계산합니다.
 	// 1이 cm라는 가정하에 50미터마다 데미지가 1씩 감소합니다. 데미지 감소는 최솟값 미만이 되지 않습니다.
@@ -84,7 +83,7 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 			mBulletDamage = FMath::Clamp(mDamageTable.HG - static_cast<int32>(distanceToHitPoint / 5000.0f), mDamageTable.HG_Min, mDamageTable.HG);
 			break;
 		default:
-			UE_LOG(LogTemp, Error, TEXT("ASRProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
+			checkf(false, TEXT("ASRProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
 			break;
 	}
 

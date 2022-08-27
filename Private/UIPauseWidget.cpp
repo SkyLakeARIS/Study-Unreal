@@ -1,5 +1,4 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "UIPauseWidget.h"
 #include <string>
 #include "SRPlayerController.h"

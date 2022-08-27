@@ -1,7 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "SRProjectile.h"
 #include "SRRifleBullet.generated.h"
 

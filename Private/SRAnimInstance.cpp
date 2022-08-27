@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SRAnimInstance.h"
 #include "SRPlayerController.h"
 #include "Curves/CurveVector.h"
@@ -289,11 +287,6 @@ void USRAnimInstance::Reload()
 		ReloadAlpha = 1.0f;
 	}
 }
-
-//void USRAnimInstance::StopReload()
-//{
-//	ReloadAlpha = 1.0f;
-//}
 
 void USRAnimInstance::Fire()
 {

@@ -1,7 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "Version.h"
 #include "GameFramework/PlayerState.h"
 #include "SRPlayerState.generated.h"
@@ -20,6 +18,7 @@ class VERSION_API ASRPlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
+
 	ASRPlayerState();
 	UFUNCTION()
 	void BindHUD(UUIHUDWidget* HUD);
@@ -32,12 +31,17 @@ public:
 	void OnHitCount();	// hit판정시 delegate 실행
 	UFUNCTION()
 	void OnKill();		// kill판정시 delegate 실행
+
 	int32 GetScore() const;
 	int32 GetAccuracy() const;
 	int32 GetKillCount() const;
+
 private:
+
 	void calcAccuracy();
+
 private:
+
 	FOnUpdateScore mOnUpdateScore;
 	FOnUpdateAccuray mOnUpdateAccuracy;
 	int32 mHits;

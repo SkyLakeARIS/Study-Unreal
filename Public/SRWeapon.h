@@ -1,7 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "Version.h"
 #include "GameModeData.h"
 #include "GameFramework/Actor.h"
@@ -22,18 +20,18 @@ class VERSION_API ASRWeapon : public AActor
 public:	
 	ASRWeapon();
 
-	USkeletalMesh* GetWeapon(EWeaponType weapon);
+	USkeletalMesh* GetWeapon(EWeaponType weapon) const;
 
-	TSubclassOf<AActor> GetScope(EScopeType scope);
+	TSubclassOf<AActor> GetScope(EScopeType scope) const;
 
-	UChildActorComponent* GetScopeActor(EScopeType scope);
+	UChildActorComponent* GetScopeActor(EScopeType scope) const;
 
-	USoundBase* GetFireSound(EWeaponType weapon);
-	USoundBase* GetDryFireSound();
-	USoundBase* GetSwtichFireModeSound();
+	USoundBase* GetFireSound(EWeaponType weapon) const;
+	USoundBase* GetDryFireSound() const;
+	USoundBase* GetSwtichFireModeSound() const;
 
-	TSubclassOf<UAnimInstance> GetCharacterAnimInstance(EWeaponType weapon);
-	TSubclassOf<UAnimInstance> GetWeaponAnimInstance(EWeaponType weapon);
+	TSubclassOf<UAnimInstance> GetCharacterAnimInstance(EWeaponType weapon) const;
+	TSubclassOf<UAnimInstance> GetWeaponAnimInstance(EWeaponType weapon) const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -103,7 +101,4 @@ protected:
 	TSubclassOf<UAnimInstance> mRifleAnimInstance;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimInstance|Weapon")
 	TSubclassOf<UAnimInstance> mHandGunAnimInstance;
-
-
-
 };
