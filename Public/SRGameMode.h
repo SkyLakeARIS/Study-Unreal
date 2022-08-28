@@ -24,12 +24,9 @@ public:
 
 private:
 
-	void initTargetManagerMode();
+	void initTargetManagerMode() const;
 
 protected:
 	UPROPERTY(BlueprintReadWrite)
 	EGameModeType mGameModeType;
-
-	UPROPERTY()
-	class ASRPlayerController* playerController;
 };

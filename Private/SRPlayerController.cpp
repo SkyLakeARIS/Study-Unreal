@@ -61,7 +61,7 @@ void ASRPlayerController::ChangeInputMode(bool bIsGameMode)
 	}
 }
 
-void ASRPlayerController::ResumeCountDown()
+void ASRPlayerController::ResumeCountDown() const
 {
 	GetWorld()->GetTimerManager().UnPauseTimer(THCountDown);
 }

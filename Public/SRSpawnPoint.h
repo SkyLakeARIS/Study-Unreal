@@ -34,9 +34,6 @@ public:
 	// Sets default values for this actor's properties
 	ASRSpawnPoint();
 
-	UFUNCTION(BlueprintCallable)
-	FVector GetSpawnLocation();
-
 	bool IsActive() const;
 
 	void Active();
@@ -44,11 +41,14 @@ public:
 	UFUNCTION()
 	void DeActive();
 
-	bool IsCrouchable();
+	bool IsCrouchable() const;
 
-	ESpawnPointType GetSpawnPointType();
+	ESpawnPointType GetSpawnPointType() const;
 
-	EMovableAxis GetMovableAxis();
+	EMovableAxis GetMovableAxis() const;
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetSpawnLocation() const;
 
 protected:
 	// Called when the game starts or when spawned

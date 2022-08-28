@@ -262,25 +262,25 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 	mOnCrossHairVisibility.BindUObject(mPlayerController->GetIngameHUD(), &UUIHUDWidget::SetCrosshairVisibility);
 
 	// 게임 모드 데이터를 초기화 합니다.
-	FString DisplayMode;
+	FString displayMode;
 	switch (mGameModeData.game)
 	{
 	case EGameType::Battlefield:
 	{
 		UE_LOG(LogTemp, Display, TEXT("InitGameMode : battlefield mode is applied"));
-		DisplayMode = "battlefield mode";
+		displayMode = "battlefield mode";
 		break;
 	}
 	case EGameType::RainbowSix:
 	{
 		UE_LOG(LogTemp, Display, TEXT("InitGameMode : rainbow six:siege mode is applied"));
-		DisplayMode = "rainbow six:siege mode";
+		displayMode = "rainbow six:siege mode";
 		break;
 	}
 	case EGameType::Tarkov:
 	{
 		UE_LOG(LogTemp, Display, TEXT("InitGameMode : Tarkov mode is applied"));
-		DisplayMode = "Tarkov mode";
+		displayMode = "Tarkov mode";
 		break;
 	}
 	default:
@@ -411,12 +411,11 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 			break;
 	}
 
-
 	// 초기화된 데이터들을 업데이트 합니다.
 	mTutAnimInstance = Cast<USRAnimInstance>(mMesh1P->GetAnimInstance());
 	mTutAnimInstance->UpdateSocketInfo();
 
-	mPlayerController->GetIngameHUD()->UpdateGameMode(DisplayMode);
+	mPlayerController->GetIngameHUD()->UpdateGameMode(displayMode);
 	mPlayerController->GetIngameHUD()->UpdateFireMode(mFireMode);
 	mPlayerController->GetIngameHUD()->UpdateAmmo(mRemainAmmo);
 
@@ -429,10 +428,12 @@ void ASRPlayerCharacter::Reload()
 {
 	if(_InterlockedCompareExchange16(&mBehaviorFlag, CAN_NOT_BEHAVIOR, CAN_BEHAVIOR) == CAN_BEHAVIOR)
 	{
-		if(mbIsAiming)
+		mbIsAiming = false;
+		mTutAnimInstance->SetAiming(mbIsAiming);
+		mFirstPersonCameraComponent->SetFieldOfView(90.0f);
+		if(!(mGameModeData.weapon == EWeaponType::SR || mGameModeData.game == EGameType::Tarkov))
 		{
-			mbIsAiming = false;
-			mTutAnimInstance->SetAiming(mbIsAiming);
+			mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
 		}
 		mbIsReload = true;
 	}
@@ -445,23 +446,22 @@ void ASRPlayerCharacter::Reload()
  */
 void ASRPlayerCharacter::SwitchFireMode()
 {
-	if(mGameModeData.weapon == EWeaponType::AR)
+	if (mGameModeData.weapon != EWeaponType::AR)
 	{
-		// 이전 발사 모드의 타이머가 남아있을 수 있으므로 제거합니다.
-		GetWorld()->GetTimerManager().ClearTimer(mFireDelayTimer);
-		EWaeponFireMode modes[] = { EWaeponFireMode::SINGLE_FIRE, EWaeponFireMode::BURST_FIRE,EWaeponFireMode::FULL_AUTO };
-		mFireModeOffset = (mFireModeOffset + 1) % FIRE_SWITCH_MODE;
-		mFireMode  = modes[mFireModeOffset];
-
-		UGameplayStatics::PlaySoundAtLocation(this, mSwitchFireModeSound, GetActorLocation());
-		mPlayerController->GetIngameHUD()->UpdateFireMode(mFireMode);
+		return;
 	}
+	// 이전 발사 모드의 타이머가 남아있을 수 있으므로 제거합니다.
+	GetWorld()->GetTimerManager().ClearTimer(mFireDelayTimer);
+	EWaeponFireMode modes[] = { EWaeponFireMode::SINGLE_FIRE, EWaeponFireMode::BURST_FIRE,EWaeponFireMode::FULL_AUTO };
+	mFireModeOffset = (mFireModeOffset + 1) % FIRE_SWITCH_MODE;
+	mFireMode  = modes[mFireModeOffset];
+
+	UGameplayStatics::PlaySoundAtLocation(this, mSwitchFireModeSound, GetActorLocation());
+	mPlayerController->GetIngameHUD()->UpdateFireMode(mFireMode);
 }
 
 void ASRPlayerCharacter::StartFire()
 {
-
-	// just read
 	if (mBehaviorFlag == CAN_NOT_BEHAVIOR)
 	{
 		return;
@@ -497,7 +497,7 @@ void ASRPlayerCharacter::StartFire()
 			GetWorld()->GetTimerManager().SetTimer(mFireDelayTimer, this, &ASRPlayerCharacter::FireShot, mFireDelay, true, 0.0f);
 			break;
 		default:
-			UE_LOG(LogTemp, Error, TEXT("ASRPlayerCharacter- StartFire : 올바르지 않은 enum EWaeponFireMode 데이터입니다."));
+			checkf(false, TEXT("ASRPlayerCharacter- StartFire : 올바르지 않은 enum EWaeponFireMode 데이터입니다."));
 			break;
 	}
 }
@@ -576,10 +576,10 @@ void ASRPlayerCharacter::FireShot()
 		}
 	}
 
-	FVector MuzzleLocation;
-	FVector EndTrace;
-	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(WeaponTrace), false, this);
-	FHitResult Hit;
+	FVector muzzleLocation = FVector::ZeroVector;
+	FVector endTrace = FVector::ZeroVector;
+	const FCollisionQueryParams queryParams = FCollisionQueryParams(SCENE_QUERY_STAT(WeaponTrace), false, this);
+	FHitResult hit;
 	FActorSpawnParameters rules;
 	rules.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	ASRProjectile* projectile = nullptr;
@@ -590,22 +590,21 @@ void ASRPlayerCharacter::FireShot()
 			// 총알이 캐릭터 카메라에서 발사되고, 투사체 방식입니다. (시리즈마다 다른 구현입니다. 4, 2042 시리즈와 비슷합니다.)
 			// 랜덤 스프레이 방식입니다.
 			// 총알의 스프레이 범위를 계산합니다.
-			float x = 0.0f;
-			float y = 0.0f;
+			FRotator randSpread = FRotator::ZeroRotator;
+
 			if(mbIsAiming)
 			{
-				x = FMath::RandRange(0.0f, 1.0f * mRecoilFactor) * (FMath::Cos(FMath::FRandRange(0.0f, 2*PI * mRecoilFactor)));
-				y = FMath::RandRange(0.0f, 1.0f * mRecoilFactor) * (FMath::Sin(FMath::FRandRange(0.0f, 2*PI * mRecoilFactor)));
+				randSpread.Yaw = FMath::RandRange(0.0f, 1.0f * mRecoilFactor) * (FMath::Cos(FMath::FRandRange(0.0f, 2*PI * mRecoilFactor)));
+				randSpread.Pitch = FMath::RandRange(0.0f, 1.0f * mRecoilFactor) * (FMath::Sin(FMath::FRandRange(0.0f, 2*PI * mRecoilFactor)));
 			}
 			else
 			{
-				x = FMath::RandRange(-5.0f * mRecoilFactor, 5.0f * mRecoilFactor);
-				y = FMath::RandRange(-5.0f * mRecoilFactor, 5.0f * mRecoilFactor);
+				randSpread.Yaw = FMath::RandRange(-5.0f * mRecoilFactor, 5.0f * mRecoilFactor);
+				randSpread.Pitch = FMath::RandRange(-5.0f * mRecoilFactor, 5.0f * mRecoilFactor);
 			}
 
-			FRotator randSpread(y, x, 0.0f);
-			MuzzleLocation = mFirstPersonCameraComponent->GetComponentLocation() + (mFirstPersonCameraComponent->GetForwardVector()*100.0f);
-			projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, MuzzleLocation, GetControlRotation()+ randSpread, rules);
+			muzzleLocation = mFirstPersonCameraComponent->GetComponentLocation() + (mFirstPersonCameraComponent->GetForwardVector()*100.0f);
+			projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, muzzleLocation, GetControlRotation()+ randSpread, rules);
 			break;
 		}
 		case EGameType::RainbowSix:
@@ -618,16 +617,16 @@ void ASRPlayerCharacter::FireShot()
 			FVector2D randSpread = FMath::RandPointInCircle(spreadRadius);
 			FVector spread(randSpread.X, 0.0f, randSpread.Y);
 
-			MuzzleLocation = mScope->GetChildComponent(0)->GetSocketLocation(FName("S_Aim"));
-			EndTrace = MuzzleLocation+ (mFirstPersonCameraComponent->GetForwardVector() + spread) * 10000.0f;
+			muzzleLocation = mScope->GetChildComponent(0)->GetSocketLocation(FName("S_Aim"));
+			endTrace = muzzleLocation + (mFirstPersonCameraComponent->GetForwardVector() + spread) * 10000.0f;
 
-			if (GetWorld()->LineTraceSingleByChannel(Hit, MuzzleLocation, EndTrace, ECC_EngineTraceChannel3, QueryParams))
+			if (GetWorld()->LineTraceSingleByChannel(hit, muzzleLocation, endTrace, ECC_EngineTraceChannel3, queryParams))
 			{
-				projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, Hit.Location, GetControlRotation(), rules);
+				projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, hit.Location, GetControlRotation(), rules);
 				projectile->SetLifeSpan(2.0f);
 				if (mPlayerController->IsDebugging())
 				{
-					DrawDebugLine(GetWorld(), MuzzleLocation, Hit.ImpactPoint, FColor::Red, false, 15.0f);
+					DrawDebugLine(GetWorld(), muzzleLocation, hit.ImpactPoint, FColor::Red, false, 15.0f);
 				}
 			}
 			break;
@@ -635,10 +634,10 @@ void ASRPlayerCharacter::FireShot()
 		case EGameType::Tarkov:
 		{
 			// 총알이 총구에서 나가는 방식입니다.
-			MuzzleLocation = mWeapon->GetSocketTransform(FName("S_Muzzle")).GetLocation();
-			FRotator MuzzleRotation =mWeapon->GetSocketTransform(FName("S_Muzzle")).Rotator();
+			muzzleLocation = mWeapon->GetSocketTransform(FName("S_Muzzle")).GetLocation();
+			FRotator muzzleRotation = mWeapon->GetSocketTransform(FName("S_Muzzle")).Rotator();
 
-			projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, MuzzleLocation, MuzzleRotation, rules);
+			projectile = GetWorld()->SpawnActor<ASRProjectile>(mProjectileClass, muzzleLocation, muzzleRotation, rules);
 			break;
 		}
 		default:
@@ -649,7 +648,7 @@ void ASRPlayerCharacter::FireShot()
 	// nullptr가 발생함으로 허공에 발사시에 대한 안전장치.
 	if(projectile != nullptr)
 	{
-		projectile->SetStartLocation(MuzzleLocation);
+		projectile->SetStartLocation(muzzleLocation);
 		projectile->SetDebugMode(mPlayerController->IsDebugging());
 		projectile->SetBulletType(mGameModeData.weapon);
 		projectile->BindPlayerStateInfo(mPlayerController->GetPlayerState());
@@ -766,16 +765,18 @@ void ASRPlayerCharacter::SetAim()
 void ASRPlayerCharacter::SetHip()
 {
 	// hold의 경우. toggle방식은 SetAim함수에서 전부 처리되었습니다.
-	if (mAimingType == EAimingType::Hold)
+	if (mAimingType != EAimingType::Hold)
 	{
-		mbIsAiming = false;
-		mTutAnimInstance->SetAiming(false);
-		mFirstPersonCameraComponent->SetFieldOfView(90.0f);
+		return;
+	}
 
-		if(mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
-		{
-			mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
-		}
+	mbIsAiming = false;
+	mTutAnimInstance->SetAiming(false);
+	mFirstPersonCameraComponent->SetFieldOfView(90.0f);
+
+	if(mGameModeData.game != EGameType::Tarkov && mGameModeData.weapon != EWeaponType::SR)
+	{
+		mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
 	}
 }
 
@@ -842,7 +843,6 @@ void ASRPlayerCharacter::TurnAtRate(float Rate)
 
 void ASRPlayerCharacter::LookUpAtRate(float Rate)
 {
-
 	if (mbIsAiming)
 	{
 		switch(mGameModeData.scope)
@@ -876,7 +876,7 @@ void ASRPlayerCharacter::LookUpAtRate(float Rate)
 
 void ASRPlayerCharacter::SaveInGameSetting()
 {
-	auto settingData = Cast<USRInGameSetting>(UGameplayStatics::CreateSaveGameObject(USRInGameSetting::StaticClass()));
+	const auto settingData = Cast<USRInGameSetting>(UGameplayStatics::CreateSaveGameObject(USRInGameSetting::StaticClass()));
 	settingData->MouseSensitivity = MouseSetting;
 	settingData->AimingType = mAimingType;
 	UGameplayStatics::SaveGameToSlot(settingData, settingData->GetSlotName(), settingData->GetSlotIndex());
@@ -894,7 +894,7 @@ void ASRPlayerCharacter::LoadInGameSetting()
 	}
 	else // 기존에 저장된 데이터가 없거나 불러올 수 없으면 기본값으로 초기화합니다.
 	{
-		FMouseSensitivity initMouseSetting;
+		const FMouseSensitivity initMouseSetting;
 		MouseSetting = initMouseSetting;
 		mAimingType = EAimingType::Hold;
 	}

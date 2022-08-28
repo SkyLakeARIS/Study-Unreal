@@ -147,7 +147,7 @@ public:
 	float sumRecoil = 0.0f;
 
 	UPROPERTY()
-	FRotator oldRotation;
+	FRotator OldCameraRotation;
 	//Control rotation at the start of the recoil
 	UPROPERTY()
 	FRotator RecoilStartRot;

@@ -25,7 +25,7 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	void ChangeInputMode(bool bIsGameMode);
 	
-	void ResumeCountDown();
+	void ResumeCountDown() const;
 	void ClearCountDown();
 
 	void BindStatToUI();
