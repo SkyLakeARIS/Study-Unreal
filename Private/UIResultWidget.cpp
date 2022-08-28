@@ -7,7 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 
 
-void UUIResultWidget::UpdateStageInfo(ASRPlayerState* srPlayerState)
+void UUIResultWidget::UpdateStageInfo(const class ASRPlayerState* const srPlayerState)
 {
 	checkf(srPlayerState != nullptr, TEXT("UUIResultWidget-UpdateStageInfo : srPlayerState이 nullptr입니다."));
 	mScore->SetText(FText::FromString(FString::FromInt(srPlayerState->GetScore())));
@@ -32,7 +32,7 @@ void UUIResultWidget::NativeConstruct()
 
 void UUIResultWidget::onRetryClicked()
 {
-	auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->RestartLevel();
 }
 
@@ -44,5 +44,4 @@ void UUIResultWidget::onStageClicked()
 void UUIResultWidget::onMenuClicked()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("MainMenu"));
-
 }

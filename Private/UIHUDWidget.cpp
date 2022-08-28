@@ -13,16 +13,17 @@ void UUIHUDWidget::NativeConstruct()
 	mRemainingAmmo = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayAmmo")));
 	mScore = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayScore")));
 	mDisplayGameMode = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayGameMode")));
-
 }
 
 // crosshair, hitmark 위젯을 초기화하고 뷰포트에 추가합니다.
 void UUIHUDWidget::InitializeWidgets()
 {
-	mHitMark = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mHitMarkClass);
-	mHeadshotMark = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mHeadshotMarkClass);
-	mKillMark = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mKillMarkClass);
-	mCrossHair = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mCrossHairClass);
+	const auto playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	mHitMark = CreateWidget<UUserWidget>(playerController, mHitMarkClass);
+	mHeadshotMark = CreateWidget<UUserWidget>(playerController, mHeadshotMarkClass);
+	mKillMark = CreateWidget<UUserWidget>(playerController, mKillMarkClass);
+	mCrossHair = CreateWidget<UUserWidget>(playerController, mCrossHairClass);
 
 	mHitMark->AddToViewport(1);
 	mHeadshotMark->AddToViewport(1);
@@ -55,23 +56,23 @@ void UUIHUDWidget::UpdateAccuracy(int32 accuracy)
 
 void UUIHUDWidget::UpdateFireMode(EWaeponFireMode newFireMode)
 {
-	FString DisplayFireMode;
+	FString displayFireMode;
 	switch(newFireMode)
 	{
 		case EWaeponFireMode::SINGLE_FIRE:
-			DisplayFireMode = "Single";
+			displayFireMode = "Single";
 			break;
 		case EWaeponFireMode::BURST_FIRE:
-			DisplayFireMode = "Burst";
+			displayFireMode = "Burst";
 			break;
 		case EWaeponFireMode::FULL_AUTO:
-			DisplayFireMode = "Full auto";
+			displayFireMode = "Full auto";
 			break;
 		default:
 			checkf(false, TEXT("UUIHUDWidget - UpdateFireMode : 올바르지 않은 EWaeponFireMode 타입입니다."));
 			break;
 	}
-	mFireMode->SetText(FText::FromString(DisplayFireMode));
+	mFireMode->SetText(FText::FromString(displayFireMode));
 }
 
 void UUIHUDWidget::UpdateScore(int32 score)
@@ -86,16 +87,15 @@ void UUIHUDWidget::UpdateGameMode(FString newGameMode)
 
 void UUIHUDWidget::SetCrosshairVisibility(ESlateVisibility option)
 {
-	if(option == ESlateVisibility::Hidden || option == ESlateVisibility::Visible)
-	{
-		mCrossHair->SetVisibility(option);
-	}
+	checkf(option == ESlateVisibility::Hidden || option == ESlateVisibility::Visible, TEXT("UUIHUDWidget - UpdateFireMode : Hidden 또는 Visible 타입만 전달할 수 있습니다."));
+
+	mCrossHair->SetVisibility(option);
 }
 
 
 // 타겟에 적중시 적절한 히트마크를 크로스헤어가 위치하는 곳에 표시하는 함수입니다.
 // 표시할 히트마크의 유형은 projectile 개체가 전달해줍니다.
-void UUIHUDWidget::AddViewPortHitMark(EHitType hitType)
+void UUIHUDWidget::AddHitMarkToViewPort(EHitType hitType)
 {
 	// 이전에 보여진 히트마크를 뷰포트에서 숨깁니다.
 	mCurrentMark->SetVisibility(ESlateVisibility::Hidden);
@@ -118,13 +118,21 @@ void UUIHUDWidget::AddViewPortHitMark(EHitType hitType)
 
 	mCurrentMark->SetVisibility(ESlateVisibility::Visible);
 
-	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &UUIHUDWidget::clearHitMark, 0.5f, false, -1.0f);
+	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &UUIHUDWidget::HideHitMark, 0.5f, false, -1.0f);
 }
 
 // 타이머에 의해 호출되는 히트마크를 지우는 함수입니다.
-void UUIHUDWidget::clearHitMark()
+void UUIHUDWidget::HideHitMark()
 {
 	mCurrentMark->SetVisibility(ESlateVisibility::Hidden);
 
 	GetWorld()->GetTimerManager().ClearTimer(mHitMarkTimer);
+}
+
+void UUIHUDWidget::RemoveHitMarkFromViewport()
+{
+	mHitMark->RemoveFromParent();
+	mHeadshotMark->RemoveFromParent();
+	mKillMark->RemoveFromParent();
+	mCrossHair->RemoveFromParent();
 }

@@ -39,9 +39,11 @@ public:
 	void SetCrosshairVisibility(ESlateVisibility option);
 
 	UFUNCTION()
-	void AddViewPortHitMark(EHitType hitType);
+	void AddHitMarkToViewPort(EHitType hitType);
 
-	void clearHitMark();
+	void HideHitMark();
+
+	void RemoveHitMarkFromViewport();
 
 protected:
 

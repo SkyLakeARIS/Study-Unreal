@@ -69,11 +69,11 @@ protected:
 protected:
 	
 	UPROPERTY()
-	UButton* btnResume;
+	UButton* mBtnResume;
 	UPROPERTY()
-	UButton* btnReturnMenu;
+	UButton* mBtnReturnMenu;
 	UPROPERTY()
-	UButton* btnRetry;
+	UButton* mBtnRetry;
 
 	UPROPERTY()
 	UEditableText* mHipX;
@@ -93,9 +93,9 @@ protected:
 	UEditableText* mScope6X_Y;
 
 	UPROPERTY()
-	UButton* btnHold;
+	UButton* mBtnHold;
 	UPROPERTY()
-	UButton* btnToggle;
+	UButton* mBtnToggle;
 
 	UPROPERTY()
 	UTextBlock* mMessageBox;
@@ -103,4 +103,8 @@ protected:
 	UCheckBox* mDebugMode;
 
 	bool mbCheckDebugMode;
+
+	const int32 MAX_SETTING_VALUE = 100;
+	const int32 MIN_SETTING_VALUE = 10;
+
 };

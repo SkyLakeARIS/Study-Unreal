@@ -18,7 +18,7 @@ class VERSION_API UUIResultWidget : public UUserWidget
 public:
 
 	UFUNCTION()
-	void UpdateStageInfo(class ASRPlayerState* srPlayerState);
+	void UpdateStageInfo(const class ASRPlayerState* const srPlayerState);
 		
 protected:
 

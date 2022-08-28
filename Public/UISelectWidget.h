@@ -40,17 +40,17 @@ protected:
 protected:
 
 	UPROPERTY()
-	UButton* BtnShortRange;
+	UButton* mBtnShortRange;
 	UPROPERTY()
-	UButton* BtnMidRange;
+	UButton* mBtnMidRange;
 	UPROPERTY()
-	UButton* BtnLongRange;
+	UButton* mBtnLongRange;
 
 	UPROPERTY()
-	UButton* BtnMovableShortRange;
+	UButton* mBtnMovableShortRange;
 	UPROPERTY()
-	UButton* BtnMovableMidRange;
+	UButton* mBtnMovableMidRange;
 	UPROPERTY()
-	UButton* BtnMovableLongRange;
+	UButton* mBtnMovableLongRange;
 
 };

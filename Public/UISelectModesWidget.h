@@ -19,7 +19,7 @@ class VERSION_API UUISelectModesWidget : public UUserWidget
 
 public:
 
-	void BindCharacterInfo(class ASRPlayerCharacter* character);
+	void BindCharacterInfo(class  ASRPlayerCharacter* character);
 
 protected:
 
@@ -54,8 +54,8 @@ protected:
 	UFUNCTION()
 	void clickedStart();
 
-
 protected:
+
 	UPROPERTY()
 	UButton* mBtnAR;
 	UPROPERTY()
@@ -90,8 +90,11 @@ protected:
 	bool mbIsCharacterType;
 
 	bool mbCanClickStart;
-	bool mbIsSelectWeapon;
-	bool mbIsSelectOptic;
-	bool mbIsSelectMode;
-	bool mbIsSelectTartgetType;
+
+	int8 mSelectionFlag;
+	const int8 SELECT_ALL_FLAG = 0xf;
+	const int8 WEAPON_SELECT_BIT = 0x1;
+	const int8 OPTIC_SELECT_BIT = 0x2;
+	const int8 GAMEMODE_SELECT_BIT = 0x4;
+	const int8 TARGET_SELECT_BIT = 0x8;
 };
