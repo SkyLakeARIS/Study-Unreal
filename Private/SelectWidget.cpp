@@ -7,21 +7,21 @@
 void USelectWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	BtnShortRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_ShortRange")));
-	BtnMidRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MidRange")));
-	BtnLongRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_LongRange")));
+	mBtnShortRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_ShortRange")));
+	mBtnMidRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MidRange")));
+	mBtnLongRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_LongRange")));
 
-	BtnMovableShortRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableShortRange")));
-	BtnMovableMidRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableMidRange")));
-	BtnMovableLongRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableLongRange")));
+	mBtnMovableShortRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableShortRange")));
+	mBtnMovableMidRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableMidRange")));
+	mBtnMovableLongRange = Cast<UButton>(GetWidgetFromName(TEXT("Btn_MovableLongRange")));
 
-	BtnShortRange->OnClicked.AddDynamic(this, &USelectWidget::OnShortRangeClicked);
-	BtnMidRange->OnClicked.AddDynamic(this, &USelectWidget::OnMidRangeClicked);
-	BtnLongRange->OnClicked.AddDynamic(this, &USelectWidget::OnLongRangeClicked);
+	mBtnShortRange->OnClicked.AddDynamic(this, &USelectWidget::OnShortRangeClicked);
+	mBtnMidRange->OnClicked.AddDynamic(this, &USelectWidget::OnMidRangeClicked);
+	mBtnLongRange->OnClicked.AddDynamic(this, &USelectWidget::OnLongRangeClicked);
 
-	BtnMovableShortRange->OnClicked.AddDynamic(this, &USelectWidget::OnMovableShortRangeClicked);
-	BtnMovableMidRange->OnClicked.AddDynamic(this, &USelectWidget::OnMovableMidRangeClicked);
-	BtnMovableLongRange->OnClicked.AddDynamic(this, &USelectWidget::OnMovableLongRangeClicked);
+	mBtnMovableShortRange->OnClicked.AddDynamic(this, &USelectWidget::OnMovableShortRangeClicked);
+	mBtnMovableMidRange->OnClicked.AddDynamic(this, &USelectWidget::OnMovableMidRangeClicked);
+	mBtnMovableLongRange->OnClicked.AddDynamic(this, &USelectWidget::OnMovableLongRangeClicked);
 }
 
 void USelectWidget::OnShortRangeClicked()

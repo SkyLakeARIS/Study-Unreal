@@ -10,8 +10,8 @@ void AUIPlayerController::BeginPlay()
 
 	UIWidgetInstance->AddToViewport();
 
-	FInputModeUIOnly Mode;
-	Mode.SetWidgetToFocus(UIWidgetInstance->GetCachedWidget());
-	SetInputMode(Mode);
+	FInputModeUIOnly mode;
+	mode.SetWidgetToFocus(UIWidgetInstance->GetCachedWidget());
+	SetInputMode(mode);
 	bShowMouseCursor = true;
 }

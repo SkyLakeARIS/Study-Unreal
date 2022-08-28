@@ -35,16 +35,14 @@ void UUISelectModesWidget::NativeConstruct()
 	mBtnPlateType->OnClicked.AddDynamic(this, &UUISelectModesWidget::clickedPlateType);
 	mBtnCharacterType->OnClicked.AddDynamic(this, &UUISelectModesWidget::clickedCharacterType);
 
-	mbIsSelectWeapon = false;
-	mbIsSelectOptic = false;
-	mbIsSelectMode = false;
 	mbCanClickStart = false;
+
+	mSelectionFlag = 0;
 }
 
 void UUISelectModesWidget::BindCharacterInfo(ASRPlayerCharacter* character)
 {
 	mOnGameData.BindUObject(character, &ASRPlayerCharacter::InitGameMode);
-	UE_LOG(LogTemp, Warning, TEXT("UI-Char : Bind End"));
 	mbCanClickStart = true;
 }
 
@@ -55,11 +53,12 @@ void UUISelectModesWidget::clickedAR()
 	mBtnHG->SetIsEnabled(true);
 	mBtnSR->SetIsEnabled(true);
 	mSelectedModes.weapon = EWeaponType::AR;
-	mbIsSelectWeapon = true;
 
 	// AR의 경우에는 모든 조준경을 장착할 수 있음.
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(true);
+
+	mSelectionFlag |= WEAPON_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clickedHG()
@@ -67,7 +66,6 @@ void UUISelectModesWidget::clickedHG()
 	mBtnAR->SetIsEnabled(true);
 	mBtnHG->SetIsEnabled(false);
 	mBtnSR->SetIsEnabled(true);
-	mbIsSelectWeapon = true;
 
 	// HG의 경우 1배율 조준경만 장착 가능하도록 제한
 	mBtn1X->SetIsEnabled(false);
@@ -76,10 +74,12 @@ void UUISelectModesWidget::clickedHG()
 
 	mBtn2Dot5X->SetIsEnabled(false);
 	mBtn6X->SetIsEnabled(false);
-	mSelectedModes.scope = EScopeType::Scope1X;
-	mbIsSelectOptic = true;
 
 	mSelectedModes.weapon = EWeaponType::HG;
+	mSelectedModes.scope = EScopeType::Scope1X;
+
+	mSelectionFlag |= WEAPON_SELECT_BIT;
+	mSelectionFlag |= OPTIC_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clickedSR()
@@ -88,11 +88,12 @@ void UUISelectModesWidget::clickedSR()
 	mBtnHG->SetIsEnabled(true);
 	mBtnSR->SetIsEnabled(false);
 	mSelectedModes.weapon = EWeaponType::SR;
-	mbIsSelectWeapon = true;
 
 	// SR의 경우에는 모든 조준경을 장착할 수 있음.
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(true);
+
+	mSelectionFlag |= WEAPON_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clicked1X()
@@ -101,7 +102,8 @@ void UUISelectModesWidget::clicked1X()
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(true);
 	mSelectedModes.scope = EScopeType::Scope1X;
-	mbIsSelectOptic = true;
+
+	mSelectionFlag |= OPTIC_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clicked2Dot5X()
@@ -110,8 +112,8 @@ void UUISelectModesWidget::clicked2Dot5X()
 	mBtn2Dot5X->SetIsEnabled(false);
 	mBtn6X->SetIsEnabled(true);
 	mSelectedModes.scope = EScopeType::Scope2dot5X;
-	mbIsSelectOptic = true;
 
+	mSelectionFlag |= OPTIC_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clicked6X()
@@ -120,8 +122,8 @@ void UUISelectModesWidget::clicked6X()
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(false);
 	mSelectedModes.scope = EScopeType::Scope6X;
-	mbIsSelectOptic = true;
 
+	mSelectionFlag |= OPTIC_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clickedBattlefield()
@@ -130,7 +132,8 @@ void UUISelectModesWidget::clickedBattlefield()
 	mBtnRainbowSix->SetIsEnabled(true);
 	mBtnTarkov->SetIsEnabled(true);
 	mSelectedModes.game = EGameType::Battlefield;
-	mbIsSelectMode = true;
+
+	mSelectionFlag |= GAMEMODE_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clickedRainbowSix()
@@ -139,7 +142,8 @@ void UUISelectModesWidget::clickedRainbowSix()
 	mBtnRainbowSix->SetIsEnabled(false);
 	mBtnTarkov->SetIsEnabled(true);
 	mSelectedModes.game = EGameType::RainbowSix;
-	mbIsSelectMode = true;
+
+	mSelectionFlag |= GAMEMODE_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clickedTarkov()
@@ -148,7 +152,8 @@ void UUISelectModesWidget::clickedTarkov()
 	mBtnRainbowSix->SetIsEnabled(true);
 	mBtnTarkov->SetIsEnabled(false);
 	mSelectedModes.game = EGameType::Tarkov;
-	mbIsSelectMode = true;
+
+	mSelectionFlag |= GAMEMODE_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clickedPlateType()
@@ -156,7 +161,8 @@ void UUISelectModesWidget::clickedPlateType()
 	mBtnPlateType->SetIsEnabled(false);
 	mBtnCharacterType->SetIsEnabled(true);
 	mbIsCharacterType = false;
-	mbIsSelectTartgetType = true;
+
+	mSelectionFlag |= TARGET_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clickedCharacterType()
@@ -164,7 +170,8 @@ void UUISelectModesWidget::clickedCharacterType()
 	mBtnPlateType->SetIsEnabled(true);
 	mBtnCharacterType->SetIsEnabled(false);
 	mbIsCharacterType = true;
-	mbIsSelectTartgetType = true;
+
+	mSelectionFlag |= TARGET_SELECT_BIT;
 }
 
 void UUISelectModesWidget::clickedStart()
@@ -173,14 +180,10 @@ void UUISelectModesWidget::clickedStart()
 	{
 		return;
 	}
-	if( mbIsSelectWeapon &&
-		mbIsSelectOptic &&
-		mbIsSelectMode &&
-		mbIsSelectTartgetType
-		)
-	{
 
-		auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	if(mSelectionFlag == SELECT_ALL_FLAG)
+	{
+		const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 		mOnGameData.Execute(mSelectedModes);
 		playerController->ShowInGameHUDAndStartTimer();
 		playerController->GetTargetManager()->SetTargetType(mbIsCharacterType);
