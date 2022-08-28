@@ -45,6 +45,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void changeCollisionEnabled(ECollisionEnabled::Type newType);
+
 protected:
 
 	// common

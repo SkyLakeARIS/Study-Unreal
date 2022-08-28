@@ -65,8 +65,6 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 	}
 
 	mHitType = EHitType::Hit;
-
-
 	const float distanceToHitPoint = (GetActorLocation() - mStartLocation).Size();
 
 	// 총알 타입에 맞는 데미지 테이블을 참고하여 거리에 따른 최종 데미지를 계산합니다.
@@ -134,7 +132,7 @@ void ASRProjectile::BindPlayerStateInfo(ASRPlayerState* srPlayerState)
  */
 void ASRProjectile::BindHUDWidget(UUIHUDWidget* hud)
 {
-	mHitmark.BindUObject(hud, &UUIHUDWidget::AddViewPortHitMark);
+	mHitmark.BindUObject(hud, &UUIHUDWidget::AddHitMarkToViewPort);
 }
 
 /*

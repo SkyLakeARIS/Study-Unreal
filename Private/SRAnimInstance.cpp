@@ -83,12 +83,12 @@ void USRAnimInstance::UpdateSocketInfo()
 // 조준시 부착물이 위치할 위치를 계산
 void USRAnimInstance::SetSightTransform()
 {
-	FTransform CamTransform = PlayerCharacter->GetFirstPersonCameraComponent()->GetComponentTransform();
-	FTransform MeshTransform = PlayerCharacter->GetMesh1P()->GetComponentTransform();
+	const FTransform camTransform = PlayerCharacter->GetFirstPersonCameraComponent()->GetComponentTransform();
+	const FTransform meshTransform = PlayerCharacter->GetMesh1P()->GetComponentTransform();
 
-	SightTransform = UKismetMathLibrary::MakeRelativeTransform(CamTransform, MeshTransform);
+	SightTransform = UKismetMathLibrary::MakeRelativeTransform(camTransform, meshTransform);
 
-	float ADSdistance = 20.0f;
+	float adsDistance = 20.0f;
 	if(PlayerCharacter->GetWeaponType() != EWeaponType::HG)
 	{
 
@@ -96,27 +96,27 @@ void USRAnimInstance::SetSightTransform()
 		{
 			if (PlayerCharacter->GetScopeType() == EScopeType::Scope2dot5X)
 			{
-				ADSdistance = 5.0f;
+				adsDistance = 5.0f;
 			}
 			else if (PlayerCharacter->GetScopeType() == EScopeType::Scope6X)
 			{
-				ADSdistance = 8.0f;
+				adsDistance = 8.0f;
 			}
 		}
 		else
 		{
 			if (PlayerCharacter->GetScopeType() == EScopeType::Scope1X)
 			{
-				ADSdistance = 15.0f;
+				adsDistance = 15.0f;
 			}
 			else
 			{
-				ADSdistance = 10.0f;
+				adsDistance = 10.0f;
 			}
 		}
 	}
 
-	SightTransform.SetLocation(SightTransform.GetLocation() + SightTransform.GetRotation().Vector() * ADSdistance);
+	SightTransform.SetLocation(SightTransform.GetLocation() + SightTransform.GetRotation().Vector() * adsDistance);
 }
 
 // 조준시 손의 위치를 계산
@@ -127,37 +127,37 @@ void USRAnimInstance::SetRelativeHandTransform()
 		return;
 	}
 
-	FTransform OpticSocketTransform=FTransform();
+	FTransform opticSocketTransform =FTransform();
 
 	if(PlayerCharacter->GetNewScope()->GetChildActor()==nullptr)
 	{
-		OpticSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_Optic"));
+		opticSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_Optic"));
 	}
 	else
 	{
-		OpticSocketTransform = PlayerCharacter->GetNewScope()->GetChildComponent(0)->GetSocketTransform(FName("S_Aim"));
+		opticSocketTransform = PlayerCharacter->GetNewScope()->GetChildComponent(0)->GetSocketTransform(FName("S_Aim"));
 	}
 
-	FTransform MeshTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("hand_r"));
+	const FTransform meshTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("hand_r"));
 
-	RelativeHandTransform = UKismetMathLibrary::MakeRelativeTransform(OpticSocketTransform, MeshTransform);
+	RelativeHandTransform = UKismetMathLibrary::MakeRelativeTransform(opticSocketTransform, meshTransform);
 }
 
 void USRAnimInstance::SetFinalHandTransform()
 {
-	FTransform OpticSocketTransform = FTransform();
+	FTransform opticSocketTransform = FTransform();
 
 	if (!PlayerCharacter->GetNewScope())
 	{
-		OpticSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_Optic"));
+		opticSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_Optic"));
 	}
 	else
 	{
-		OpticSocketTransform = PlayerCharacter->GetNewScope()->GetChildComponent(0)->GetSocketTransform(FName("S_Aim"));
+		opticSocketTransform = PlayerCharacter->GetNewScope()->GetChildComponent(0)->GetSocketTransform(FName("S_Aim"));
 	}
 
-	FTransform MeshTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("ik_hand_root"));
-	FinalHandTransform = UKismetMathLibrary::MakeRelativeTransform(OpticSocketTransform, MeshTransform);
+	const FTransform meshTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("ik_hand_root"));
+	FinalHandTransform = UKismetMathLibrary::MakeRelativeTransform(opticSocketTransform, meshTransform);
 }
 
 void USRAnimInstance::SetLeftHandIK()
@@ -167,11 +167,11 @@ void USRAnimInstance::SetLeftHandIK()
 		return;
 	}
 
-	FTransform GunSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_LeftHand"));
-	FTransform MeshSocketTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("hand_r"));
+	const FTransform gunSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_LeftHand"));
+	const FTransform meshSocketTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("hand_r"));
 
 	// mesh(팔)을 총에 있는 그립 소켓에 맞는 위치를 계산해줌.
-	LeftHandTransform = UKismetMathLibrary::MakeRelativeTransform(GunSocketTransform, MeshSocketTransform);
+	LeftHandTransform = UKismetMathLibrary::MakeRelativeTransform(gunSocketTransform, meshSocketTransform);
 }
 
 void USRAnimInstance::InterpAiming(float DeltaSeconds)
@@ -196,26 +196,25 @@ void USRAnimInstance::InterpRelativeHand(float DeltaSeconds)
 
 void USRAnimInstance::MoveVectorCurve(float DeltaSeconds)
 {
-	if(VectorCurve)
-	{
-		FVector VelocityVec = PlayerCharacter->GetMovementComponent()->Velocity;
-		VelocityVec.Z = 0.0f;
-		float Velocity = VelocityVec.Size();
-		float MaxSpeed = PlayerCharacter->GetMovementComponent()->GetMaxSpeed();
-		Velocity = UKismetMathLibrary::NormalizeToRange(Velocity, (MaxSpeed/0.3f)*-1.0f, MaxSpeed);
-		// 캐릭터가 이동시 만든 벡터 커브에 따라 총의 수직 흔들림을 구현.
-		// 시간과 z의 곡선에 따라 현재 총위치와 보간하여 계산함.
-		FVector NewVec = VectorCurve->GetVectorValue(PlayerCharacter->GetGameTimeSinceCreation());
-		SwayLocation = UKismetMathLibrary::VInterpTo(SwayLocation, NewVec, DeltaSeconds, 1.8f)*Velocity;
-		SwayLocation *= Velocity;
-	}
+	//checkf(VectorCurve != nullptr, TEXT("VectorCurve가 nullptr입니다. blueprint확인 필요."));
+
+	FVector velocityVec = PlayerCharacter->GetMovementComponent()->Velocity;
+	velocityVec.Z = 0.0f;
+	float velocity = velocityVec.Size();
+	const float maxSpeed = PlayerCharacter->GetMovementComponent()->GetMaxSpeed();
+	velocity = UKismetMathLibrary::NormalizeToRange(velocity, (maxSpeed /0.3f)*-1.0f, maxSpeed);
+	// 캐릭터가 이동시 만든 벡터 커브에 따라 총의 수직 흔들림을 구현.
+	// 시간과 z의 곡선에 따라 현재 총위치와 보간하여 계산함.
+	const FVector newVec = VectorCurve->GetVectorValue(PlayerCharacter->GetGameTimeSinceCreation());
+	SwayLocation = UKismetMathLibrary::VInterpTo(SwayLocation, newVec, DeltaSeconds, 1.8f)* velocity;
+	SwayLocation *= velocity;
 }
 
 // 화면을 움직일때 무기의 상하좌우 흔들림 구현 (타르코프)
 void USRAnimInstance::RotateWithRotation(float DeltaSeconds)
 {
-	FRotator CurrentRotation = PlayerCharacter->GetControlRotation();
-	TurnRotation = UKismetMathLibrary::RInterpTo(TurnRotation, CurrentRotation - OldRotation, DeltaSeconds, 3.0f);
+	const FRotator currentRotation = PlayerCharacter->GetControlRotation();
+	TurnRotation = UKismetMathLibrary::RInterpTo(TurnRotation, currentRotation - OldRotation, DeltaSeconds, 3.0f);
 	TurnRotation.Roll = TurnRotation.Pitch * -1.0;	// 화면을 상하로 움직일시 무기의 흔들림
 
 	// 급격한 움직임에서 너무 큰 움직임을 보이지 않도록 제한함.
@@ -225,7 +224,7 @@ void USRAnimInstance::RotateWithRotation(float DeltaSeconds)
 	TurnLocation.X = TurnRotation.Yaw/4.0f;
 	TurnLocation.Z = TurnRotation.Roll/1.5f;
 
-	OldRotation = CurrentRotation;
+	OldRotation = currentRotation;
 }
 
 void USRAnimInstance::InterpFinalRecoil(float DeltaSeconds)
@@ -282,7 +281,7 @@ void USRAnimInstance::Reload()
 	{
 		ReloadAlpha = 0.0f;
 	}
-	else if(ReloadAlpha ==0.0f)
+	else if(ReloadAlpha == 0.0f)
 	{
 		ReloadAlpha = 1.0f;
 	}
@@ -290,8 +289,8 @@ void USRAnimInstance::Reload()
 
 void USRAnimInstance::Fire()
 {
-	FVector RecoilLoc = FVector::ZeroVector;
-	FRotator RecoilRot = FRotator::ZeroRotator;
+	FVector recoilLoc = FVector::ZeroVector;
+	FRotator recoilRot = FRotator::ZeroRotator;
 
 	switch(PlayerCharacter->GetWeaponType())
 	{
@@ -299,26 +298,26 @@ void USRAnimInstance::Fire()
 		{
 			if (bIsAiming)
 			{
-				RecoilLoc = FinalRecoilTransform.GetLocation();
+				recoilLoc = FinalRecoilTransform.GetLocation();
 				// 사격시 총이 뒤로 밀려나는 효과를 내는 벡터
 				// x 좌우로 흔들림, y 뒤로 밀림
-				RecoilLoc += FVector(FMath::RandRange(-0.3f, 0.3f), FMath::RandRange(-2.0f, -1.0f), FMath::RandRange(0.2f, 1.0f));
+				recoilLoc += FVector(FMath::RandRange(-0.3f, 0.3f), FMath::RandRange(-2.0f, -1.0f), FMath::RandRange(0.2f, 1.0f));
 
-				RecoilRot = FinalRecoilTransform.GetRotation().Rotator();
+				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
 				// p, y 좌우 반동, r = 수직반동 (-3은 안정적인 반동)
-				RecoilRot += FRotator(FMath::RandRange(-5.0f, 5.0f), FMath::RandRange(-1.0f, 1.0f), -5.0f);
-				FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(RecoilLoc);
+				recoilRot += FRotator(FMath::RandRange(-5.0f, 5.0f), FMath::RandRange(-1.0f, 1.0f), -5.0f);
+				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
+				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			else
 			{
-				RecoilLoc = FinalRecoilTransform.GetLocation();
-				RecoilLoc += FVector(FMath::RandRange(-0.5f, 0.5f), FMath::RandRange(-5.0f, -1.0f), FMath::RandRange(0.2f, 1.0f));
+				recoilLoc = FinalRecoilTransform.GetLocation();
+				recoilLoc += FVector(FMath::RandRange(-0.5f, 0.5f), FMath::RandRange(-5.0f, -1.0f), FMath::RandRange(0.2f, 1.0f));
 
-				RecoilRot = FinalRecoilTransform.GetRotation().Rotator();
-				RecoilRot += FRotator(FMath::RandRange(-10.0f, 10.0f), FMath::RandRange(-1.0f, 1.0f), -7.0f);
-				FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(RecoilLoc);
+				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
+				recoilRot += FRotator(FMath::RandRange(-10.0f, 10.0f), FMath::RandRange(-1.0f, 1.0f), -7.0f);
+				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
+				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			break;
 		}
@@ -326,23 +325,23 @@ void USRAnimInstance::Fire()
 		{
 			if (bIsAiming)
 			{
-				RecoilLoc = FinalRecoilTransform.GetLocation();
-				RecoilLoc += FVector(0.0f, -1.0f, 0.2f);
+				recoilLoc = FinalRecoilTransform.GetLocation();
+				recoilLoc += FVector(0.0f, -1.0f, 0.2f);
 
-				RecoilRot = FinalRecoilTransform.GetRotation().Rotator();
-				RecoilRot += FRotator(FMath::RandRange(-2.0f, 2.0f), FMath::RandRange(-2.0f, 2.0f), -5.0f);
-				FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(RecoilLoc);
+				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
+				recoilRot += FRotator(FMath::RandRange(-2.0f, 2.0f), FMath::RandRange(-2.0f, 2.0f), -5.0f);
+				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
+				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			else
 			{
-				RecoilLoc = FinalRecoilTransform.GetLocation();
-				RecoilLoc += FVector(FMath::RandRange(-0.1f, 0.1f), FMath::RandRange(-2.0f, -3.f), FMath::RandRange(-2.0f, 2.0f));
+				recoilLoc = FinalRecoilTransform.GetLocation();
+				recoilLoc += FVector(FMath::RandRange(-0.1f, 0.1f), FMath::RandRange(-2.0f, -3.f), FMath::RandRange(-2.0f, 2.0f));
 
-				RecoilRot = FinalRecoilTransform.GetRotation().Rotator();
-				RecoilRot += FRotator(FMath::RandRange(-3.0f, 3.0f), FMath::RandRange(-3.0f, 3.0f), -7.0f);
-				FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(RecoilLoc);
+				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
+				recoilRot += FRotator(FMath::RandRange(-3.0f, 3.0f), FMath::RandRange(-3.0f, 3.0f), -7.0f);
+				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
+				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			break;
 		}
@@ -350,39 +349,42 @@ void USRAnimInstance::Fire()
 		{
 			if (bIsAiming)
 			{
-				RecoilLoc = FinalRecoilTransform.GetLocation();
-				RecoilLoc += FVector(5.0f, -5.0f, FMath::RandRange(0.2f, 1.0f));
+				recoilLoc = FinalRecoilTransform.GetLocation();
+				recoilLoc += FVector(5.0f, -5.0f, FMath::RandRange(0.2f, 1.0f));
 
-				RecoilRot = FinalRecoilTransform.GetRotation().Rotator();
-				RecoilRot += FRotator(-5.0f, FMath::RandRange(-1.0f, 1.0f), -5.0f);
-				FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(RecoilLoc);
+				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
+				recoilRot += FRotator(-5.0f, FMath::RandRange(-1.0f, 1.0f), -5.0f);
+				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
+				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			else
 			{
-				RecoilLoc = FinalRecoilTransform.GetLocation();
-				RecoilLoc += FVector(5.0f, FMath::RandRange(-9.0f, -10.0f), FMath::RandRange(0.2f, 1.0f));
+				recoilLoc = FinalRecoilTransform.GetLocation();
+				recoilLoc += FVector(5.0f, FMath::RandRange(-9.0f, -10.0f), FMath::RandRange(0.2f, 1.0f));
 
-				RecoilRot = FinalRecoilTransform.GetRotation().Rotator();
-				RecoilRot += FRotator(-5.0f, FMath::RandRange(-1.0f, 1.0f), -15.0f);
-				FinalRecoilTransform.SetRotation(RecoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(RecoilLoc);
+				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
+				recoilRot += FRotator(-5.0f, FMath::RandRange(-1.0f, 1.0f), -15.0f);
+				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
+				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			break;
 		}
+		default:
+			checkf(false, TEXT("USRAnimInstance-Fire 잘못된 EWeaponType입니다."));
+			break;
 	}
 }
 
 void USRAnimInstance::RecoilStart()
 {
 
-	PlayerDeltaRot = FRotator(0.0f, 0.0f, 0.0f);
-	RecoilDeltaRot = FRotator(0.0f, 0.0f, 0.0f);
-	Del = FRotator(0.0f, 0.0f, 0.0f);
+	PlayerDeltaRot = FRotator::ZeroRotator;
+	RecoilDeltaRot = FRotator::ZeroRotator;
+	Del = FRotator::ZeroRotator;
 
 	RecoilStartRot = UGameplayStatics::GetPlayerController(this, 0)->GetControlRotation();
 
-	oldRotation = mPlayerController->GetControlRotation();
+	OldCameraRotation = mPlayerController->GetControlRotation();
 	bFiring = true;
 
 	//Timer for the recoil: I have set it to 10s but dependeding how long it takes to empty the gun mag, you can increase the time.
@@ -399,23 +401,21 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 		return;
 	}
 
-	float recoiltime;
-	FVector RecoilVec;
 	FRotator originalRotator = mPlayerController->GetControlRotation();
 	if (bRecoil)
 	{
-
+		//FVector recoilVec;
 		//Calculation of control rotation to update 
-		recoiltime = GetWorld()->GetTimerManager().GetTimerElapsed(FireTimer);
-		RecoilVec = RecoilCurve->GetVectorValue(recoiltime);
-		const float PitchLimit = 20.0f;
+		const float recoilTime = GetWorld()->GetTimerManager().GetTimerElapsed(FireTimer);
+		//recoilVec = RecoilCurve->GetVectorValue(recoiltime);
+		const float Pitch_Limit = 20.0f;
 		Del.Roll = 0;
 
 		if(PlayerCharacter->GetGameType() == EGameType::Battlefield)
 		{
 			if(PlayerCharacter->IsAimimg())
 			{
-				if (sumRecoil < PitchLimit)
+				if (sumRecoil < Pitch_Limit)
 				{
 					Del.Pitch = 0.1f;
 					sumRecoil += 0.1f;
@@ -428,7 +428,7 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 			}
 			else
 			{
-				if(sumRecoil < PitchLimit)
+				if(sumRecoil < Pitch_Limit)
 				{
 					Del.Pitch = 0.13f;
 					sumRecoil += 0.13f;
@@ -444,7 +444,7 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 		{
 			if(PlayerCharacter->IsAimimg())
 			{
-				if (sumRecoil < PitchLimit)
+				if (sumRecoil < Pitch_Limit)
 				{
 					Del.Pitch = 0.06f;
 					sumRecoil += 0.06f;
@@ -457,7 +457,7 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 			}
 			else
 			{
-				if (sumRecoil < PitchLimit)
+				if (sumRecoil < Pitch_Limit)
 				{
 					Del.Pitch = 0.09f;
 					sumRecoil += 0.09f;
@@ -480,7 +480,7 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 		//Conditionally start resetting the recoil
 		if (!bFiring)
 		{
-			if (recoiltime > FireRate)
+			if (recoilTime > FireRate)
 			{
 				GetWorld()->GetTimerManager().ClearTimer(FireTimer);
 				RecoilStop();
@@ -491,11 +491,11 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 	}
 	else if (bRecoilRecovery)
 	{
-		FRotator tmprot = mPlayerController->GetControlRotation();
+		const FRotator tmpRot = mPlayerController->GetControlRotation();
 
 		mPlayerController->SetControlRotation(UKismetMathLibrary::RInterpTo(originalRotator, originalRotator - RecoilDeltaRot, DeltaTime, 5.0f));
 		sumRecoil = UKismetMathLibrary::FInterpTo(sumRecoil, 0.0f, DeltaTime, 5.0f);
-		RecoilDeltaRot = RecoilDeltaRot + (mPlayerController->GetControlRotation() - tmprot);
+		RecoilDeltaRot = RecoilDeltaRot + (mPlayerController->GetControlRotation() - tmpRot);
 	}
 }
 

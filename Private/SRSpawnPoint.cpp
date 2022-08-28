@@ -19,7 +19,7 @@ ASRSpawnPoint::ASRSpawnPoint()
 	mbActive = false;
 }
 
-FVector ASRSpawnPoint::GetSpawnLocation()
+FVector ASRSpawnPoint::GetSpawnLocation() const
 {
 	return GetActorLocation();
 }
@@ -49,17 +49,17 @@ void ASRSpawnPoint::DeActive()
 	mbActive = false;
 }
 
-bool ASRSpawnPoint::IsCrouchable()
+bool ASRSpawnPoint::IsCrouchable() const
 {
 	return mbCrouchable;
 }
 
-ESpawnPointType ASRSpawnPoint::GetSpawnPointType()
+ESpawnPointType ASRSpawnPoint::GetSpawnPointType() const
 {
 	return mSpawnerType;
 }
 
-EMovableAxis ASRSpawnPoint::GetMovableAxis()
+EMovableAxis ASRSpawnPoint::GetMovableAxis() const
 {
 	return mMovableAxis;
 }
