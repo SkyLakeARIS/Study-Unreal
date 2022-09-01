@@ -63,6 +63,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 
