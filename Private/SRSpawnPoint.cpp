@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "SRSpawnPoint.h"
 
 // Sets default values
@@ -29,8 +29,8 @@ bool ASRSpawnPoint::IsActive() const
 	return mbActive;
 }
 
-// trueÀÌ¸é ÇØ´ç À§Ä¡¿¡ Å¸°ÙÀÌ ÀÖÀ¸¹Ç·Î ½ºÆùÀÌ ºÒ°¡´ÉÇÕ´Ï´Ù.
-// falseÀÌ¸é Å¸°ÙÀ» ½ºÆùÇÒ ¼ö ÀÖ½À´Ï´Ù.
+// trueì´ë©´ í•´ë‹¹ ìœ„ì¹˜ì— íƒ€ê²Ÿì´ ìˆìœ¼ë¯€ë¡œ ìŠ¤í°ì´ ë¶ˆê°€ëŠ¥í•©ë‹ˆë‹¤.
+// falseì´ë©´ íƒ€ê²Ÿì„ ìŠ¤í°í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
 void ASRSpawnPoint::Active()
 {
 	mbActive = true;

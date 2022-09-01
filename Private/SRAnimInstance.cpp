@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "SRAnimInstance.h"
 #include "SRPlayerController.h"
 #include "Curves/CurveVector.h"
@@ -54,7 +54,7 @@ void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	
 	MoveVectorCurve(DeltaSeconds);
 
-	// ¹ß»çÇÒ ¶§¸¸ ½ÇÇà
+	// ë°œì‚¬í•  ë•Œë§Œ ì‹¤í–‰
 	if(!RecoilTransform.Equals(FTransform()) || !FinalRecoilTransform.Equals(FTransform()))
 	{
 		InterpRecoil(DeltaSeconds);
@@ -80,7 +80,7 @@ void USRAnimInstance::UpdateSocketInfo()
 	OldRotation = PlayerCharacter->GetControlRotation();
 }
 
-// Á¶ÁØ½Ã ºÎÂø¹°ÀÌ À§Ä¡ÇÒ À§Ä¡¸¦ °è»ê
+// ì¡°ì¤€ì‹œ ë¶€ì°©ë¬¼ì´ ìœ„ì¹˜í•  ìœ„ì¹˜ë¥¼ ê³„ì‚°
 void USRAnimInstance::SetSightTransform()
 {
 	const FTransform camTransform = PlayerCharacter->GetFirstPersonCameraComponent()->GetComponentTransform();
@@ -119,7 +119,7 @@ void USRAnimInstance::SetSightTransform()
 	SightTransform.SetLocation(SightTransform.GetLocation() + SightTransform.GetRotation().Vector() * adsDistance);
 }
 
-// Á¶ÁØ½Ã ¼ÕÀÇ À§Ä¡¸¦ °è»ê
+// ì¡°ì¤€ì‹œ ì†ì˜ ìœ„ì¹˜ë¥¼ ê³„ì‚°
 void USRAnimInstance::SetRelativeHandTransform()
 {
 	if (!PlayerCharacter->GetNewWeapon())
@@ -170,7 +170,7 @@ void USRAnimInstance::SetLeftHandIK()
 	const FTransform gunSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_LeftHand"));
 	const FTransform meshSocketTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("hand_r"));
 
-	// mesh(ÆÈ)À» ÃÑ¿¡ ÀÖ´Â ±×¸³ ¼ÒÄÏ¿¡ ¸Â´Â À§Ä¡¸¦ °è»êÇØÁÜ.
+	// mesh(íŒ”)ì„ ì´ì— ìˆëŠ” ê·¸ë¦½ ì†Œì¼“ì— ë§ëŠ” ìœ„ì¹˜ë¥¼ ê³„ì‚°í•´ì¤Œ.
 	LeftHandTransform = UKismetMathLibrary::MakeRelativeTransform(gunSocketTransform, meshSocketTransform);
 }
 
@@ -187,7 +187,7 @@ void USRAnimInstance::InterpAiming(float DeltaSeconds)
 void USRAnimInstance::InterpRelativeHand(float DeltaSeconds)
 {
 	RelativeHandTransform = UKismetMathLibrary::TInterpTo(RelativeHandTransform, FinalHandTransform, DeltaSeconds, 10.0f);
-	// ±âÁ¸ ºÎÂø¹° À§Ä¡¿¡¼­ ´Ù¸¥ ºÎÂø¹° À§Ä¡·Î ¼ÕÀ» ¿Å±æ¶§ º¸°£ÇÏ´Âµ¥ º¸°£ÀÌ ³¡³ª¸é(equals) false·Î.
+	// ê¸°ì¡´ ë¶€ì°©ë¬¼ ìœ„ì¹˜ì—ì„œ ë‹¤ë¥¸ ë¶€ì°©ë¬¼ ìœ„ì¹˜ë¡œ ì†ì„ ì˜®ê¸¸ë•Œ ë³´ê°„í•˜ëŠ”ë° ë³´ê°„ì´ ëë‚˜ë©´(equals) falseë¡œ.
 	if(RelativeHandTransform.Equals(FinalHandTransform))
 	{
 		bInterpRelativeHand = false;
@@ -196,28 +196,28 @@ void USRAnimInstance::InterpRelativeHand(float DeltaSeconds)
 
 void USRAnimInstance::MoveVectorCurve(float DeltaSeconds)
 {
-	//checkf(VectorCurve != nullptr, TEXT("VectorCurve°¡ nullptrÀÔ´Ï´Ù. blueprintÈ®ÀÎ ÇÊ¿ä."));
+	//checkf(VectorCurve != nullptr, TEXT("VectorCurveê°€ nullptrì…ë‹ˆë‹¤. blueprintí™•ì¸ í•„ìš”."));
 
 	FVector velocityVec = PlayerCharacter->GetMovementComponent()->Velocity;
 	velocityVec.Z = 0.0f;
 	float velocity = velocityVec.Size();
 	const float maxSpeed = PlayerCharacter->GetMovementComponent()->GetMaxSpeed();
 	velocity = UKismetMathLibrary::NormalizeToRange(velocity, (maxSpeed /0.3f)*-1.0f, maxSpeed);
-	// Ä³¸¯ÅÍ°¡ ÀÌµ¿½Ã ¸¸µç º¤ÅÍ Ä¿ºê¿¡ µû¶ó ÃÑÀÇ ¼öÁ÷ Èçµé¸²À» ±¸Çö.
-	// ½Ã°£°ú zÀÇ °î¼±¿¡ µû¶ó ÇöÀç ÃÑÀ§Ä¡¿Í º¸°£ÇÏ¿© °è»êÇÔ.
+	// ìºë¦­í„°ê°€ ì´ë™ì‹œ ë§Œë“  ë²¡í„° ì»¤ë¸Œì— ë”°ë¼ ì´ì˜ ìˆ˜ì§ í”ë“¤ë¦¼ì„ êµ¬í˜„.
+	// ì‹œê°„ê³¼ zì˜ ê³¡ì„ ì— ë”°ë¼ í˜„ì¬ ì´ìœ„ì¹˜ì™€ ë³´ê°„í•˜ì—¬ ê³„ì‚°í•¨.
 	const FVector newVec = VectorCurve->GetVectorValue(PlayerCharacter->GetGameTimeSinceCreation());
 	SwayLocation = UKismetMathLibrary::VInterpTo(SwayLocation, newVec, DeltaSeconds, 1.8f)* velocity;
 	SwayLocation *= velocity;
 }
 
-// È­¸éÀ» ¿òÁ÷ÀÏ¶§ ¹«±âÀÇ »óÇÏÁÂ¿ì Èçµé¸² ±¸Çö (Å¸¸£ÄÚÇÁ)
+// í™”ë©´ì„ ì›€ì§ì¼ë•Œ ë¬´ê¸°ì˜ ìƒí•˜ì¢Œìš° í”ë“¤ë¦¼ êµ¬í˜„ (íƒ€ë¥´ì½”í”„)
 void USRAnimInstance::RotateWithRotation(float DeltaSeconds)
 {
 	const FRotator currentRotation = PlayerCharacter->GetControlRotation();
 	TurnRotation = UKismetMathLibrary::RInterpTo(TurnRotation, currentRotation - OldRotation, DeltaSeconds, 3.0f);
-	TurnRotation.Roll = TurnRotation.Pitch * -1.0;	// È­¸éÀ» »óÇÏ·Î ¿òÁ÷ÀÏ½Ã ¹«±âÀÇ Èçµé¸²
+	TurnRotation.Roll = TurnRotation.Pitch * -1.0;	// í™”ë©´ì„ ìƒí•˜ë¡œ ì›€ì§ì¼ì‹œ ë¬´ê¸°ì˜ í”ë“¤ë¦¼
 
-	// ±Ş°İÇÑ ¿òÁ÷ÀÓ¿¡¼­ ³Ê¹« Å« ¿òÁ÷ÀÓÀ» º¸ÀÌÁö ¾Êµµ·Ï Á¦ÇÑÇÔ.
+	// ê¸‰ê²©í•œ ì›€ì§ì„ì—ì„œ ë„ˆë¬´ í° ì›€ì§ì„ì„ ë³´ì´ì§€ ì•Šë„ë¡ ì œí•œí•¨.
 	TurnRotation.Yaw = FMath::Clamp(TurnRotation.Yaw, -7.0f, 7.0f);
 	TurnRotation.Roll = FMath::Clamp(TurnRotation.Roll, -3.0f, 3.0f);
 
@@ -299,12 +299,12 @@ void USRAnimInstance::Fire()
 			if (bIsAiming)
 			{
 				recoilLoc = FinalRecoilTransform.GetLocation();
-				// »ç°İ½Ã ÃÑÀÌ µÚ·Î ¹Ğ·Á³ª´Â È¿°ú¸¦ ³»´Â º¤ÅÍ
-				// x ÁÂ¿ì·Î Èçµé¸², y µÚ·Î ¹Ğ¸²
+				// ì‚¬ê²©ì‹œ ì´ì´ ë’¤ë¡œ ë°€ë ¤ë‚˜ëŠ” íš¨ê³¼ë¥¼ ë‚´ëŠ” ë²¡í„°
+				// x ì¢Œìš°ë¡œ í”ë“¤ë¦¼, y ë’¤ë¡œ ë°€ë¦¼
 				recoilLoc += FVector(FMath::RandRange(-0.3f, 0.3f), FMath::RandRange(-2.0f, -1.0f), FMath::RandRange(0.2f, 1.0f));
 
 				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
-				// p, y ÁÂ¿ì ¹İµ¿, r = ¼öÁ÷¹İµ¿ (-3Àº ¾ÈÁ¤ÀûÀÎ ¹İµ¿)
+				// p, y ì¢Œìš° ë°˜ë™, r = ìˆ˜ì§ë°˜ë™ (-3ì€ ì•ˆì •ì ì¸ ë°˜ë™)
 				recoilRot += FRotator(FMath::RandRange(-5.0f, 5.0f), FMath::RandRange(-1.0f, 1.0f), -5.0f);
 				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
 				FinalRecoilTransform.SetLocation(recoilLoc);
@@ -370,7 +370,7 @@ void USRAnimInstance::Fire()
 			break;
 		}
 		default:
-			checkf(false, TEXT("USRAnimInstance-Fire Àß¸øµÈ EWeaponTypeÀÔ´Ï´Ù."));
+			checkf(false, TEXT("USRAnimInstance-Fire ì˜ëª»ëœ EWeaponTypeì…ë‹ˆë‹¤."));
 			break;
 	}
 }

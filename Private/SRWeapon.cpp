@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "SRWeapon.h"
 
 // Sets default values
@@ -124,7 +124,7 @@ USkeletalMesh* ASRWeapon::GetWeapon(EWeaponType weapon) const
 		case EWeaponType::SR:
 			return mM24;
 		default:
-			checkf(false, TEXT("ASRWeapon-GetWeapon : Àß¸øµÈ EWeaponType Å¸ÀÔÀÔ´Ï´Ù."));
+			checkf(false, TEXT("ASRWeapon-GetWeapon : ì˜ëª»ëœ EWeaponType íƒ€ì…ì…ë‹ˆë‹¤."));
 			break;
 	}
 	return nullptr;
@@ -141,7 +141,7 @@ TSubclassOf<AActor> ASRWeapon::GetScope(EScopeType scope) const
 		case EScopeType::Scope6X:
 			return mScope6XClass;
 		default:
-			checkf(false, TEXT("SRWeapon : GetScope - ¿Ã¹Ù¸£Áö ¾ÊÀº enumÅ¸ÀÔÀÔ´Ï´Ù."));
+			checkf(false, TEXT("SRWeapon : GetScope - ì˜¬ë°”ë¥´ì§€ ì•Šì€ enumíƒ€ì…ì…ë‹ˆë‹¤."));
 			break;
 	}
 	return nullptr;
@@ -158,7 +158,7 @@ UChildActorComponent* ASRWeapon::GetScopeActor(EScopeType scope) const
 		case EScopeType::Scope6X:
 			return mScope6X;
 		default:
-			checkf(false, TEXT("SRWeapon : GetScope - ¿Ã¹Ù¸£Áö ¾ÊÀº enumÅ¸ÀÔÀÔ´Ï´Ù."));
+			checkf(false, TEXT("SRWeapon : GetScope - ì˜¬ë°”ë¥´ì§€ ì•Šì€ enumíƒ€ì…ì…ë‹ˆë‹¤."));
 			break;
 	}
 	return nullptr;
@@ -176,7 +176,7 @@ USoundBase* ASRWeapon::GetFireSound(EWeaponType weapon) const
 		case EWeaponType::SR:
 			return mSniperFireSound;
 		default:
-			checkf(false, TEXT("ASRWeapon-GetFireSound : Àß¸øµÈ EWeaponType Å¸ÀÔÀÔ´Ï´Ù."));
+			checkf(false, TEXT("ASRWeapon-GetFireSound : ì˜ëª»ëœ EWeaponType íƒ€ì…ì…ë‹ˆë‹¤."));
 			break;
 	}
 	return nullptr;
@@ -184,13 +184,13 @@ USoundBase* ASRWeapon::GetFireSound(EWeaponType weapon) const
 
 USoundBase* ASRWeapon::GetDryFireSound() const
 {
-	checkf(DryFireSound != nullptr, TEXT("ASRWeapon-GetDryFireSound : DryFireSoundÀÌ nullptrÀÔ´Ï´Ù."));
+	checkf(DryFireSound != nullptr, TEXT("ASRWeapon-GetDryFireSound : DryFireSoundì´ nullptrì…ë‹ˆë‹¤."));
 	return DryFireSound;
 }
 
 USoundBase* ASRWeapon::GetSwtichFireModeSound() const
 {
-	checkf(DryFireSound != nullptr, TEXT("ASRWeapon-GetSwtichFireModeSound : mSwitchFireModeSoundÀÌ nullptrÀÔ´Ï´Ù."));
+	checkf(DryFireSound != nullptr, TEXT("ASRWeapon-GetSwtichFireModeSound : mSwitchFireModeSoundì´ nullptrì…ë‹ˆë‹¤."));
 	return mSwitchFireModeSound;
 }
 
@@ -205,7 +205,7 @@ TSubclassOf<UAnimInstance> ASRWeapon::GetCharacterAnimInstance(EWeaponType weapo
 		case EWeaponType::SR:
 			return mCharacterSniperAnimInstance;
 		default:
-			checkf(DryFireSound != nullptr, TEXT("ASRWeapon-GetCharacterAnimInstance : Àß¸øµÈ EWeaponType Å¸ÀÔÀÔ´Ï´Ù.."));
+			checkf(DryFireSound != nullptr, TEXT("ASRWeapon-GetCharacterAnimInstance : ì˜ëª»ëœ EWeaponType íƒ€ì…ì…ë‹ˆë‹¤.."));
 			break;
 	}
 	return nullptr;
@@ -222,7 +222,7 @@ TSubclassOf<UAnimInstance> ASRWeapon::GetWeaponAnimInstance(EWeaponType weapon) 
 	case EWeaponType::SR:
 		return mSniperAnimInstance;
 	default:
-		checkf(DryFireSound != nullptr, TEXT("ASRWeapon-GetWeaponAnimInstance : Àß¸øµÈ EWeaponType Å¸ÀÔÀÔ´Ï´Ù.."));
+		checkf(DryFireSound != nullptr, TEXT("ASRWeapon-GetWeaponAnimInstance : ì˜ëª»ëœ EWeaponType íƒ€ì…ì…ë‹ˆë‹¤.."));
 		break;
 	}
 	return nullptr;
