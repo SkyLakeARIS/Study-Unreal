@@ -35,15 +35,19 @@ void UUISelectModesWidget::NativeConstruct()
 	mBtnPlateType->OnClicked.AddDynamic(this, &UUISelectModesWidget::clickedPlateType);
 	mBtnCharacterType->OnClicked.AddDynamic(this, &UUISelectModesWidget::clickedCharacterType);
 
-	mbCanClickStart = false;
-
 	mSelectionFlag = 0;
+}
+
+void UUISelectModesWidget::NativeDestruct()
+{
+	Super::NativeDestruct();
+	mOnGameData.Unbind();
 }
 
 void UUISelectModesWidget::BindCharacterInfo(ASRPlayerCharacter* character)
 {
 	mOnGameData.BindUObject(character, &ASRPlayerCharacter::InitGameMode);
-	mbCanClickStart = true;
+	mSelectionFlag |= BIND_COMPLETE_BIT;
 }
 
 
@@ -176,10 +180,6 @@ void UUISelectModesWidget::clickedCharacterType()
 
 void UUISelectModesWidget::clickedStart()
 {
-	if(mbCanClickStart == false)
-	{
-		return;
-	}
 
 	if(mSelectionFlag == SELECT_ALL_FLAG)
 	{

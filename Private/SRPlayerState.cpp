@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 #include "SRPlayerState.h"
 #include "UIHUDWidget.h"
 
@@ -9,6 +9,13 @@ ASRPlayerState::ASRPlayerState()
 	mHits = 0;
 	mFireShots = 0;
 	mKill = 0;
+}
+
+void ASRPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	mOnUpdateScore.Unbind();
+	mOnUpdateAccuracy.Unbind();
 }
 
 void ASRPlayerState::BindHUD(UUIHUDWidget* HUD)

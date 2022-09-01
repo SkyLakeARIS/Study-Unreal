@@ -73,6 +73,12 @@ ASRPlayerCharacter::ASRPlayerCharacter()
 	mWeaponLocationSocketName = FString("S_HandR_Rifle");
 }
 
+void ASRPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	mOnCrossHairVisibility.Unbind();
+}
+
 void ASRPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);

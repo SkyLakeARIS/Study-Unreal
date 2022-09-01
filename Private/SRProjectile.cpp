@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 #include "SRProjectile.h"
 #include "SRPlayerController.h"
 #include "DrawDebugHelpers.h"
@@ -51,13 +51,23 @@ void ASRProjectile::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ASRProjectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	onHitAndUpdateAcc.Unbind();
+	mOnUpdateScore.Unbind();
+	mOnUpdateKill.Unbind();
+	mHitmark.Unbind();
+}
+
 void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	mbIsCollision = true;
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(Hit.ImpactNormal.Rotation(), Hit.ImpactPoint));
 
-	// Å¸°Ù¿¡ ÀûÁßÇÑ °æ¿ì ¿Ü¿¡´Â º°µµÀÇ Ãæµ¹ Ã³¸®¸¦ ÇÏÁö ¾Ê½À´Ï´Ù.
+	// íƒ€ê²Ÿì— ì ì¤‘í•œ ê²½ìš° ì™¸ì—ëŠ” ë³„ë„ì˜ ì¶©ëŒ ì²˜ë¦¬ë¥¼ í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
 	if (!Hit.GetActor()->GetName().Contains(FString("TargetCharacter")))
 	{
 		Destroy();
@@ -67,8 +77,8 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 	mHitType = EHitType::Hit;
 	const float distanceToHitPoint = (GetActorLocation() - mStartLocation).Size();
 
-	// ÃÑ¾Ë Å¸ÀÔ¿¡ ¸Â´Â µ¥¹ÌÁö Å×ÀÌºíÀ» Âü°íÇÏ¿© °Å¸®¿¡ µû¸¥ ÃÖÁ¾ µ¥¹ÌÁö¸¦ °è»êÇÕ´Ï´Ù.
-	// 1ÀÌ cm¶ó´Â °¡Á¤ÇÏ¿¡ 50¹ÌÅÍ¸¶´Ù µ¥¹ÌÁö°¡ 1¾¿ °¨¼ÒÇÕ´Ï´Ù. µ¥¹ÌÁö °¨¼Ò´Â ÃÖ¼Ú°ª ¹Ì¸¸ÀÌ µÇÁö ¾Ê½À´Ï´Ù.
+	// ì´ì•Œ íƒ€ì…ì— ë§ëŠ” ë°ë¯¸ì§€ í…Œì´ë¸”ì„ ì°¸ê³ í•˜ì—¬ ê±°ë¦¬ì— ë”°ë¥¸ ìµœì¢… ë°ë¯¸ì§€ë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
+	// 1ì´ cmë¼ëŠ” ê°€ì •í•˜ì— 50ë¯¸í„°ë§ˆë‹¤ ë°ë¯¸ì§€ê°€ 1ì”© ê°ì†Œí•©ë‹ˆë‹¤. ë°ë¯¸ì§€ ê°ì†ŒëŠ” ìµœì†Ÿê°’ ë¯¸ë§Œì´ ë˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
 	switch(mBulletType)
 	{
 		case EWeaponType::AR:
@@ -81,7 +91,7 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 			mBulletDamage = FMath::Clamp(mDamageTable.HG - static_cast<int32>(distanceToHitPoint / 5000.0f), mDamageTable.HG_Min, mDamageTable.HG);
 			break;
 		default:
-			checkf(false, TEXT("ASRProjectile - OnHit - EWeaponType ¿Ã¹Ù¸£Áö ¾ÊÀº enum Å¸ÀÔÀÔ´Ï´Ù."));
+			checkf(false, TEXT("ASRProjectile - OnHit - EWeaponType ì˜¬ë°”ë¥´ì§€ ì•Šì€ enum íƒ€ì…ì…ë‹ˆë‹¤."));
 			break;
 	}
 
@@ -101,7 +111,7 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 
 	if(bIsKill)
 	{
-		// Àú°İÃÑÀÇ °æ¿ì¿¡ Å¸°ÙÀ» ¾²·¯Æ®·ÈÀ» ¶§ °Å¸®¿¡ µû¸¥ Ãß°¡ Á¡¼ö¸¦ ¾ò½À´Ï´Ù.
+		// ì €ê²©ì´ì˜ ê²½ìš°ì— íƒ€ê²Ÿì„ ì“°ëŸ¬íŠ¸ë ¸ì„ ë•Œ ê±°ë¦¬ì— ë”°ë¥¸ ì¶”ê°€ ì ìˆ˜ë¥¼ ì–»ìŠµë‹ˆë‹¤.
 		if(mBulletType == EWeaponType::SR)
 		{
 			getScore += static_cast<int32>(distanceToHitPoint);
@@ -116,8 +126,8 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 }
 
 /*
- * playerstate¿Í Á¤º¸¸¦ ¹ÙÀÎµåÇÕ´Ï´Ù.(delegate)
- * ´ë»ó Á¤º¸: Hit count, accuracy, score, kill count
+ * playerstateì™€ ì •ë³´ë¥¼ ë°”ì¸ë“œí•©ë‹ˆë‹¤.(delegate)
+ * ëŒ€ìƒ ì •ë³´: Hit count, accuracy, score, kill count
  */
 void ASRProjectile::BindPlayerStateInfo(ASRPlayerState* srPlayerState)
 {
@@ -127,8 +137,8 @@ void ASRProjectile::BindPlayerStateInfo(ASRPlayerState* srPlayerState)
 }
 
 /*
- * player controller¿Í Á¤º¸¸¦ ¹ÙÀÎµåÇÕ´Ï´Ù.(delegate)
- * ´ë»ó Á¤º¸: HUDWidget
+ * player controllerì™€ ì •ë³´ë¥¼ ë°”ì¸ë“œí•©ë‹ˆë‹¤.(delegate)
+ * ëŒ€ìƒ ì •ë³´: HUDWidget
  */
 void ASRProjectile::BindHUDWidget(UUIHUDWidget* hud)
 {
@@ -136,7 +146,7 @@ void ASRProjectile::BindHUDWidget(UUIHUDWidget* hud)
 }
 
 /*
- * ¹ß»çµÈ ÃÑ¾ËÀÇ Å¸ÀÔÀ» ¹«±âÅ¸ÀÔÀ¸·ÎºÎÅÍ Á¤ÇÏ´Â ÇÔ¼öÀÔ´Ï´Ù.
+ * ë°œì‚¬ëœ ì´ì•Œì˜ íƒ€ì…ì„ ë¬´ê¸°íƒ€ì…ìœ¼ë¡œë¶€í„° ì •í•˜ëŠ” í•¨ìˆ˜ì…ë‹ˆë‹¤.
  */
 void ASRProjectile::SetBulletType(EWeaponType gunType)
 {

@@ -25,6 +25,8 @@ protected:
 
 	virtual void NativeConstruct() override;
 
+	virtual void NativeDestruct() override;
+
 	UFUNCTION()
 	void clickedAR();
 	UFUNCTION()
@@ -89,12 +91,12 @@ protected:
 	FGameModeData mSelectedModes;
 	bool mbIsCharacterType;
 
-	bool mbCanClickStart;
-
 	int8 mSelectionFlag;
-	const int8 SELECT_ALL_FLAG = 0xf;
+	const int8 SELECT_ALL_FLAG = 0x1f;
 	const int8 WEAPON_SELECT_BIT = 0x1;
 	const int8 OPTIC_SELECT_BIT = 0x2;
 	const int8 GAMEMODE_SELECT_BIT = 0x4;
 	const int8 TARGET_SELECT_BIT = 0x8;
+	const int8 BIND_COMPLETE_BIT = 0x10;
+
 };

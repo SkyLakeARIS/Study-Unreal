@@ -23,6 +23,8 @@ class ASRPlayerCharacter : public ACharacter
 public:
 	ASRPlayerCharacter();
 
+
+
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void PostInitializeComponents() override;
@@ -78,6 +80,8 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 

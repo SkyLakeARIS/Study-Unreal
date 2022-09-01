@@ -20,6 +20,7 @@ class VERSION_API ASRPlayerState : public APlayerState
 public:
 
 	ASRPlayerState();
+
 	UFUNCTION()
 	void BindHUD(UUIHUDWidget* HUD);
 
@@ -35,6 +36,10 @@ public:
 	int32 GetScore() const;
 	int32 GetAccuracy() const;
 	int32 GetKillCount() const;
+
+protected:
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
 

@@ -36,13 +36,15 @@ public:
 
 	void BindSpawnPoint(class ASRSpawnPoint* spawnPoint);
 
-	bool OnHit(int32 damage, int32* scoreOut);
+	bool OnHit(int32 damage, int32* outScore);
 
 	void initializeMovement(FVector endLocation, float speedFactor);
 
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void changeCollisionEnabled(ECollisionEnabled::Type newType);
 

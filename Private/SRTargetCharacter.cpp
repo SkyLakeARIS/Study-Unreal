@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "SRTargetCharacter.h"
 #include "SRPlayerController.h"
 #include "SRSpawnPoint.h"
@@ -105,6 +105,12 @@ void ASRTargetCharacter::BeginPlay()
 	changeCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ASRTargetCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	mOnTargetDown.Clear();
+}
+
 void ASRTargetCharacter::changeCollisionEnabled(ECollisionEnabled::Type newType)
 {
 	mHead->SetCollisionEnabled(newType);
@@ -156,7 +162,7 @@ void ASRTargetCharacter::SetTarget(bool isCharacterType, bool isMovable, bool is
 	GetMesh()->SetCollisionObjectType(ECC_Pawn);
 }
 
-// Å¸°ÙÀ» ½ÇÁ¦·Î ¸ÂÃß°í Ã³¸®ÇÒ ¼ö ÀÖ´Â »óÅÂ°¡ µË´Ï´Ù.
+// íƒ€ê²Ÿì„ ì‹¤ì œë¡œ ë§ì¶”ê³  ì²˜ë¦¬í•  ìˆ˜ ìˆëŠ” ìƒíƒœê°€ ë©ë‹ˆë‹¤.
 void ASRTargetCharacter::ActiveTarget()
 {
 	mHP = MAX_HP;
@@ -165,7 +171,7 @@ void ASRTargetCharacter::ActiveTarget()
 
 	if(mbIsCharacterType)
 	{
-		// Ä³¸¯ÅÍ Æ÷Áî°¡ ¾ÉÀ» ¼ö ÀÖ´Â(½ºÆùÆ÷ÀÎÆ®ÀÌ¸é) »óÅÂÀÌ¸é ·£´ıÀ¸·Î Æ÷Áî¸¦ Á¤ÇÔ.
+		// ìºë¦­í„° í¬ì¦ˆê°€ ì•‰ì„ ìˆ˜ ìˆëŠ”(ìŠ¤í°í¬ì¸íŠ¸ì´ë©´) ìƒíƒœì´ë©´ ëœë¤ìœ¼ë¡œ í¬ì¦ˆë¥¼ ì •í•¨.
 		if (mbIsCrouchable && FMath::RandBool())
 		{
 			GetMesh()->PlayAnimation(mCharacterCrouchPoseAnimation, true);
@@ -195,20 +201,20 @@ void ASRTargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
 }
 
 /*
- *  Å¸°ÙÀÌ ÃÑ¾Ë¿¡ ¸Â¾ÒÀ»¶§ ½ÇÇàÇÏ´Â ÇÔ¼öÀÔ´Ï´Ù.
- *	Àü´ŞµÈ µ¥¹ÌÁö¸¸Å­ Å¸°Ù Ã¼·ÂÀ» °¨¼ÒÇÏ°í Á¡¼ö¸¦ Æ÷ÀÎÅÍ·Î ¹İÈ¯ÇÕ´Ï´Ù.
- *	Å¸°ÙÀÌ ´Ù¿îµÇ¸é true, ±×·¸Áö ¾ÊÀ¸¸é false¸¦ ¹İÈ¯ÇÕ´Ï´Ù.
- *	Å¸°ÙÀº ´Ù¿î½Ã Å¸°Ù¸Å´ÏÀú¿¡°Ô ¾Ë¸³´Ï´Ù.
+ *  íƒ€ê²Ÿì´ ì´ì•Œì— ë§ì•˜ì„ë•Œ ì‹¤í–‰í•˜ëŠ” í•¨ìˆ˜ì…ë‹ˆë‹¤.
+ *	ì „ë‹¬ëœ ë°ë¯¸ì§€ë§Œí¼ íƒ€ê²Ÿ ì²´ë ¥ì„ ê°ì†Œí•˜ê³  ì ìˆ˜ë¥¼ í¬ì¸í„°ë¡œ ë°˜í™˜í•©ë‹ˆë‹¤.
+ *	íƒ€ê²Ÿì´ ë‹¤ìš´ë˜ë©´ true, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ falseë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
+ *	íƒ€ê²Ÿì€ ë‹¤ìš´ì‹œ íƒ€ê²Ÿë§¤ë‹ˆì €ì—ê²Œ ì•Œë¦½ë‹ˆë‹¤.
  */
-bool ASRTargetCharacter::OnHit(int32 damage, int32* scoreOut)
+bool ASRTargetCharacter::OnHit(int32 damage, int32* outScore)
 {
-	checkf(scoreOut != nullptr, TEXT("ASRTargetCharacter-OnHit scoreOutÀÌ nullÀÔ´Ï´Ù."));
-	checkf(damage > 0, TEXT("ASRTargetCharacter-OnHit damage°¡ 0ÀÌÇÏ ÀÔ´Ï´Ù."));
+	checkf(outScore != nullptr, TEXT("ASRTargetCharacter-OnHit scoreOutì´ nullì…ë‹ˆë‹¤."));
+	checkf(damage > 0, TEXT("ASRTargetCharacter-OnHit damageê°€ 0ì´í•˜ ì…ë‹ˆë‹¤."));
 
 	if(mHP > MIN_HP)
 	{
 		mHP -= damage;
-		*scoreOut = HIT_SCORE;
+		*outScore = HIT_SCORE;
 	}
 
 	if (!mbIsCharacterType)
@@ -218,7 +224,7 @@ bool ASRTargetCharacter::OnHit(int32 damage, int32* scoreOut)
 
 	if(mHP <= MIN_HP)
 	{
-		*scoreOut = KILL_SCORE;
+		*outScore = KILL_SCORE;
 
 		if(mbIsCharacterType)
 		{
@@ -254,7 +260,7 @@ bool ASRTargetCharacter::OnHit(int32 damage, int32* scoreOut)
 
 void ASRTargetCharacter::initializeMovement(FVector endLocation, float speedFactor)
 {
-	checkf(speedFactor >= 1.0f, TEXT("ASRTargetCharacter - SetEndLocation : speedFactor´Â 1.0fÀÌ»óÀÌ¾î¾ß ÇÕ´Ï´Ù."));
+	checkf(speedFactor >= 1.0f, TEXT("ASRTargetCharacter - SetEndLocation : speedFactorëŠ” 1.0fì´ìƒì´ì–´ì•¼ í•©ë‹ˆë‹¤."));
 
 	mEndLocation = endLocation;
 	mDistanceToMoveEveryTime = mEndLocation - mStartLocation;
