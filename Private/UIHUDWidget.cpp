@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "UIHUDWidget.h"
 #include "Components/TextBlock.h"
 #include "SRPlayerCharacter.h"
@@ -15,7 +15,7 @@ void UUIHUDWidget::NativeConstruct()
 	mDisplayGameMode = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayGameMode")));
 }
 
-// crosshair, hitmark À§Á¬À» ÃÊ±âÈ­ÇÏ°í ºäÆ÷Æ®¿¡ Ãß°¡ÇÕ´Ï´Ù.
+// crosshair, hitmark ìœ„ì ¯ì„ ì´ˆê¸°í™”í•˜ê³  ë·°í¬íŠ¸ì— ì¶”ê°€í•©ë‹ˆë‹¤.
 void UUIHUDWidget::InitializeWidgets()
 {
 	const auto playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -35,7 +35,7 @@ void UUIHUDWidget::InitializeWidgets()
 	mKillMark->SetVisibility(ESlateVisibility::Hidden);
 	mCrossHair->SetVisibility(ESlateVisibility::Hidden);
 
-	// ÀÓÀÇÀÇ °ªÀ¸·Î ÁöÁ¤ÇØµÓ´Ï´Ù.
+	// ìž„ì˜ì˜ ê°’ìœ¼ë¡œ ì§€ì •í•´ë‘¡ë‹ˆë‹¤.
 	mCurrentMark = mHitMark;
 }
 
@@ -69,7 +69,7 @@ void UUIHUDWidget::UpdateFireMode(EWaeponFireMode newFireMode)
 			displayFireMode = "Full auto";
 			break;
 		default:
-			checkf(false, TEXT("UUIHUDWidget - UpdateFireMode : ¿Ã¹Ù¸£Áö ¾ÊÀº EWaeponFireMode Å¸ÀÔÀÔ´Ï´Ù."));
+			checkf(false, TEXT("UUIHUDWidget - UpdateFireMode : ì˜¬ë°”ë¥´ì§€ ì•Šì€ EWaeponFireMode íƒ€ìž…ìž…ë‹ˆë‹¤."));
 			break;
 	}
 	mFireMode->SetText(FText::FromString(displayFireMode));
@@ -87,17 +87,17 @@ void UUIHUDWidget::UpdateGameMode(FString newGameMode)
 
 void UUIHUDWidget::SetCrosshairVisibility(ESlateVisibility option)
 {
-	checkf(option == ESlateVisibility::Hidden || option == ESlateVisibility::Visible, TEXT("UUIHUDWidget - UpdateFireMode : Hidden ¶Ç´Â Visible Å¸ÀÔ¸¸ Àü´ÞÇÒ ¼ö ÀÖ½À´Ï´Ù."));
+	checkf(option == ESlateVisibility::Hidden || option == ESlateVisibility::Visible, TEXT("UUIHUDWidget - UpdateFireMode : Hidden ë˜ëŠ” Visible íƒ€ìž…ë§Œ ì „ë‹¬í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤."));
 
 	mCrossHair->SetVisibility(option);
 }
 
 
-// Å¸°Ù¿¡ ÀûÁß½Ã ÀûÀýÇÑ È÷Æ®¸¶Å©¸¦ Å©·Î½ºÇì¾î°¡ À§Ä¡ÇÏ´Â °÷¿¡ Ç¥½ÃÇÏ´Â ÇÔ¼öÀÔ´Ï´Ù.
-// Ç¥½ÃÇÒ È÷Æ®¸¶Å©ÀÇ À¯ÇüÀº projectile °³Ã¼°¡ Àü´ÞÇØÁÝ´Ï´Ù.
+// íƒ€ê²Ÿì— ì ì¤‘ì‹œ ì ì ˆí•œ ížˆíŠ¸ë§ˆí¬ë¥¼ í¬ë¡œìŠ¤í—¤ì–´ê°€ ìœ„ì¹˜í•˜ëŠ” ê³³ì— í‘œì‹œí•˜ëŠ” í•¨ìˆ˜ìž…ë‹ˆë‹¤.
+// í‘œì‹œí•  ížˆíŠ¸ë§ˆí¬ì˜ ìœ í˜•ì€ projectile ê°œì²´ê°€ ì „ë‹¬í•´ì¤ë‹ˆë‹¤.
 void UUIHUDWidget::AddHitMarkToViewPort(EHitType hitType)
 {
-	// ÀÌÀü¿¡ º¸¿©Áø È÷Æ®¸¶Å©¸¦ ºäÆ÷Æ®¿¡¼­ ¼û±é´Ï´Ù.
+	// ì´ì „ì— ë³´ì—¬ì§„ ížˆíŠ¸ë§ˆí¬ë¥¼ ë·°í¬íŠ¸ì—ì„œ ìˆ¨ê¹ë‹ˆë‹¤.
 	mCurrentMark->SetVisibility(ESlateVisibility::Hidden);
 
 	switch (hitType)
@@ -112,7 +112,7 @@ void UUIHUDWidget::AddHitMarkToViewPort(EHitType hitType)
 			mCurrentMark = mKillMark;
 			break;
 		default:
-			checkf(false, TEXT("UUIHUDWidget - AddViewPortHitMark : ¿Ã¹Ù¸£Áö ¾ÊÀº EHitType Å¸ÀÔÀÔ´Ï´Ù."));
+			checkf(false, TEXT("UUIHUDWidget - AddViewPortHitMark : ì˜¬ë°”ë¥´ì§€ ì•Šì€ EHitType íƒ€ìž…ìž…ë‹ˆë‹¤."));
 			break;
 	}
 
@@ -121,7 +121,7 @@ void UUIHUDWidget::AddHitMarkToViewPort(EHitType hitType)
 	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &UUIHUDWidget::HideHitMark, 0.5f, false, -1.0f);
 }
 
-// Å¸ÀÌ¸Ó¿¡ ÀÇÇØ È£ÃâµÇ´Â È÷Æ®¸¶Å©¸¦ Áö¿ì´Â ÇÔ¼öÀÔ´Ï´Ù.
+// íƒ€ì´ë¨¸ì— ì˜í•´ í˜¸ì¶œë˜ëŠ” ížˆíŠ¸ë§ˆí¬ë¥¼ ì§€ìš°ëŠ” í•¨ìˆ˜ìž…ë‹ˆë‹¤.
 void UUIHUDWidget::HideHitMark()
 {
 	mCurrentMark->SetVisibility(ESlateVisibility::Hidden);

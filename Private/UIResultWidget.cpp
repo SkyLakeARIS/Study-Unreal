@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "UIResultWidget.h"
 #include "SRPlayerController.h"
 #include "SRPlayerState.h"
@@ -9,7 +9,7 @@
 
 void UUIResultWidget::UpdateStageInfo(const class ASRPlayerState* const srPlayerState)
 {
-	checkf(srPlayerState != nullptr, TEXT("UUIResultWidget-UpdateStageInfo : srPlayerStateÀÌ nullptrÀÔ´Ï´Ù."));
+	checkf(srPlayerState != nullptr, TEXT("UUIResultWidget-UpdateStageInfo : srPlayerStateì´ nullptrì…ë‹ˆë‹¤."));
 	mScore->SetText(FText::FromString(FString::FromInt(srPlayerState->GetScore())));
 	mAccuracy->SetText(FText::FromString(FString::FromInt(srPlayerState->GetAccuracy()) + FString("%")));
 	mKill->SetText(FText::FromString(FString::FromInt(srPlayerState->GetKillCount())));

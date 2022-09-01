@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "SRPlayerController.h"
 #include "SRPlayerState.h"
 #include "SRSpawnPoint.h"
@@ -93,7 +93,7 @@ bool ASRPlayerController::IsDebugging() const
 	return mbDebugMode;
 }
 
-// °ÔÀÓÀ» ½ÃÀÛ Çß´ÂÁö ¿©ºÎ¸¦ ¹İÈ¯ÇÕ´Ï´Ù. (false - ÁØºñ ½Ã°£, true - °ÔÀÓ ½ÃÀÛ)
+// ê²Œì„ì„ ì‹œì‘ í–ˆëŠ”ì§€ ì—¬ë¶€ë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤. (false - ì¤€ë¹„ ì‹œê°„, true - ê²Œì„ ì‹œì‘)
 bool ASRPlayerController::IsStartMainGame() const
 {
 	return mbStartGame;

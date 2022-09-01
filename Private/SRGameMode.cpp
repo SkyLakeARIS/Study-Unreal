@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "SRGameMode.h"
 #include "SRPlayerController.h"
 #include "SRPlayerState.h"
@@ -29,7 +29,7 @@ void ASRGameMode::PostLogin(APlayerController* NewPlayer)
 
 void ASRGameMode::initTargetManagerMode() const
 {
-	checkf(mGameModeType != EGameModeType::None, TEXT("ASRGameMode : initTargetManagerMode - EGameModeType None Å¸ÀÔÀÌ µÉ ¼ö ¾ø½À´Ï´Ù."));
+	checkf(mGameModeType != EGameModeType::None, TEXT("ASRGameMode : initTargetManagerMode - EGameModeType None íƒ€ì…ì´ ë  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 
 	const auto playerController = Cast<ASRPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	playerController->GetTargetManager()->SetMovableTargetMode(mGameModeType);
