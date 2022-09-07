@@ -21,23 +21,34 @@ class VERSION_API ASRPlayerController : public APlayerController
 
 public:
 	ASRPlayerController();
+
 	virtual void PostInitializeComponents() override;
+
 	virtual void OnPossess(APawn* InPawn) override;
+
 	void ChangeInputMode(bool bIsGameMode);
 	
 	void ResumeCountDown() const;
+
 	void ClearCountDown();
 
 	void BindStatToUI();
 
 	void ShowInGameHUDAndStartTimer();
 
+	// setter/getter
 	void SetDebugMode(bool active);
+
 	bool IsDebugging() const;
+
 	bool IsStartMainGame() const;
+
 	ASRPlayerState* GetPlayerState() const;
+
 	UUIHUDWidget* GetIngameHUD() const;
+
 	UUISelectModesWidget* GetSelectModesWidget() const;
+
 	class ASRTargetManager* GetTargetManager() const;
 
 protected:
@@ -56,7 +67,6 @@ private:
 	void countReadyTime();
 
 	void result();
-
 
 protected:
 

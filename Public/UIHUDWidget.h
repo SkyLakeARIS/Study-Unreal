@@ -24,14 +24,19 @@ public:
 
 	UFUNCTION()
 	void UpdateRemainingTime(int32 remainingTime);
+
 	UFUNCTION()
 	void UpdateAmmo(int32 newAmmo);
+
 	UFUNCTION()
 	void UpdateAccuracy(int32 accuracy);
+
 	UFUNCTION()
 	void UpdateFireMode(EWaeponFireMode newFireMode);
+
 	UFUNCTION()
 	void UpdateScore(int32 score);
+
 	UFUNCTION()
 	void UpdateGameMode(FString newGameMode);
 
