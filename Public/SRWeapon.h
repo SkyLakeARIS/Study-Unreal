@@ -27,10 +27,13 @@ public:
 	UChildActorComponent* GetScopeActor(EScopeType scope) const;
 
 	USoundBase* GetFireSound(EWeaponType weapon) const;
+
 	USoundBase* GetDryFireSound() const;
+
 	USoundBase* GetSwtichFireModeSound() const;
 
 	TSubclassOf<UAnimInstance> GetCharacterAnimInstance(EWeaponType weapon) const;
+
 	TSubclassOf<UAnimInstance> GetWeaponAnimInstance(EWeaponType weapon) const;
 
 protected:

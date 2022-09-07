@@ -19,6 +19,7 @@ public:
 
 	UFUNCTION()
 	FString GetSlotName() const;
+
 	UFUNCTION()
 	int32 GetSlotIndex() const;
 

@@ -23,8 +23,6 @@ class ASRPlayerCharacter : public ACharacter
 public:
 	ASRPlayerCharacter();
 
-
-
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void PostInitializeComponents() override;
@@ -32,32 +30,43 @@ public:
 	// getter
 	UFUNCTION(BlueprintPure)
 	USkeletalMeshComponent* GetMesh1P() const { return mMesh1P; }
+
 	UFUNCTION(BlueprintPure)
 	UCameraComponent* GetFirstPersonCameraComponent() const { return mFirstPersonCameraComponent; }
 
 	UFUNCTION(BlueprintPure)
 	EWeaponType GetWeaponType() const;
+
 	UFUNCTION(BlueprintPure)
 	EScopeType GetScopeType() const;
+
 	UFUNCTION(BlueprintPure)
 	EGameType GetGameType() const;
+
 	UFUNCTION(BlueprintPure)
 	USkeletalMeshComponent* GetNewWeapon()  const { return mWeapon; }
+
 	UFUNCTION(BlueprintPure)
 	UChildActorComponent* GetNewScope() const { return mScope; }
+
 	UFUNCTION(BlueprintPure)
 	EAimingType GetAimingType() const;
 
 	UFUNCTION(BlueprintPure)
 	bool IsAimimg() const;
+
 	UFUNCTION(BlueprintPure)
 	bool IsCanFire() const;
+
 	UFUNCTION(BlueprintPure)
 	bool IsNeedBoltAction() const;
+
 	UFUNCTION(BlueprintPure)
 	bool IsFiring() const;
+
 	UFUNCTION(BlueprintPure)
 	bool IsEmptyMag() const;
+
 	UFUNCTION(BlueprintPure)
 	bool IsReload() const;
 
@@ -66,8 +75,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SniperMoveSocket(bool active);
+
 	UFUNCTION(BlueprintCallable)
 	void NotifyBoltActionEnd();
+
 	UFUNCTION(BlueprintCallable)
 	void NotifyReloadEnd();
 
@@ -75,6 +86,7 @@ public:
 	void InitGameMode(FGameModeData modeData);
 
 	void SaveInGameSetting();
+
 	void LoadInGameSetting();
 
 protected:
@@ -88,8 +100,11 @@ protected:
 	void tryBindSelectModesUI();
 
 	void StartFire();
+
 	void StopFire();
+
 	void BurstFire();
+
 	void FireShot();
 
 	void Reload();
@@ -97,14 +112,19 @@ protected:
 	void SwitchFireMode();
 
 	void SetAim();
+
 	void SetHip();
 
 	void endBehaviorDelay();
+
 	void endWeaponDelay();
 
 	void MoveForward(float Val);
+
 	void MoveRight(float Val);
+
 	void TurnAtRate(float Rate);
+
 	void LookUpAtRate(float Rate);
 
 public:

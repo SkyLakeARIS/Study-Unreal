@@ -67,11 +67,11 @@ struct FGameModeData
 		game = EGameType::NONE;
 	}
 	UPROPERTY(EditAnywhere)
-		EWeaponType weapon;
+	EWeaponType weapon;
 	UPROPERTY(EditAnywhere)
-		EScopeType scope;
+	EScopeType scope;
 	UPROPERTY(EditAnywhere)
-		EGameType game;
+	EGameType game;
 };
 
 USTRUCT()

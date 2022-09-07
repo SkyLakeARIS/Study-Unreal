@@ -7,11 +7,11 @@ ASRRifleBullet::ASRRifleBullet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 100000.f;
-	ProjectileMovement->MaxSpeed = 500000.f;
-	ProjectileMovement->bRotationFollowsVelocity = false;
-	ProjectileMovement->bShouldBounce = false;
+	mProjectileMovement->UpdatedComponent = mCollisionComp;
+	mProjectileMovement->InitialSpeed = 100000.f;
+	mProjectileMovement->MaxSpeed = 500000.f;
+	mProjectileMovement->bRotationFollowsVelocity = false;
+	mProjectileMovement->bShouldBounce = false;
 }
 
 // Called when the game starts or when spawned

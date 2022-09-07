@@ -24,7 +24,6 @@ public:
 
 	void UpdateInfoWhenOpen();
 
-
 protected:
 
 	virtual void NativeConstruct() override;

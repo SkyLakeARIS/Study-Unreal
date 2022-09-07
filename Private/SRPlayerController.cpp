@@ -139,7 +139,6 @@ void ASRPlayerController::BeginPlay()
 		mSelectModesWidget = CreateWidget<UUISelectModesWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), mSelectModesWidgetClass);
 	}
 
-
 	mPlayerState = Cast<ASRPlayerState>(PlayerState);
 
 	ChangeInputMode(false);
