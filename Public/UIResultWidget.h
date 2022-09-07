@@ -42,9 +42,14 @@ public:
 	UButton* mBtnMenu;
 
 	UPROPERTY()
-	UTextBlock* mScore;
+	UTextBlock* mScores;
 	UPROPERTY()
 	UTextBlock* mAccuracy;
 	UPROPERTY()
-	UTextBlock* mKill;
+	UTextBlock* mKills;
+	UPROPERTY()
+	UTextBlock* mShots;
+	UPROPERTY()
+	UTextBlock* mHeadshotRate;
+
 };

@@ -9,6 +9,7 @@
 #include "SRInGameSetting.h"
 #include "SRRifleBullet.h"
 #include "SRSniperBullet.h"
+#include "SRTargetManager.h"
 #include "SRWeapon.h"
 #include "UIHUDWidget.h"
 #include "UISelectModesWidget.h"
@@ -427,6 +428,10 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 
 	mFireFlag = CAN_FIRE;
 	mBehaviorFlag = CAN_BEHAVIOR;
+
+	// 통계 데이터 저장을 위해서 게임모드들을 playerState에 전달합니다.
+	const EGameModeType gameModeType = mPlayerController->GetTargetManager()->GetGameModeType();
+	mPlayerController->GetPlayerState()->initialize(mGameModeData.weapon, mGameModeData.game, gameModeType);
 }
 
 // 재장전 함수. AnimNotify에 의해서 다시 사격가능한 상태가 됩니다.
@@ -546,15 +551,16 @@ void ASRPlayerCharacter::FireShot()
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), mMuzzleParticles, mWeapon->GetSocketTransform(FName("S_Muzzle")).GetLocation(), mWeapon->GetSocketTransform(FName("S_Muzzle")).GetRotation().Rotator());
 
-	mTutAnimInstance->SetRecoil(true);
+
 
 	// 준비 기간에는 전적 및 정확도를 기록하지 않습니다.
 	if(mPlayerController->IsStartMainGame())
 	{
-		mPlayerController->GetPlayerState()->OnAddFireShots(1);
+		mPlayerController->GetPlayerState()->OnAddFireShots();
 	}
 
 	mTutAnimInstance->Fire();
+	mTutAnimInstance->SetRecoil(true);
 
 	// 반동 계수입니다. 스프레이의 반지름에 곱해집니다.
 	// 0.1~1.0 사이로, 총알이 연속으로 발사될수록 계수가 높아집니다.
@@ -600,8 +606,8 @@ void ASRPlayerCharacter::FireShot()
 
 			if(mbIsAiming)
 			{
-				randSpread.Yaw = FMath::RandRange(0.0f, 1.0f * mRecoilFactor) * (FMath::Cos(FMath::FRandRange(0.0f, 2*PI * mRecoilFactor)));
-				randSpread.Pitch = FMath::RandRange(0.0f, 1.0f * mRecoilFactor) * (FMath::Sin(FMath::FRandRange(0.0f, 2*PI * mRecoilFactor)));
+				randSpread.Yaw = FMath::RandRange(0.0f, 1.5f * mRecoilFactor) * (FMath::Cos(FMath::FRandRange(0.0f, 3*PI * mRecoilFactor)));
+				randSpread.Pitch = FMath::RandRange(0.0f, 1.5f * mRecoilFactor) * (FMath::Sin(FMath::FRandRange(0.0f, 3*PI * mRecoilFactor)));
 			}
 			else
 			{

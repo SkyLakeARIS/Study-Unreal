@@ -10,9 +10,11 @@
 void UUIResultWidget::UpdateStageInfo(const class ASRPlayerState* const srPlayerState)
 {
 	checkf(srPlayerState != nullptr, TEXT("UUIResultWidget-UpdateStageInfo : srPlayerState이 nullptr입니다."));
-	mScore->SetText(FText::FromString(FString::FromInt(srPlayerState->GetScore())));
+	mScores->SetText(FText::FromString(FString::FromInt(srPlayerState->GetScore())));
 	mAccuracy->SetText(FText::FromString(FString::FromInt(srPlayerState->GetAccuracy()) + FString("%")));
-	mKill->SetText(FText::FromString(FString::FromInt(srPlayerState->GetKillCount())));
+	mKills->SetText(FText::FromString(FString::FromInt(srPlayerState->GetKillCount())));
+	mShots->SetText(FText::FromString(FString::FromInt(srPlayerState->GetShotsCount())));
+	mHeadshotRate->SetText(FText::FromString(FString::FromInt(srPlayerState->GetHeadshotRate()) + FString("%")));
 }
 
 void UUIResultWidget::NativeConstruct()
@@ -21,9 +23,11 @@ void UUIResultWidget::NativeConstruct()
 	mBtnRetry = Cast<UButton>(GetWidgetFromName(TEXT("Btn_Retry")));
 	mBtnStage = Cast<UButton>(GetWidgetFromName(TEXT("Btn_Stage")));
 	mBtnMenu= Cast<UButton>(GetWidgetFromName(TEXT("Btn_Menu")));
-	mScore = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayScore")));
+	mScores = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayScore")));
 	mAccuracy = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayAccuracy")));
-	mKill = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayKill")));
+	mKills = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayKill")));
+	mShots = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayShotsCount")));
+	mHeadshotRate = Cast<UTextBlock>(GetWidgetFromName(TEXT("DisplayHeadshotRate")));
 
 	mBtnRetry->OnClicked.AddDynamic(this, &UUIResultWidget::onRetryClicked);
 	mBtnStage->OnClicked.AddDynamic(this, &UUIResultWidget::onStageClicked);
