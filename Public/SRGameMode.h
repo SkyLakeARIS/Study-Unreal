@@ -5,6 +5,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "SRGameMode.generated.h"
 
+class ASRPlayerState;
 /**
  *  맵을 선택할 때의 게임모드입니다.
  *	블루프린트로 상속하여 구현합니다.
@@ -22,11 +23,14 @@ public:
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 private:
 
-	void initTargetManagerMode() const;
+	void initTargetManagerMode();
 
 protected:
 	UPROPERTY(BlueprintReadWrite)
 	EGameModeType mGameModeType;
+	UPROPERTY(BlueprintReadWrite)
+	ASRPlayerState* mPlayerState;
 };
