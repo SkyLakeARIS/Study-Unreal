@@ -36,6 +36,7 @@ public:
 	void Fire();
 
 	void RecoilStart();
+
 	UFUNCTION(BlueprintCallable)
 	void RecoilTick(float DeltaTime);
 
@@ -45,17 +46,23 @@ public:
 	void Reload();
 
 	void SetSightTransform();
+
 	void SetRelativeHandTransform();
+
 	void SetFinalHandTransform();
+
 	void SetLeftHandIK();
 
 	void InterpAiming(float DeltaSeconds);
+
 	void InterpRelativeHand(float DeltaSeconds);
 
 	void MoveVectorCurve(float DeltaSeconds);
+
 	void RotateWithRotation(float DeltaSeconds);
 
 	void InterpFinalRecoil(float DeltaSeconds);
+
 	void InterpRecoil(float DeltaSeconds);
 
 protected:
@@ -98,10 +105,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCurveVector* VectorCurve;
 
-	// recoil pattern
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UCurveVector* RecoilCurve;
-
 	UPROPERTY(BlueprintReadOnly)
 	FVector SwayLocation;
 
@@ -113,7 +116,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FVector TurnLocation;
 
-	// weapon recoil
+
 	UPROPERTY(BlueprintReadOnly)
 	FTransform RecoilTransform;
 
@@ -123,48 +126,46 @@ public:
 	bool bInterpRelativeHand;
 	bool bIsAiming;
 
-	// recoil
-	UPROPERTY(BlueprintReadWrite)
-	bool bRecoil;
-	UPROPERTY(BlueprintReadWrite)
-	bool bFiring;
-	UPROPERTY(BlueprintReadWrite)
-	bool bRecoilRecovery;
 
-	//Timer Handles
-	UPROPERTY(BlueprintReadwrite)
-	FTimerHandle FireTimer;
-	UPROPERTY(BlueprintReadwrite)
-	FTimerHandle RecoveryTimer;
-
-	/*Optional variables to customize how fast the recoil resets and what is the max time
-		upto which the recovery can last */
-
-	UPROPERTY(BlueprintReadWrite)
-	float RecoveryTime = 3.0f;
-	UPROPERTY(BlueprintReadWrite)
-	float RecoverySpeed = 10.0f;
-	float sumRecoil = 0.0f;
+private:
 
 	UPROPERTY()
-	FRotator OldCameraRotation;
-	//Control rotation at the start of the recoil
-	UPROPERTY()
-	FRotator RecoilStartRot;
-	//Control rotation change due to recoil
-	UPROPERTY()
-	FRotator RecoilDeltaRot;
-	//Control rotation chnage due to player moving the mouse
-	UPROPERTY()
-	FRotator PlayerDeltaRot;
-	//Temporary variable used in tick
-	UPROPERTY(BlueprintReadWrite)
-	FRotator Del;
-
-	//Player controller reference
-	UPROPERTY(BlueprintReadWrite)
 	class ASRPlayerController* mPlayerController;
 
-	UPROPERTY(BlueprintReadWrite)
-	float FireRate;
+	// weapon recoil
+	FRandomStream mRandomStream;
+
+	float mRecoveryTime;
+	//float mRecoverySpeed = 10.0f;
+	float mSumRecoil;
+
+	float mFireRate;
+
+	// recoil
+	bool mbRecoil;
+
+	bool mbFiring;
+
+	bool mbRecoilRecovery;
+
+	//	UPROPERTY()
+//	FRotator OldCameraRotation;
+	//Control rotation at the start of the recoil
+	FRotator mRecoilStartRotator;
+
+	//Control rotation change due to recoil
+	FRotator mRecoilDeltaRotator;
+
+	//Control rotation chnage due to player moving the mouse
+	FRotator mPlayerDeltaRotator;
+
+	//Temporary variable used in tick
+	FRotator mDeltaRotator;
+
+	//Timer Handles
+	UPROPERTY()
+	FTimerHandle mFireTimer;
+
+	UPROPERTY()
+	FTimerHandle mRecoveryTimer;
 };

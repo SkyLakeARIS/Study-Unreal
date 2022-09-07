@@ -13,12 +13,17 @@ USRAnimInstance::USRAnimInstance()
 	bInterpRelativeHand = false;
 	ReloadAlpha = 1.0f;
 
-	FireRate = 0.1f;
+	mRecoveryTime = 1.0f;
+	mSumRecoil = 0.0f;
+	mFireRate = 0.1f;
 }
 
 void USRAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
+
+	enum { SEED = 184654 };
+	mRandomStream.Initialize(SEED);
 }
 
 void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -66,7 +71,11 @@ void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		SetLeftHandIK();
 	}
 
-	RecoilTick(DeltaSeconds);
+	if (PlayerCharacter->GetGameType() != EGameType::Tarkov)
+	{
+		RecoilTick(DeltaSeconds);
+	}
+
 }
 
 void USRAnimInstance::UpdateSocketInfo()
@@ -241,19 +250,24 @@ void USRAnimInstance::InterpRecoil(float DeltaSeconds)
 
 void USRAnimInstance::RecoilTimerFunction()
 {
-	bRecoil = false;
-	GetWorld()->GetTimerManager().PauseTimer(FireTimer);
+	mbRecoil = false;
+	GetWorld()->GetTimerManager().PauseTimer(mFireTimer);
 }
 
 void USRAnimInstance::RecoveryStart()
 {
-	bRecoilRecovery = true;
-	GetWorld()->GetTimerManager().SetTimer(RecoveryTimer, this, &USRAnimInstance::RecoveryTimerFunction, RecoveryTime, false);
+
+	if (mPlayerController->GetControlRotation().Pitch >= mRecoilStartRotator.Pitch)
+	{
+		mbRecoilRecovery = true;
+		GetWorld()->GetTimerManager().SetTimer(mRecoveryTimer, this, &USRAnimInstance::RecoveryTimerFunction, mRecoveryTime, false);
+	}
+
 }
 
 void USRAnimInstance::RecoveryTimerFunction()
 {
-	bRecoilRecovery = false;
+	mbRecoilRecovery = false;
 }
 
 void USRAnimInstance::SetAiming(bool IsAiming)
@@ -267,10 +281,14 @@ void USRAnimInstance::SetAiming(bool IsAiming)
 
 void USRAnimInstance::SetRecoil(bool isStart)
 {
-	bFiring = isStart;
-	if(bFiring)
+	mbFiring = isStart;
+	if(mbFiring)
 	{
 		RecoilStart();
+	}
+	else
+	{
+		RecoilStop();
 	}
 }
 
@@ -377,129 +395,117 @@ void USRAnimInstance::Fire()
 
 void USRAnimInstance::RecoilStart()
 {
+	mPlayerDeltaRotator = FRotator::ZeroRotator;
+	mRecoilDeltaRotator = FRotator::ZeroRotator;
+	mDeltaRotator = FRotator::ZeroRotator;
+	mRecoilStartRotator = mPlayerController->GetControlRotation();
 
-	PlayerDeltaRot = FRotator::ZeroRotator;
-	RecoilDeltaRot = FRotator::ZeroRotator;
-	Del = FRotator::ZeroRotator;
-
-	RecoilStartRot = UGameplayStatics::GetPlayerController(this, 0)->GetControlRotation();
-
-	OldCameraRotation = mPlayerController->GetControlRotation();
-	bFiring = true;
+	mbFiring = true;
 
 	//Timer for the recoil: I have set it to 10s but dependeding how long it takes to empty the gun mag, you can increase the time.
-	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &USRAnimInstance::RecoilTimerFunction, 10.0f, false);
 
-	bRecoil = true;
-	bRecoilRecovery = false;
+	GetWorld()->GetTimerManager().SetTimer(mFireTimer, this, &USRAnimInstance::RecoilTimerFunction, 10.0f, false);
+
+	mbRecoil = true;
+	mbRecoilRecovery = false;
 }
 
 void USRAnimInstance::RecoilTick(float DeltaTime)
 {
-	if(PlayerCharacter->GetGameType() == EGameType::Tarkov)
+
+	if (PlayerCharacter->GetGameType() == EGameType::Tarkov)
 	{
 		return;
 	}
 
-	FRotator originalRotator = mPlayerController->GetControlRotation();
-	if (bRecoil)
+	//FRotator originalRotator = mPlayerController->GetControlRotation();
+	const FRotator currentRotation = mPlayerController->GetControlRotation();
+	if (mbRecoil)
 	{
-		//FVector recoilVec;
+
 		//Calculation of control rotation to update 
-		const float recoilTime = GetWorld()->GetTimerManager().GetTimerElapsed(FireTimer);
-		//recoilVec = RecoilCurve->GetVectorValue(recoiltime);
-		const float Pitch_Limit = 20.0f;
-		Del.Roll = 0;
-
-		if(PlayerCharacter->GetGameType() == EGameType::Battlefield)
+		const float PitchLimit = 20.0f;
+		mDeltaRotator.Roll = 0;
+		if (PlayerCharacter->GetGameType() == EGameType::Battlefield)
 		{
-			if(PlayerCharacter->IsAimimg())
+			if (PlayerCharacter->IsAimimg())
 			{
-				if (sumRecoil < Pitch_Limit)
-				{
-					Del.Pitch = 0.1f;
-					sumRecoil += 0.1f;
-				}
-				else
-				{
-					Del.Pitch = 0.0f;
-				}
-				Del.Yaw = FMath::RandRange(-0.08f, 0.10f);
+
+				mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? 0.15f : 0.0f;
+				mSumRecoil += mDeltaRotator.Pitch;
+
+				float horizonRecoil = mRandomStream.FRandRange(-0.07f, 0.12f);
+				horizonRecoil = horizonRecoil >= 0.0f ? 0.12f : -0.07f;
+				mDeltaRotator.Yaw = horizonRecoil;
 			}
 			else
 			{
-				if(sumRecoil < Pitch_Limit)
-				{
-					Del.Pitch = 0.13f;
-					sumRecoil += 0.13f;
-				}
-				else
-				{
-					Del.Pitch = 0.0f;
-				}
-				Del.Yaw = FMath::RandRange(-0.14f, 0.18f);	
+				// 아래로 바꾸기
+				mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? 0.15f : 0.0f;
+				mSumRecoil += mDeltaRotator.Pitch;
+
+				float horizonRecoil = mRandomStream.FRandRange(-0.07f, 0.2f);
+				horizonRecoil = horizonRecoil >= 0.0f ? 0.12f : -0.07f;
+				mDeltaRotator.Yaw = horizonRecoil;
 			}
 		}
-		else //  EGameType::RainbowSix
+		else // EGameType::RainbowSix
 		{
-			if(PlayerCharacter->IsAimimg())
+			if (PlayerCharacter->IsAimimg())
 			{
-				if (sumRecoil < Pitch_Limit)
-				{
-					Del.Pitch = 0.06f;
-					sumRecoil += 0.06f;
-				}
-				else
-				{
-					Del.Pitch = 0.0f;
-				}
-				Del.Yaw = FMath::RandRange(-0.08f, 0.12f);
+				mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? 0.06f : 0.0f;
+				mSumRecoil += mDeltaRotator.Pitch;
+
+				float horizonRecoil = mRandomStream.FRandRange(-0.08f, 0.12f);
+				horizonRecoil = horizonRecoil >= 0.0f ? 0.12f : -0.08f;
+				mDeltaRotator.Yaw = horizonRecoil;
 			}
 			else
 			{
-				if (sumRecoil < Pitch_Limit)
-				{
-					Del.Pitch = 0.09f;
-					sumRecoil += 0.09f;
-				}
-				else
-				{
-					Del.Pitch = 0.0f;
-				}
-				Del.Yaw = FMath::RandRange(-0.14f, 0.20f);
+				mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? 0.09f : 0.0f;
+				mSumRecoil += mDeltaRotator.Pitch;
+
+				float horizonRecoil = mRandomStream.FRandRange(-0.14f, 0.20f);
+				horizonRecoil = horizonRecoil >= 0.0f ? 0.20f : -0.14f;
+				mDeltaRotator.Yaw = horizonRecoil;
 			}
 
 		}
 
-		PlayerDeltaRot = originalRotator - RecoilStartRot - RecoilDeltaRot;
+		mPlayerDeltaRotator = currentRotation - mRecoilStartRotator - mRecoilDeltaRotator;
 
-		mPlayerController->SetControlRotation(UKismetMathLibrary::RInterpTo(originalRotator, originalRotator + Del, DeltaTime, 5000.0f));
+		mPlayerController->SetControlRotation(UKismetMathLibrary::RInterpTo(currentRotation, currentRotation + mDeltaRotator, DeltaTime, 3000.0f));
 
-		RecoilDeltaRot += Del;
+		mRecoilDeltaRotator += mDeltaRotator;
 
 		//Conditionally start resetting the recoil
-		if (!bFiring)
+		if (!mbFiring)
 		{
-			if (recoilTime > FireRate)
+			float recoilTime = GetWorld()->GetTimerManager().GetTimerElapsed(mFireTimer);
+
+			if (recoilTime > mFireRate)
 			{
-				GetWorld()->GetTimerManager().ClearTimer(FireTimer);
+				GetWorld()->GetTimerManager().ClearTimer(mFireTimer);
 				RecoilStop();
-				bRecoil = false;
+				mbRecoil = false;
 				RecoveryStart();
 			}
 		}
 	}
-	else if (bRecoilRecovery)
+	else if (mbRecoilRecovery)
 	{
-		const FRotator tmpRot = mPlayerController->GetControlRotation();
 
-		mPlayerController->SetControlRotation(UKismetMathLibrary::RInterpTo(originalRotator, originalRotator - RecoilDeltaRot, DeltaTime, 5.0f));
-		sumRecoil = UKismetMathLibrary::FInterpTo(sumRecoil, 0.0f, DeltaTime, 5.0f);
-		RecoilDeltaRot = RecoilDeltaRot + (mPlayerController->GetControlRotation() - tmpRot);
+		if(currentRotation.Pitch > mRecoilStartRotator.Pitch)
+		{
+			mPlayerController->SetControlRotation(UKismetMathLibrary::RInterpTo(currentRotation, currentRotation - mRecoilDeltaRotator, DeltaTime, 10.0f));
+			mRecoilDeltaRotator = mRecoilDeltaRotator + (mPlayerController->GetControlRotation() - currentRotation);
+		}
 	}
 }
 
 void USRAnimInstance::RecoilStop()
 {
-	bFiring = false;
+	mSumRecoil = 0;
+	mbFiring = false;
+	mRandomStream.Reset();
 }
