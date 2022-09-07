@@ -4,6 +4,10 @@
 #include "GameFramework/PlayerState.h"
 #include "SRPlayerState.generated.h"
 
+class USRStatistics;
+enum class EGameType : uint8;
+enum class EWeaponType : uint8;
+enum class EGameModeType : uint8;
 class UUIHUDWidget;
 DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
 DECLARE_DELEGATE_OneParam(FOnUpdateAccuray, int32)
@@ -21,21 +25,37 @@ public:
 
 	ASRPlayerState();
 
+	void initialize(EWeaponType weapon, EGameType game, EGameModeType mode);
+
 	UFUNCTION()
 	void BindHUD(UUIHUDWidget* HUD);
 
+	void UpdateStatistics() const;
+
 	UFUNCTION()
 	void OnAddScore(int32 getScore);
+
 	UFUNCTION()
-	void OnAddFireShots(int32 shots);
+	void OnAddFireShots();
+
 	UFUNCTION()
-	void OnHitCount();	// hit판정시 delegate 실행
+	void OnAddHitCount();		// hit판정시 delegate 실행
+
 	UFUNCTION()
-	void OnKill();		// kill판정시 delegate 실행
+	void OnAddKill();			// kill판정시 delegate 실행
+
+	UFUNCTION()
+	void OnAddHeadshotCount();	// headshot판정시 delegate 실행
 
 	int32 GetScore() const;
+
 	int32 GetAccuracy() const;
+
 	int32 GetKillCount() const;
+
+	int32 GetShotsCount() const;
+
+	int32 GetHeadshotRate() const;
 
 protected:
 
@@ -49,9 +69,20 @@ private:
 
 	FOnUpdateScore mOnUpdateScore;
 	FOnUpdateAccuray mOnUpdateAccuracy;
+	UPROPERTY()
+	USRStatistics* mStatistics;
+
+	// weapon
 	int32 mHits;
-	int32 mFireShots;	// result ui에서 사용
-	int32 mAccuracy;	// hud, result ui에서 사용
-	int32 mScore;	// hud, result ui에서 사용
-	int32 mKill;	// result ui에서 사용.
+	int32 mFireShots;		// result ui에서 사용
+	int32 mAccuracy;		// hud, result ui에서 사용
+	int32 mKills;			// result ui에서 사용.
+	int32 mHeadshotsCount;	// result ui에서 사용.
+	EWeaponType mWeaponType;
+
+	// game
+	int32 mScores;			// hud, result ui에서 사용
+	EGameModeType mModeType;
+	EGameType mGameType;
+
 };
