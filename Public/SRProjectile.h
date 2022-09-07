@@ -20,7 +20,8 @@ enum class EHitType : uint8
 class USphereComponent;
 class UProjectileMovementComponent;
 
-DECLARE_DELEGATE(FOnHitTarget)
+DECLARE_DELEGATE(FOnUpdateHitCount)
+DECLARE_DELEGATE(FOnUpdateHeatshotCount)
 DECLARE_DELEGATE(FOnUpdateKill)
 DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
 DECLARE_DELEGATE_OneParam(FOnHitmark, EHitType)
@@ -56,7 +57,6 @@ public:
 
 	void SetStartLocation(FVector location);
 
-
 	void SetDebugMode(bool active);
 
 protected:
@@ -65,42 +65,42 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	USphereComponent* GetCollisionComp() const { return CollisionComp; }
-	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+	USphereComponent* GetCollisionComp() const;
+
+	UProjectileMovementComponent* GetProjectileMovement() const;
 
 protected:
-	FOnHitTarget onHitAndUpdateAcc;
+	FOnUpdateHitCount mOnHitAndUpdateAcc;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UParticleSystem* ImpactParticles;
+	UParticleSystem* mImpactParticles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UParticleSystem* mBulletTrace;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
+	UProjectileMovementComponent* mProjectileMovement;
 
 	UPROPERTY(VisibleDefaultsOnly)
-	USphereComponent* CollisionComp;
+	USphereComponent* mCollisionComp;
 
 private:
 
 	bool mbDebugMode;
 	// UI
-	FOnHitmark mHitmark;
+	FOnHitmark mShowHitmark;
 
 	// Datas
 	FVector mStartLocation;
 	FOnUpdateScore mOnUpdateScore;
 	FOnUpdateKill mOnUpdateKill;
-	FWeaponDamage mDamageTable;
+	FOnUpdateHeatshotCount mOnUpdateHeadshotCount;
 	EWeaponType mBulletType;
 	EHitType mHitType;
 	int32 mBulletDamage;
 	bool mbIsCollision;
 	bool mbIsHeadshot;
 	bool mbIsTargetHit;
-
 };
 
 

@@ -143,3 +143,8 @@ void ASRTargetManager::SetTargetType(bool isCharacter)
 	mbIsCharacterType = isCharacter;
 }
 
+EGameModeType ASRTargetManager::GetGameModeType() const
+{
+	return mGameModeType;
+}
+
