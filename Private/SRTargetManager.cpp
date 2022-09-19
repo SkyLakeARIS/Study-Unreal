@@ -23,9 +23,9 @@ void ASRTargetManager::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASRSpawnPoint::StaticClass(), mSpawnPointList);
 	UE_LOG(LogTemp, Warning, TEXT("ASRTargetManager : BeginPlay - spawnpoint amount : [ %d ]"), mSpawnPointList.Num());
 
-	for(auto spawner :mSpawnPointList)
+	for(auto* spawner :mSpawnPointList)
 	{
-		auto castedSpawner = Cast<ASRSpawnPoint>(spawner);
+		auto* castedSpawner = Cast<ASRSpawnPoint>(spawner);
 	 	switch(castedSpawner->GetSpawnPointType())
 	 	{
 	 		case ESpawnPointType::CharacterType:
@@ -63,7 +63,7 @@ void ASRTargetManager::RandomTargetSpawn()
 
 	FActorSpawnParameters rules;
 	rules.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	const auto target = GetWorld()->SpawnActor<ASRTargetCharacter>(spawnPoint->GetActorLocation(), spawnPoint->GetActorRotation(), rules);
+	auto* target = GetWorld()->SpawnActor<ASRTargetCharacter>(spawnPoint->GetActorLocation(), spawnPoint->GetActorRotation(), rules);
 
 	// 기본적인 타겟 데이터를 설정합니다.
 	target->SetActorRotation(spawnPoint->GetActorRotation());

@@ -12,7 +12,7 @@
 
 void UUIPauseWidget::OnResumeClicked()
 {
-	const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 
 	RemoveFromParent();
 	playerController->ChangeInputMode(true);
@@ -23,21 +23,21 @@ void UUIPauseWidget::OnResumeClicked()
 
 void UUIPauseWidget::OnRetryClicked()
 {
-	const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->ClearCountDown();
 	playerController->RestartLevel();
 }
 
 void UUIPauseWidget::OnReturnMenuClicked()
 {
-	const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->ClearCountDown();
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("MainMenu"));
 }
 
 void UUIPauseWidget::onChangeHip_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
@@ -55,7 +55,7 @@ void UUIPauseWidget::onChangeHip_X(const FText& InText, ETextCommit::Type InComm
 
 void UUIPauseWidget::onChangeHip_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
 	{
@@ -72,7 +72,7 @@ void UUIPauseWidget::onChangeHip_Y(const FText& InText, ETextCommit::Type InComm
 
 void UUIPauseWidget::onChangeScope1X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
 	{
@@ -89,7 +89,7 @@ void UUIPauseWidget::onChangeScope1X_X(const FText& InText, ETextCommit::Type In
 
 void UUIPauseWidget::onChangeScope1X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue))
 	{
@@ -106,7 +106,7 @@ void UUIPauseWidget::onChangeScope1X_Y(const FText& InText, ETextCommit::Type In
 
 void UUIPauseWidget::onChangeScope2dot5X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
 	{
@@ -123,7 +123,7 @@ void UUIPauseWidget::onChangeScope2dot5X_X(const FText& InText, ETextCommit::Typ
 
 void UUIPauseWidget::onChangeScope2dot5X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue)) 
 	{
@@ -140,7 +140,7 @@ void UUIPauseWidget::onChangeScope2dot5X_Y(const FText& InText, ETextCommit::Typ
 
 void UUIPauseWidget::onChangeScope6X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue))
 	{
@@ -157,7 +157,7 @@ void UUIPauseWidget::onChangeScope6X_X(const FText& InText, ETextCommit::Type In
 
 void UUIPauseWidget::onChangeScope6X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
 	if (!StringToInteger(InText, &newValue))
 	{
@@ -174,7 +174,7 @@ void UUIPauseWidget::onChangeScope6X_Y(const FText& InText, ETextCommit::Type In
 
 void UUIPauseWidget::onHoldClicked()
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	player->SetAimToggleOrHold(EAimingType::Hold);
 
 	mBtnHold->SetIsEnabled(false);
@@ -186,7 +186,7 @@ void UUIPauseWidget::onHoldClicked()
 
 void UUIPauseWidget::onToggleClicked()
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	player->SetAimToggleOrHold(EAimingType::Toggle);
 
 	mBtnHold->SetIsEnabled(true);
@@ -198,7 +198,7 @@ void UUIPauseWidget::onToggleClicked()
 
 void UUIPauseWidget::onDebugChecked(bool active)
 {
-	const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->SetDebugMode(active);
 }
 
@@ -220,8 +220,8 @@ bool UUIPauseWidget::StringToInteger(const FText& InText, int32* int_Out)
 
 void UUIPauseWidget::UpdateInfoWhenOpen()
 {
-	const auto player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
-	const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	const auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+	const auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 
 	mHipX->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipX)));
 	mHipY->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipY)));

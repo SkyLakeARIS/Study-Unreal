@@ -18,7 +18,7 @@ void UUIHUDWidget::NativeConstruct()
 // crosshair, hitmark 위젯을 초기화하고 뷰포트에 추가합니다.
 void UUIHUDWidget::InitializeWidgets()
 {
-	const auto playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	auto* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
 	mHitMark = CreateWidget<UUserWidget>(playerController, mHitMarkClass);
 	mHeadshotMark = CreateWidget<UUserWidget>(playerController, mHeadshotMarkClass);

@@ -349,7 +349,7 @@ void ASRPlayerCharacter::InitGameMode(FGameModeData modeData)
 	// 타모드는 조준시 카메라에도 FOV값 조정이 있어 상대적으로 타르코프 모드의 배율이 낮아보이는 느낌을 줄입니다.
 	if (mGameModeData.game == EGameType::Tarkov)
 	{
-		auto sceneCapture = Cast<USceneCaptureComponent2D>(mScope->GetChildComponent(0)->GetChildComponent(0));
+		auto* sceneCapture = Cast<USceneCaptureComponent2D>(mScope->GetChildComponent(0)->GetChildComponent(0));
 
 		if (mGameModeData.scope == EScopeType::Scope6X)
 		{
@@ -886,9 +886,9 @@ void ASRPlayerCharacter::LookUpAtRate(float Rate)
 }
 
 
-void ASRPlayerCharacter::SaveInGameSetting()
+void ASRPlayerCharacter::SaveInGameSetting() const
 {
-	const auto settingData = Cast<USRInGameSetting>(UGameplayStatics::CreateSaveGameObject(USRInGameSetting::StaticClass()));
+	auto* settingData = Cast<USRInGameSetting>(UGameplayStatics::CreateSaveGameObject(USRInGameSetting::StaticClass()));
 	settingData->MouseSensitivity = MouseSetting;
 	settingData->AimingType = mAimingType;
 	UGameplayStatics::SaveGameToSlot(settingData, settingData->GetSlotName(), settingData->GetSlotIndex());
@@ -896,7 +896,7 @@ void ASRPlayerCharacter::SaveInGameSetting()
 
 void ASRPlayerCharacter::LoadInGameSetting()
 {
-	auto settingData = Cast<USRInGameSetting>(UGameplayStatics::CreateSaveGameObject(USRInGameSetting::StaticClass()));
+	const auto* settingData = Cast<USRInGameSetting>(UGameplayStatics::CreateSaveGameObject(USRInGameSetting::StaticClass()));
 
 	settingData = Cast<USRInGameSetting>(UGameplayStatics::LoadGameFromSlot(settingData->GetSlotName(), settingData->GetSlotIndex()));
 	if(settingData)

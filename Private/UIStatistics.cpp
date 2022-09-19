@@ -58,8 +58,7 @@ void UUIStatistics::UpdateStatistics()
 		mStatistics->LoadStats();
 	}
 
-	FWeaponStatistics weapon;
-	weapon = mStatistics->GetWeaponStats(EWeaponType::AR);
+	FWeaponStatistics weapon = mStatistics->GetWeaponStats(EWeaponType::AR);
 
 	mARFireshots->SetText(FText::FromString(FString(std::to_string(weapon.FireShots).c_str())));
 	mARHits->SetText(FText::FromString(FString(std::to_string(weapon.Hits).c_str())));
