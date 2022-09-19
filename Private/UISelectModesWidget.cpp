@@ -183,7 +183,7 @@ void UUISelectModesWidget::clickedStart()
 
 	if(mSelectionFlag == SELECT_ALL_FLAG)
 	{
-		const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+		auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 		mOnGameData.Execute(mSelectedModes);
 		playerController->ShowInGameHUDAndStartTimer();
 		playerController->GetTargetManager()->SetTargetType(mbIsCharacterType);

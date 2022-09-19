@@ -85,7 +85,7 @@ public:
 	UFUNCTION()
 	void InitGameMode(FGameModeData modeData);
 
-	void SaveInGameSetting();
+	void SaveInGameSetting() const;
 
 	void LoadInGameSetting();
 

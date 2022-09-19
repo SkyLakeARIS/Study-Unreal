@@ -36,7 +36,7 @@ void UUIResultWidget::NativeConstruct()
 
 void UUIResultWidget::onRetryClicked()
 {
-	const auto playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->RestartLevel();
 }
 
