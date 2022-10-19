@@ -565,7 +565,6 @@ void ASRPlayerCharacter::FireShot()
 	// 반동 계수입니다. 스프레이의 반지름에 곱해집니다.
 	// 0.1~1.0 사이로, 총알이 연속으로 발사될수록 계수가 높아집니다.
 	// 권총은 계수가 그대로 유지됩니다.
-
 	if(mFirstShot)
 	{
 		mRecoilFactor = 0.0f;
@@ -606,8 +605,8 @@ void ASRPlayerCharacter::FireShot()
 
 			if(mbIsAiming)
 			{
-				randSpread.Yaw = FMath::RandRange(0.0f, 1.5f * mRecoilFactor) * (FMath::Cos(FMath::FRandRange(0.0f, 3*PI * mRecoilFactor)));
-				randSpread.Pitch = FMath::RandRange(0.0f, 1.5f * mRecoilFactor) * (FMath::Sin(FMath::FRandRange(0.0f, 3*PI * mRecoilFactor)));
+				randSpread.Yaw = FMath::Sqrt(FMath::RandRange(0.0f, 1.5f * mRecoilFactor)) * (FMath::Cos(FMath::FRandRange(0.0f, 3*PI * mRecoilFactor)));
+				randSpread.Pitch = FMath::Sqrt(FMath::RandRange(0.0f, 1.5f * mRecoilFactor)) * (FMath::Sin(FMath::FRandRange(0.0f, 3*PI * mRecoilFactor)));
 			}
 			else
 			{

@@ -10,6 +10,7 @@
  *	무기의 반동(sway, recoil)도 계산됩니다.
  */
 
+enum class EGameType : uint8;
 class UCurveVector;
 class ASRPlayerCharacter;
 
@@ -79,6 +80,10 @@ protected:
 	UFUNCTION()
 	void RecoveryTimerFunction();
 
+private:
+
+	void calcRecoilFactor(EGameType gameType);
+
 public:
 
 	UPROPERTY(BlueprintReadOnly)
@@ -138,6 +143,7 @@ private:
 	float mRecoveryTime;
 	//float mRecoverySpeed = 10.0f;
 	float mSumRecoil;
+	float mSumHorizonRecoil;
 
 	float mFireRate;
 

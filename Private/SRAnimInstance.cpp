@@ -15,6 +15,7 @@ USRAnimInstance::USRAnimInstance()
 
 	mRecoveryTime = 1.0f;
 	mSumRecoil = 0.0f;
+	mSumHorizonRecoil = 0.0f;
 	mFireRate = 0.1f;
 }
 
@@ -205,8 +206,6 @@ void USRAnimInstance::InterpRelativeHand(float DeltaSeconds)
 
 void USRAnimInstance::MoveVectorCurve(float DeltaSeconds)
 {
-	//checkf(VectorCurve != nullptr, TEXT("VectorCurve가 nullptr입니다. blueprint확인 필요."));
-
 	FVector velocityVec = PlayerCharacter->GetMovementComponent()->Velocity;
 	velocityVec.Z = 0.0f;
 	float velocity = velocityVec.Size();
@@ -270,6 +269,42 @@ void USRAnimInstance::RecoveryTimerFunction()
 	mbRecoilRecovery = false;
 }
 
+void USRAnimInstance::calcRecoilFactor(EGameType gameType)
+{
+	const float PitchLimit = (gameType == EGameType::Battlefield) ? 13.0f : 20.0f;
+	const float YawLimit = 10.0f;
+
+	float pitchFactor = 0.0f;
+	float leftRecoil = 0.0f;
+	float rightRecoil = 0.0f;
+
+	if (PlayerCharacter->IsAimimg())
+	{
+		pitchFactor = (gameType == EGameType::Battlefield) ? 0.04f : 0.15f;
+		leftRecoil = (gameType == EGameType::Battlefield) ? -0.07f : -0.08f;
+		rightRecoil = (gameType == EGameType::Battlefield) ? 0.10f : 0.12f;
+
+	}
+	else
+	{
+		pitchFactor = (gameType == EGameType::Battlefield) ? 0.04f : 0.12f;
+		leftRecoil = (gameType == EGameType::Battlefield) ? -0.07f : -0.14f;
+		rightRecoil = (gameType == EGameType::Battlefield) ? 0.20f : 0.20f;
+	}
+
+	mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? pitchFactor : 0.0f;
+
+	mDeltaRotator.Yaw = (mRandomStream.FRandRange(leftRecoil, rightRecoil) >= 0.0f) ? rightRecoil : leftRecoil;
+	// 좌우반동 Limit을 넘었어도 왼쪽 반동이면 허용합니다.
+	if (mSumHorizonRecoil > YawLimit)
+	{
+		mDeltaRotator.Yaw = (mDeltaRotator.Yaw <= 0.0f) ? mDeltaRotator.Yaw : 0.0f;
+	}
+
+	mSumHorizonRecoil += mDeltaRotator.Yaw;
+	mSumRecoil += mDeltaRotator.Pitch;
+}
+
 void USRAnimInstance::SetAiming(bool IsAiming)
 {
 	if(bIsAiming != IsAiming)
@@ -307,8 +342,8 @@ void USRAnimInstance::Reload()
 
 void USRAnimInstance::Fire()
 {
-	FVector recoilLoc = FVector::ZeroVector;
-	FRotator recoilRot = FRotator::ZeroRotator;
+	FVector recoilLoc = FinalRecoilTransform.GetLocation();
+	FRotator recoilRot = FinalRecoilTransform.GetRotation().Rotator();
 
 	switch(PlayerCharacter->GetWeaponType())
 	{
@@ -316,26 +351,17 @@ void USRAnimInstance::Fire()
 		{
 			if (bIsAiming)
 			{
-				recoilLoc = FinalRecoilTransform.GetLocation();
 				// 사격시 총이 뒤로 밀려나는 효과를 내는 벡터
 				// x 좌우로 흔들림, y 뒤로 밀림
 				recoilLoc += FVector(FMath::RandRange(-0.3f, 0.3f), FMath::RandRange(-2.0f, -1.0f), FMath::RandRange(0.2f, 1.0f));
 
-				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
 				// p, y 좌우 반동, r = 수직반동 (-3은 안정적인 반동)
 				recoilRot += FRotator(FMath::RandRange(-5.0f, 5.0f), FMath::RandRange(-1.0f, 1.0f), -5.0f);
-				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			else
 			{
-				recoilLoc = FinalRecoilTransform.GetLocation();
 				recoilLoc += FVector(FMath::RandRange(-0.5f, 0.5f), FMath::RandRange(-5.0f, -1.0f), FMath::RandRange(0.2f, 1.0f));
-
-				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
 				recoilRot += FRotator(FMath::RandRange(-10.0f, 10.0f), FMath::RandRange(-1.0f, 1.0f), -7.0f);
-				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			break;
 		}
@@ -343,23 +369,13 @@ void USRAnimInstance::Fire()
 		{
 			if (bIsAiming)
 			{
-				recoilLoc = FinalRecoilTransform.GetLocation();
 				recoilLoc += FVector(0.0f, -1.0f, 0.2f);
-
-				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
 				recoilRot += FRotator(FMath::RandRange(-2.0f, 2.0f), FMath::RandRange(-2.0f, 2.0f), -5.0f);
-				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			else
 			{
-				recoilLoc = FinalRecoilTransform.GetLocation();
 				recoilLoc += FVector(FMath::RandRange(-0.1f, 0.1f), FMath::RandRange(-2.0f, -3.f), FMath::RandRange(-2.0f, 2.0f));
-
-				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
 				recoilRot += FRotator(FMath::RandRange(-3.0f, 3.0f), FMath::RandRange(-3.0f, 3.0f), -7.0f);
-				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			break;
 		}
@@ -367,23 +383,13 @@ void USRAnimInstance::Fire()
 		{
 			if (bIsAiming)
 			{
-				recoilLoc = FinalRecoilTransform.GetLocation();
 				recoilLoc += FVector(5.0f, -5.0f, FMath::RandRange(0.2f, 1.0f));
-
-				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
 				recoilRot += FRotator(-5.0f, FMath::RandRange(-1.0f, 1.0f), -5.0f);
-				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			else
 			{
-				recoilLoc = FinalRecoilTransform.GetLocation();
 				recoilLoc += FVector(5.0f, FMath::RandRange(-9.0f, -10.0f), FMath::RandRange(0.2f, 1.0f));
-
-				recoilRot = FinalRecoilTransform.GetRotation().Rotator();
 				recoilRot += FRotator(-5.0f, FMath::RandRange(-1.0f, 1.0f), -15.0f);
-				FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
-				FinalRecoilTransform.SetLocation(recoilLoc);
 			}
 			break;
 		}
@@ -391,6 +397,8 @@ void USRAnimInstance::Fire()
 			checkf(false, TEXT("USRAnimInstance-Fire 잘못된 EWeaponType입니다."));
 			break;
 	}
+	FinalRecoilTransform.SetRotation(recoilRot.Quaternion());
+	FinalRecoilTransform.SetLocation(recoilLoc);
 }
 
 void USRAnimInstance::RecoilStart()
@@ -412,65 +420,17 @@ void USRAnimInstance::RecoilStart()
 
 void USRAnimInstance::RecoilTick(float DeltaTime)
 {
-
-	if (PlayerCharacter->GetGameType() == EGameType::Tarkov)
+	const EGameType gameType = PlayerCharacter->GetGameType();
+	if (gameType == EGameType::Tarkov)
 	{
 		return;
 	}
 
-	//FRotator originalRotator = mPlayerController->GetControlRotation();
 	const FRotator currentRotation = mPlayerController->GetControlRotation();
 	if (mbRecoil)
 	{
 
-		//Calculation of control rotation to update 
-		const float PitchLimit = 20.0f;
-		mDeltaRotator.Roll = 0;
-		if (PlayerCharacter->GetGameType() == EGameType::Battlefield)
-		{
-			if (PlayerCharacter->IsAimimg())
-			{
-
-				mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? 0.15f : 0.0f;
-				mSumRecoil += mDeltaRotator.Pitch;
-
-				float horizonRecoil = mRandomStream.FRandRange(-0.07f, 0.12f);
-				horizonRecoil = horizonRecoil >= 0.0f ? 0.12f : -0.07f;
-				mDeltaRotator.Yaw = horizonRecoil;
-			}
-			else
-			{
-				// 아래로 바꾸기
-				mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? 0.15f : 0.0f;
-				mSumRecoil += mDeltaRotator.Pitch;
-
-				float horizonRecoil = mRandomStream.FRandRange(-0.07f, 0.2f);
-				horizonRecoil = horizonRecoil >= 0.0f ? 0.12f : -0.07f;
-				mDeltaRotator.Yaw = horizonRecoil;
-			}
-		}
-		else // EGameType::RainbowSix
-		{
-			if (PlayerCharacter->IsAimimg())
-			{
-				mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? 0.06f : 0.0f;
-				mSumRecoil += mDeltaRotator.Pitch;
-
-				float horizonRecoil = mRandomStream.FRandRange(-0.08f, 0.12f);
-				horizonRecoil = horizonRecoil >= 0.0f ? 0.12f : -0.08f;
-				mDeltaRotator.Yaw = horizonRecoil;
-			}
-			else
-			{
-				mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? 0.09f : 0.0f;
-				mSumRecoil += mDeltaRotator.Pitch;
-
-				float horizonRecoil = mRandomStream.FRandRange(-0.14f, 0.20f);
-				horizonRecoil = horizonRecoil >= 0.0f ? 0.20f : -0.14f;
-				mDeltaRotator.Yaw = horizonRecoil;
-			}
-
-		}
+		calcRecoilFactor(gameType);
 
 		mPlayerDeltaRotator = currentRotation - mRecoilStartRotator - mRecoilDeltaRotator;
 
@@ -505,7 +465,8 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 
 void USRAnimInstance::RecoilStop()
 {
-	mSumRecoil = 0;
+	mSumRecoil = 0.0f;
+	mSumHorizonRecoil = 0.0f;
 	mbFiring = false;
 	mRandomStream.Reset();
 }

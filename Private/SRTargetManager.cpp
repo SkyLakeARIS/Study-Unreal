@@ -44,7 +44,7 @@ void ASRTargetManager::BeginPlay()
 void ASRTargetManager::RandomTargetSpawn()
 {
 	const int32 amountSpawnPoint = mbIsCharacterType ? mCharacterSpawnPointList.Num() - 1 : mPlateSpawnPointList.Num() - 1;
-	const std::uniform_int_distribution<int> RNG(0, amountSpawnPoint);
+	std::uniform_int_distribution<int> RNG(0, amountSpawnPoint);
 
 	// 해당 스폰 포인트에 타겟이 생성되어 있으면 다른 스폰포인트를 고릅니다.
 	ASRSpawnPoint* spawnPoint = nullptr;
