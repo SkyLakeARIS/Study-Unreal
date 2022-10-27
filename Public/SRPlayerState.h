@@ -4,13 +4,13 @@
 #include "GameFramework/PlayerState.h"
 #include "SRPlayerState.generated.h"
 
-class USRStatistics;
+DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
+DECLARE_DELEGATE_OneParam(FOnUpdateAccuray, int32)
+
 enum class EGameType : uint8;
 enum class EWeaponType : uint8;
 enum class EGameModeType : uint8;
 class UUIHUDWidget;
-DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
-DECLARE_DELEGATE_OneParam(FOnUpdateAccuray, int32)
 
 /*
  * 한 게임 동안 플레이어의 기록을 저장하는 전적 클래스입니다.
@@ -25,12 +25,7 @@ public:
 
 	ASRPlayerState();
 
-	void initialize(EWeaponType weapon, EGameType game, EGameModeType mode);
-
-	UFUNCTION()
-	void BindHUD(UUIHUDWidget* HUD);
-
-	void UpdateStatistics() const;
+	void UpdateToStatistics() const;
 
 	UFUNCTION()
 	void OnAddScore(int32 getScore);
@@ -47,6 +42,17 @@ public:
 	UFUNCTION()
 	void OnAddHeadshotCount();	// headshot판정시 delegate 실행
 
+	/*
+	 *  setter
+	 */
+	void SetRecordMode(bool isRecordable);
+
+	void Initialize(EWeaponType weapon, EGameType game, EGameModeType mode, UUIHUDWidget* HUD);
+
+	/*
+	 *  getter
+	 */
+	// playerState 부모클래스에 Score의 getter setter가 있어서 그거 써도됨.
 	int32 GetScore() const;
 
 	int32 GetAccuracy() const;
@@ -66,13 +72,15 @@ private:
 	void calcAccuracy();
 
 private:
-
+	/*
+	 *  delegates
+	 */
 	FOnUpdateScore mOnUpdateScore;
 	FOnUpdateAccuray mOnUpdateAccuracy;
-	UPROPERTY()
-	USRStatistics* mStatistics;
 
-	// weapon
+	/*
+	 *  weapon stats
+	 */
 	int32 mHits;
 	int32 mFireShots;		// result ui에서 사용
 	int32 mAccuracy;		// hud, result ui에서 사용
@@ -80,9 +88,19 @@ private:
 	int32 mHeadshotsCount;	// result ui에서 사용.
 	EWeaponType mWeaponType;
 
-	// game
+	/*
+	 * score stats
+	 */ 
 	int32 mScores;			// hud, result ui에서 사용
+
+	/*
+	 *  game mode data
+	 */
 	EGameModeType mModeType;
 	EGameType mGameType;
 
+	/*
+	 *  only record statistics in main game time
+	 */
+	bool mbRecordable;
 };

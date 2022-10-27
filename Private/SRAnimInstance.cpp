@@ -4,19 +4,21 @@
 #include "Curves/CurveVector.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "SRPlayerCharacter.h"
+#include "SRWeapon.h"
 
 USRAnimInstance::USRAnimInstance()
 {
 	AimAlpha = 0.0f;
 	bInterpAiming = false;
-	bIsAiming = false;
 	bInterpRelativeHand = false;
 	ReloadAlpha = 1.0f;
+	bUseMultiThreadedAnimationUpdate = false;
 
 	mRecoveryTime = 1.0f;
 	mSumRecoil = 0.0f;
 	mSumHorizonRecoil = 0.0f;
 	mFireRate = 0.1f;
+	mAimingAlpha = 0.0f;
 }
 
 void USRAnimInstance::NativeBeginPlay()
@@ -41,7 +43,9 @@ void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
-	if(!PlayerCharacter->GetNewWeapon())
+
+	
+	if(!PlayerCharacter->GetWeapon())
 	{
 		return;
 	}
@@ -67,7 +71,7 @@ void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		InterpFinalRecoil(DeltaSeconds);
 	}
 
-	if(PlayerCharacter->IsCanFire())
+	if(PlayerCharacter->GetBehaviorFlag() & (FIRING | AIMING))
 	{
 		SetLeftHandIK();
 	}
@@ -76,7 +80,28 @@ void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		RecoilTick(DeltaSeconds);
 	}
+}
 
+void USRAnimInstance::SetAim()
+{
+	bInterpAiming = true;
+	mAimingAlpha = 1.0f;
+}
+
+void USRAnimInstance::UnsetAim()
+{
+	bInterpAiming = true;
+	mAimingAlpha = 0.0f;
+}
+
+void USRAnimInstance::SetFire()
+{
+	RecoilStart();
+}
+
+void USRAnimInstance::UnsetFire()
+{
+	RecoilStop();
 }
 
 void USRAnimInstance::UpdateSocketInfo()
@@ -132,23 +157,24 @@ void USRAnimInstance::SetSightTransform()
 // 조준시 손의 위치를 계산
 void USRAnimInstance::SetRelativeHandTransform()
 {
-	if (!PlayerCharacter->GetNewWeapon())
+	if (!PlayerCharacter->GetWeapon())
 	{
 		return;
 	}
 
-	FTransform opticSocketTransform =FTransform();
+	FTransform opticSocketTransform = FTransform();
 
-	if(PlayerCharacter->GetNewScope()->GetChildActor()==nullptr)
+	if(PlayerCharacter->GetWeapon()->GetScope()->GetChildActor()==nullptr)
 	{
-		opticSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_Optic"));
+		opticSocketTransform = PlayerCharacter->GetWeapon()->GetGun()->GetSocketTransform(FName("S_Optic"));
 	}
 	else
 	{
-		opticSocketTransform = PlayerCharacter->GetNewScope()->GetChildComponent(0)->GetSocketTransform(FName("S_Aim"));
+		opticSocketTransform = PlayerCharacter->GetWeapon()->GetScope()->GetChildComponent(0)->GetSocketTransform(FName("S_Aim"));
 	}
 
 	const FTransform meshTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("hand_r"));
+	
 
 	RelativeHandTransform = UKismetMathLibrary::MakeRelativeTransform(opticSocketTransform, meshTransform);
 }
@@ -157,36 +183,36 @@ void USRAnimInstance::SetFinalHandTransform()
 {
 	FTransform opticSocketTransform = FTransform();
 
-	if (!PlayerCharacter->GetNewScope())
+	if (!PlayerCharacter->GetWeapon()->GetScope())
 	{
-		opticSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_Optic"));
+		opticSocketTransform = PlayerCharacter->GetWeapon()->GetGun()->GetSocketTransform(FName("S_Optic"));
 	}
 	else
 	{
-		opticSocketTransform = PlayerCharacter->GetNewScope()->GetChildComponent(0)->GetSocketTransform(FName("S_Aim"));
+		opticSocketTransform = PlayerCharacter->GetWeapon()->GetScope()->GetChildComponent(0)->GetSocketTransform(FName("S_Aim"));
 	}
-
+	//ik_hand_root (BoneName="ik_hand_r") ik_hand
 	const FTransform meshTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("ik_hand_root"));
 	FinalHandTransform = UKismetMathLibrary::MakeRelativeTransform(opticSocketTransform, meshTransform);
 }
 
 void USRAnimInstance::SetLeftHandIK()
 {
-	if(!PlayerCharacter->GetNewWeapon())
+	if(!PlayerCharacter->GetWeapon())
 	{
 		return;
 	}
 
-	const FTransform gunSocketTransform = PlayerCharacter->GetNewWeapon()->GetSocketTransform(FName("S_LeftHand"));
+	const FTransform gunSocketTransform = PlayerCharacter->GetWeapon()->GetGun()->GetSocketTransform(FName("S_LeftHand"));
 	const FTransform meshSocketTransform = PlayerCharacter->GetMesh1P()->GetSocketTransform(FName("hand_r"));
-
+	
 	// mesh(팔)을 총에 있는 그립 소켓에 맞는 위치를 계산해줌.
 	LeftHandTransform = UKismetMathLibrary::MakeRelativeTransform(gunSocketTransform, meshSocketTransform);
 }
 
 void USRAnimInstance::InterpAiming(float DeltaSeconds)
 {
-	AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, static_cast<float>(bIsAiming), DeltaSeconds, 10.0f);
+	AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, mAimingAlpha, DeltaSeconds, 10.0f);
 
 	if(AimAlpha >= 1.0f || AimAlpha <= 0.0f)
 	{
@@ -247,24 +273,24 @@ void USRAnimInstance::InterpRecoil(float DeltaSeconds)
 	RecoilTransform =  UKismetMathLibrary::TInterpTo(RecoilTransform, FinalRecoilTransform, DeltaSeconds, 10.0f);
 }
 
-void USRAnimInstance::RecoilTimerFunction()
+void USRAnimInstance::recoilTimerFunction()
 {
 	mbRecoil = false;
 	GetWorld()->GetTimerManager().PauseTimer(mFireTimer);
 }
 
-void USRAnimInstance::RecoveryStart()
+void USRAnimInstance::recoveryStart()
 {
 
 	if (mPlayerController->GetControlRotation().Pitch >= mRecoilStartRotator.Pitch)
 	{
 		mbRecoilRecovery = true;
-		GetWorld()->GetTimerManager().SetTimer(mRecoveryTimer, this, &USRAnimInstance::RecoveryTimerFunction, mRecoveryTime, false);
+		GetWorld()->GetTimerManager().SetTimer(mRecoveryTimer, this, &USRAnimInstance::recoveryTimerFunction, mRecoveryTime, false);
 	}
 
 }
 
-void USRAnimInstance::RecoveryTimerFunction()
+void USRAnimInstance::recoveryTimerFunction()
 {
 	mbRecoilRecovery = false;
 }
@@ -278,7 +304,7 @@ void USRAnimInstance::calcRecoilFactor(EGameType gameType)
 	float leftRecoil = 0.0f;
 	float rightRecoil = 0.0f;
 
-	if (PlayerCharacter->IsAimimg())
+	if (PlayerCharacter->GetBehaviorFlag() & AIMING)
 	{
 		pitchFactor = (gameType == EGameType::Battlefield) ? 0.04f : 0.15f;
 		leftRecoil = (gameType == EGameType::Battlefield) ? -0.07f : -0.08f;
@@ -305,41 +331,6 @@ void USRAnimInstance::calcRecoilFactor(EGameType gameType)
 	mSumRecoil += mDeltaRotator.Pitch;
 }
 
-void USRAnimInstance::SetAiming(bool IsAiming)
-{
-	if(bIsAiming != IsAiming)
-	{
-		bIsAiming = IsAiming;
-		bInterpAiming = true;
-	}
-}
-
-void USRAnimInstance::SetRecoil(bool isStart)
-{
-	mbFiring = isStart;
-	if(mbFiring)
-	{
-		RecoilStart();
-	}
-	else
-	{
-		RecoilStop();
-	}
-}
-
-
-void USRAnimInstance::Reload()
-{
-	if(ReloadAlpha == 1.0f)
-	{
-		ReloadAlpha = 0.0f;
-	}
-	else if(ReloadAlpha == 0.0f)
-	{
-		ReloadAlpha = 1.0f;
-	}
-}
-
 void USRAnimInstance::Fire()
 {
 	FVector recoilLoc = FinalRecoilTransform.GetLocation();
@@ -349,7 +340,8 @@ void USRAnimInstance::Fire()
 	{
 		case EWeaponType::AR:
 		{
-			if (bIsAiming)
+			
+			if (PlayerCharacter->GetBehaviorFlag() & AIMING)
 			{
 				// 사격시 총이 뒤로 밀려나는 효과를 내는 벡터
 				// x 좌우로 흔들림, y 뒤로 밀림
@@ -367,7 +359,7 @@ void USRAnimInstance::Fire()
 		}
 		case EWeaponType::HG:
 		{
-			if (bIsAiming)
+			if (PlayerCharacter->GetBehaviorFlag() & AIMING)
 			{
 				recoilLoc += FVector(0.0f, -1.0f, 0.2f);
 				recoilRot += FRotator(FMath::RandRange(-2.0f, 2.0f), FMath::RandRange(-2.0f, 2.0f), -5.0f);
@@ -381,7 +373,7 @@ void USRAnimInstance::Fire()
 		}
 		case EWeaponType::SR:
 		{
-			if (bIsAiming)
+			if (PlayerCharacter->GetBehaviorFlag() & AIMING)
 			{
 				recoilLoc += FVector(5.0f, -5.0f, FMath::RandRange(0.2f, 1.0f));
 				recoilRot += FRotator(-5.0f, FMath::RandRange(-1.0f, 1.0f), -5.0f);
@@ -412,7 +404,7 @@ void USRAnimInstance::RecoilStart()
 
 	//Timer for the recoil: I have set it to 10s but dependeding how long it takes to empty the gun mag, you can increase the time.
 
-	GetWorld()->GetTimerManager().SetTimer(mFireTimer, this, &USRAnimInstance::RecoilTimerFunction, 10.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(mFireTimer, this, &USRAnimInstance::recoilTimerFunction, 10.0f, false);
 
 	mbRecoil = true;
 	mbRecoilRecovery = false;
@@ -448,7 +440,7 @@ void USRAnimInstance::RecoilTick(float DeltaTime)
 				GetWorld()->GetTimerManager().ClearTimer(mFireTimer);
 				RecoilStop();
 				mbRecoil = false;
-				RecoveryStart();
+				recoveryStart();
 			}
 		}
 	}

@@ -268,4 +268,3 @@ void ASRTargetCharacter::initializeMovement(FVector endLocation, float speedFact
 	mDistanceToMoveEveryTime *= speedFactor;
 }
 
-

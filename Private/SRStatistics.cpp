@@ -3,9 +3,34 @@
 #include <string>
 #include "GameModeData.h"
 
+ const char* USRStatistics::PATH = "..\\dplayer.srdata";
+ bool USRStatistics::mbIsInitialize = false;	// 이미 초기화된 상태인지 판단합니다.
+ bool USRStatistics::mbIsLoaded = false;		// 파일에서 데이터를 불러오면 true가 됩니다.
+ bool USRStatistics::mbFail = false;			// 잘못된 데이터 전달로 인해 저장하면 안될 때 true입니다.
 
-USRStatistics::USRStatistics()
+// weapons
+ FWeaponStatistics USRStatistics::mAssultRifle = FWeaponStatistics();
+ FWeaponStatistics USRStatistics::mHandGun = FWeaponStatistics();
+ FWeaponStatistics USRStatistics::mSniperRifle = FWeaponStatistics();
+
+// game modes
+ uint32 USRStatistics::mSelectedBattlefield = 0;
+ uint32 USRStatistics::mSelectedRainbowSix = 0;
+ uint32 USRStatistics::mSelectedEscapeFromTarkov = 0;
+
+// scores
+ uint32 USRStatistics::mStaticShortRangeHighScore = 0;
+ uint32 USRStatistics::mStaticMidRangeHighScore = 0;
+ uint32 USRStatistics::mStaticLongRangeHighScore = 0;
+ uint32 USRStatistics::mMovableShortRangeHighScore = 0;
+ uint32 USRStatistics::mMovableMidRangeHighScore = 0;
+ uint32 USRStatistics::mMovableLongRangeHighScore = 0;
+
+
+void USRStatistics::Initialize()
 {
+	//checkf(mbIsInitialize == false, TEXT("클래스가 두번 초기화 되었습니다."));
+
 	mSelectedBattlefield = 0;
 	mSelectedRainbowSix = 0;
 	mSelectedEscapeFromTarkov = 0;
@@ -20,6 +45,7 @@ USRStatistics::USRStatistics()
 
 	mbIsLoaded = false;
 	mbFail = false;
+	mbIsInitialize = true;
 }
 
 bool USRStatistics::LoadStats()
@@ -40,11 +66,10 @@ bool USRStatistics::LoadStats()
 		else
 		{
 			checkf(false, TEXT("파일 오픈에 실패했습니다.: %hs"), strerror(errno));
-			// 파일이 없는 에러인지 확인 후 파일 생성
 			return false;
 		}
 	}
-
+	bool bSuccess = false;
 	// file이 있으면 파싱 시작
 	std::string header;
 	std::string garbage;
@@ -55,70 +80,85 @@ bool USRStatistics::LoadStats()
 	do
 	{
 		std::getline(fs, header);
-		UE_LOG(LogTemp, Warning, TEXT("%hs"), header.c_str());
 
 		enum { EQUALS = 0 };
 		if (header.compare("Weapons") == EQUALS)
 		{
 			// { 를 버립니다.
 			std::getline(fs, garbage);
-			UE_LOG(LogTemp, Warning, TEXT("trunc : %hs"), garbage.c_str());
 
 			std::string weapon;
 			weapon.reserve(HEADER_SIZE);
 			while (true)
 			{
 				std::getline(fs, weapon);
-				UE_LOG(LogTemp, Warning, TEXT("%hs"), weapon.c_str());
 
 				if (weapon.compare("}") == EQUALS)
 				{
 					// weapons 부분 파싱이 끝났으므로 while문을 탈출합니다.
-					goto PARSE_END;
+					goto PARSE_WEAPONS_END;
 				}
 
 				if (weapon.compare("AssultRifle") == EQUALS)
 				{
-					parseWeapons(fs, mAssultRifle);
+					bSuccess = parseWeapons(fs, mAssultRifle);
 				}
 				else if (weapon.compare("HandGun") == EQUALS)
 				{
-					parseWeapons(fs, mHandGun);
+					bSuccess = parseWeapons(fs, mHandGun);
 				}
 				else if (weapon.compare("SniperRifle") == EQUALS)
 				{
-					parseWeapons(fs, mSniperRifle);
+					bSuccess = parseWeapons(fs, mSniperRifle);
 				}
 				else
 				{
 					// 그 외는 에러로 간주합니다.
 					checkf(false, TEXT("데이터 파싱 과정에 문제가 발생했습니다. : %hs"), weapon.c_str());
+					goto ERROR_END_PARSE;
 				}
 				weapon.clear();
+
+				if(!bSuccess)
+				{
+					goto ERROR_END_PARSE;
+				}
 			}
 		}
 		else if (header.compare("Games") == EQUALS)
 		{
-			parseGames(fs);
+			bSuccess = parseGames(fs);
 		}
 		else if (header.compare("Scores") == EQUALS)
 		{
-			parseScore(fs);
+			bSuccess = parseScore(fs);
 		}
 		else
 		{
 			checkf(false, TEXT("데이터 포멧이 잘못되었습니다. : %hs"), header.c_str());
+			goto ERROR_END_PARSE;
 		}
-		PARSE_END:
+
+		if (!bSuccess)
+		{
+			goto ERROR_END_PARSE;
+		}
+
+		PARSE_WEAPONS_END:
+
 		header.clear();
 	} while (!fs.eof());
 	// 다음 읽기가 가능하면 true이기 때문에 eof 말고 fs 자체를 전달하는 것이 좋다는 정보도 있음.
 
-	// 명시적으로 close.
-	fs.close();
-	UE_LOG(LogTemp, Warning, TEXT("success load stats! - file closed"));
+
+	bSuccess = true;
+	UE_LOG(LogTemp, Warning, TEXT("success load statistics! - file closed"));
 	mbIsLoaded = true;
-	return true;
+
+	ERROR_END_PARSE:
+	// 명시적으로 close. 혹은 에러
+	fs.close();
+	return bSuccess;
 }
 
 bool USRStatistics::SaveStats()
@@ -250,7 +290,7 @@ void USRStatistics::UpdateScores(EGameModeType modeType, const uint32& score)
 	}
 }
 
-FWeaponStatistics USRStatistics::GetWeaponStats(EWeaponType weapon) const
+FWeaponStatistics USRStatistics::GetWeaponStats(EWeaponType weapon)
 {
 	switch (weapon)
 	{
@@ -267,7 +307,7 @@ FWeaponStatistics USRStatistics::GetWeaponStats(EWeaponType weapon) const
 	}
 }
 
-uint32 USRStatistics::GetGameStats(EGameType game) const
+uint32 USRStatistics::GetGameStats(EGameType game)
 {
 	switch (game)
 	{
@@ -283,7 +323,7 @@ uint32 USRStatistics::GetGameStats(EGameType game) const
 	}
 }
 
-uint32 USRStatistics::GetScoresStats(EGameModeType mode) const
+uint32 USRStatistics::GetScoresStats(EGameModeType mode) 
 {
 	switch (mode)
 	{
@@ -305,7 +345,7 @@ uint32 USRStatistics::GetScoresStats(EGameModeType mode) const
 	}
 }
 
-uint32 USRStatistics::GetHeadshotRate(EWeaponType weapon) const
+uint32 USRStatistics::GetHeadshotRate(EWeaponType weapon) 
 {
 	const FWeaponStatistics* stats = nullptr;
 	switch (weapon)
@@ -333,7 +373,7 @@ uint32 USRStatistics::GetHeadshotRate(EWeaponType weapon) const
 	return (stats->Headshots / (float)stats->Hits) * 100.0f;
 }
 
-uint32 USRStatistics::GetAccuracy(EWeaponType weapon) const
+uint32 USRStatistics::GetAccuracy(EWeaponType weapon) 
 {
 	const FWeaponStatistics* stats = nullptr;
 	switch (weapon)
@@ -361,7 +401,7 @@ uint32 USRStatistics::GetAccuracy(EWeaponType weapon) const
 	return (stats->Hits / (float)stats->FireShots) * 100.0f;
 }
 
-bool USRStatistics::IsLoaded() const
+bool USRStatistics::IsLoaded() 
 {
 	return mbIsLoaded;
 }
@@ -373,7 +413,7 @@ void USRStatistics::createDataFile()
 	SaveStats();
 }
 
-void USRStatistics::parseWeapons(std::ifstream& fs, FWeaponStatistics& weapon)
+bool USRStatistics::parseWeapons(std::ifstream& fs, FWeaponStatistics& weapon)
 {
 	std::string line;
 	std::string garbage;
@@ -381,21 +421,20 @@ void USRStatistics::parseWeapons(std::ifstream& fs, FWeaponStatistics& weapon)
 	line.reserve(DATA_SIZE);
 	garbage.reserve(GARBAGE_SIZE);
 
+	bool bSuccess = false;
+
+
 	// { 를 버립니다.
 	std::getline(fs, garbage);
-	UE_LOG(LogTemp, Warning, TEXT("trunc : %hs"), garbage.c_str());
 
 	while (true)
 	{
 		std::getline(fs, line);
-		UE_LOG(LogTemp, Warning, TEXT("%hs"), line.c_str());
 
 		// 한 덩어리의 파싱이 끝났습니다.
 		enum { EQUALS = 0 };
 		if (line.compare("}") == EQUALS)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("parseWeapons end"));
-
 			break;
 		}
 		// : 를 기준으로 문자열을 분리합니다.
@@ -427,12 +466,18 @@ void USRStatistics::parseWeapons(std::ifstream& fs, FWeaponStatistics& weapon)
 		else
 		{
 			checkf(false, TEXT("포멧 데이터가 잘못되었습니다. : %hs"), statName);
+			bSuccess = false;
+			goto ERROR_END_PARSE_WEAPONS;
 		}
 		line.clear();
 	}
+	bSuccess = true;
+
+	ERROR_END_PARSE_WEAPONS:
+	return bSuccess;
 }
 
-void USRStatistics::parseGames(std::ifstream& fs)
+bool USRStatistics::parseGames(std::ifstream& fs)
 {
 	std::string line;
 	std::string garbage;
@@ -440,20 +485,18 @@ void USRStatistics::parseGames(std::ifstream& fs)
 	line.reserve(DATA_SIZE);
 	garbage.reserve(GARBAGE_SIZE);
 
+	bool bSuccess = false;
 	// { 를 버립니다.
 	std::getline(fs, garbage);
-	UE_LOG(LogTemp, Warning, TEXT("trunc : %hs"), garbage.c_str());
 
 	while (true)
 	{
 		std::getline(fs, line);
-		UE_LOG(LogTemp, Warning, TEXT("%hs"), line.c_str());
 
 		// 한 덩어리의 파싱이 끝났습니다.
 		enum { EQUALS = 0 };
 		if (line.compare("}") == EQUALS)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("parseGames end"));
 			break;
 		}
 
@@ -477,13 +520,19 @@ void USRStatistics::parseGames(std::ifstream& fs)
 		else
 		{
 			checkf(false, TEXT("포멧 데이터가 잘못되었습니다. : %hs"), statName);
+			bSuccess = false;
+			goto ERROR_END_PARSE_GAMES;
 		}
 
 		line.clear();
 	}
+	bSuccess = true;
+
+	ERROR_END_PARSE_GAMES:
+	return bSuccess;
 }
 
-void USRStatistics::parseScore(std::ifstream& fs)
+bool USRStatistics::parseScore(std::ifstream& fs)
 {
 	std::string line;
 	std::string garbage;
@@ -491,21 +540,20 @@ void USRStatistics::parseScore(std::ifstream& fs)
 	line.reserve(DATA_SIZE);
 	garbage.reserve(GARBAGE_SIZE);
 
+	bool bSuccess = false;
+
 	// { 를 버립니다.
 	std::getline(fs, garbage);
-	UE_LOG(LogTemp, Warning, TEXT("trunc : %hs"), garbage.c_str());
 
 	while (true)
 	{
 		std::getline(fs, line);
-		UE_LOG(LogTemp, Warning, TEXT("%hs"), line.c_str());
 
 
 		// 한 덩어리의 파싱이 끝났습니다.
 		enum { EQUALS = 0 };
 		if (line.compare("}") == EQUALS)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("parse scores end"));
 			break;
 		}
 
@@ -542,7 +590,13 @@ void USRStatistics::parseScore(std::ifstream& fs)
 		else
 		{
 			checkf(false, TEXT("포멧 데이터가 잘못되었습니다. : %hs"), statName);
+			bSuccess = false;
+			goto ERROR_END_PARSE_SCORES;
 		}
 		line.clear();
 	}
+	bSuccess = true;
+
+	ERROR_END_PARSE_SCORES:
+	return bSuccess;
 }

@@ -1,9 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
+#include "GameModeData.h"
 #include "Version.h"
 #include "Blueprint/UserWidget.h"
 #include "UIPauseWidget.generated.h"
 
+enum class EScopeType : uint8;
+enum class EAimingType : uint8;
 class UCheckBox;
 class UEditableText;
 class UTextBlock;
@@ -20,6 +23,7 @@ UCLASS()
 class VERSION_API UUIPauseWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
 public:
 
 	void UpdateInfoWhenOpen();
@@ -63,7 +67,12 @@ protected:
 	UFUNCTION()
 	void onDebugChecked(bool active);
 
-	bool StringToInteger(const FText& InText, int32* int_Out);
+	bool StringToInteger(const FText& InText, int32& outInt);
+
+private:
+
+	void updateAimSetting();
+	void updateMouseSetting();
 
 protected:
 	
@@ -101,9 +110,11 @@ protected:
 	UPROPERTY()
 	UCheckBox* mDebugMode;
 
+	FMouseSensitivity mMouseSetting;
+	EAimingType mAimingType;
 	bool mbCheckDebugMode;
 
-	const int32 MAX_SETTING_VALUE = 100;
-	const int32 MIN_SETTING_VALUE = 10;
 
+	const int32 MIN_SETTING_VALUE = 10;
+	const int32 MAX_SETTING_VALUE = 100;
 };

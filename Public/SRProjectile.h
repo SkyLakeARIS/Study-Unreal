@@ -7,8 +7,11 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "SRProjectile.generated.h"
 
-class ASRPlayerController;
-enum class EWeaponType : uint8;
+DECLARE_DELEGATE(FOnUpdateHitCount)
+DECLARE_DELEGATE(FOnUpdateHeatshotCount)
+DECLARE_DELEGATE(FOnUpdateKill)
+DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
+
 UENUM(BlueprintType)
 enum class EHitType : uint8
 {
@@ -16,15 +19,13 @@ enum class EHitType : uint8
 	HeadShot,
 	Kill
 };
+DECLARE_DELEGATE_OneParam(FOnHitmark, EHitType)
 
+
+class ASRPlayerController;
+enum class EWeaponType : uint8;
 class USphereComponent;
 class UProjectileMovementComponent;
-
-DECLARE_DELEGATE(FOnUpdateHitCount)
-DECLARE_DELEGATE(FOnUpdateHeatshotCount)
-DECLARE_DELEGATE(FOnUpdateKill)
-DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
-DECLARE_DELEGATE_OneParam(FOnHitmark, EHitType)
 
 
 /*
@@ -90,7 +91,7 @@ private:
 	// UI
 	FOnHitmark mShowHitmark;
 
-	// Datas
+	// Data
 	FVector mStartLocation;
 	FOnUpdateScore mOnUpdateScore;
 	FOnUpdateKill mOnUpdateKill;

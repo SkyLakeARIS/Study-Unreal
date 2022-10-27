@@ -6,102 +6,166 @@
 #include "SRWeapon.generated.h"
 
 
-/*
- * 무기 클래스입니다.
- * 게임을 시작하기 전에 선택된 무기 정보를 통해서
- * 해당 무기나 조준경등 게임모드를 통해서 적절한 데이터를 반환합니다.
- */
+DECLARE_DELEGATE(FOnAddFireShot);
 
+class USRWeaponData;
+class ASRPlayerCharacter;
+class UUIHUDWidget;
+
+
+/*
+ * 무기 클래스 클래스입니다.
+ * 게임을 시작하기 전에 선택한 무기나 조준경등 게임모드를
+ * 통해서 적절한 데이터를 반환합니다.
+ */
 UCLASS()
 class VERSION_API ASRWeapon : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	ASRWeapon();
 
-	USkeletalMesh* GetWeapon(EWeaponType weapon) const;
+	void StartFire();
+	void StopFire();
 
-	TSubclassOf<AActor> GetScope(EScopeType scope) const;
+	/*
+	 * call by anim blueprints
+	 */
+	void Reload();
+	UFUNCTION(BlueprintCallable)
+	void EndReload();
 
-	UChildActorComponent* GetScopeActor(EScopeType scope) const;
+	void SwitchFireMode();
 
-	USoundBase* GetFireSound(EWeaponType weapon) const;
+	/*
+	 *  call by anim blueprints
+	 */
+	UFUNCTION(BlueprintCallable)
+	void NotifyBeginBoltaction();
+	UFUNCTION(BlueprintCallable)
+	void NotifyEndBoltaction();
 
-	USoundBase* GetDryFireSound() const;
+	/*
+	 *  setter
+	 */
 
-	USoundBase* GetSwtichFireModeSound() const;
+	void Initialize(EGameType gameType, EScopeType scopeType, EWeaponType weaponType, ASRPlayerCharacter* const owner);
 
-	TSubclassOf<UAnimInstance> GetCharacterAnimInstance(EWeaponType weapon) const;
-
-	TSubclassOf<UAnimInstance> GetWeaponAnimInstance(EWeaponType weapon) const;
+	/*
+	 *  getter
+	 */
+	UFUNCTION(BlueprintPure)
+	USkeletalMeshComponent* GetGun()  const { return mWeapon; }
+	UFUNCTION(BlueprintPure)
+	UChildActorComponent* GetScope() const { return mScope; }
+	EWaeponFireMode GetFireMode() const;
+	int32 GetRemainAmmo() const;
+	bool IsBurstShot() const;
 
 protected:
-	// Called when the game starts or when spawned
+
 	virtual void BeginPlay() override;
 
+private:
+
+	void moveSocketSniperMode(bool active);
+
+	void fireShots();
+
+	void clearBehaviorFlagAfterAnimation();
+
+public :
+
+	static bool bIsDebugMode;
+
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponData)
+	TSubclassOf<class ASRWeaponData> mWeaponDataClass;
+
+private:
+
+	/*
+	 *  weapon data class
+	 */
+
 	UPROPERTY()
-	USceneComponent* mDefault;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Rifle)
-	USkeletalMesh* mM4;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = HandGun)
-	USkeletalMesh* mHandGun;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Sniper)
-	USkeletalMesh* mM24;
+	ASRWeaponData* mWeaponData;
 
 	/*
-	 *  optics
+	 * weapon
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Optics)
-	UChildActorComponent* mScope1X;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Optics)
-	UChildActorComponent* mScope2dot5X;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Optics)
-	UChildActorComponent* mScope6X;
+	UPROPERTY()
+	USkeletalMeshComponent* mWeapon;
+	UPROPERTY()
+	UChildActorComponent* mScope;
 
-	UPROPERTY(VisibleAnywhere, Category = Optics)
-	TSubclassOf<AActor> mHGOptic;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Optics)
-	TSubclassOf<AActor> mScope1XClass;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Optics)
-	TSubclassOf<AActor> mScope2dot5XClass;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Optics)
-	TSubclassOf<AActor> mScope6XClass;
-
+	FString mScopeLocationSocketName;
+	FString mWeaponLocationSocketName;
 
 	/*
-	 *  sounds
+	 *  projectile
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sniper)
-	USoundBase* mSniperFireSound;
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class ASRProjectile> mProjectileClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rifle)
-	USoundBase* mRifleFireSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rifle)
+	/*
+	 *  sounds and effect
+	 */
+	UPROPERTY()
+	USoundBase* mFireSound;
+	UPROPERTY()
 	USoundBase* mSwitchFireModeSound;
+	UPROPERTY()
+	USoundBase* mDryFireSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HandGun)
-	USoundBase* mHandGunFireSound;
+	UPROPERTY()
+	UParticleSystem* mMuzzleParticles;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Common)
-	USoundBase* DryFireSound;
+	/*
+	 *  class and ui
+	 */
+	UPROPERTY()
+	UUIHUDWidget* mHUD;
+	UPROPERTY()
+	ASRPlayerCharacter* mOwner;
 
-	// character animInstance
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimInstance|Character")
-	TSubclassOf<UAnimInstance> mCharacterSniperAnimInstance;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimInstance|Character")
-	TSubclassOf<UAnimInstance> mCharacterRifleAnimInstance;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimInstance|Character")
-	TSubclassOf<UAnimInstance> mCharacterHandGunAnimInstance;
+	/*
+	 *  player state delegate
+	 */
+	FOnAddFireShot mAddFireShot;
 
-	// gun animInstance
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimInstance|Weapon")
-	TSubclassOf<UAnimInstance> mSniperAnimInstance;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimInstance|Weapon")
-	TSubclassOf<UAnimInstance> mRifleAnimInstance;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimInstance|Weapon")
-	TSubclassOf<UAnimInstance> mHandGunAnimInstance;
+	/*
+	 *  gun info
+	 */
+	FTimerHandle mFireDelayTimer;
+	float mFireDelay;
+	float mRecoilFactor;
+	bool mbFirstShot;
+	/*
+	 *  mag info
+	 */
+	int32 mMaxMagAmount;
+	int32 mRemainAmmo;
+
+	/*
+	 *  fire mode info
+	 */
+	const int32 BURST_COUNT = 3;
+	int32 mCurrentBurst;
+
+	const int FIRE_SWITCH_MODE = 3;
+	EWaeponFireMode mFireMode;
+	int32 mFireModeOffset;
+
+	/*
+	 *  game mode info
+	 */
+	EGameType mGameType;
+	EScopeType mScopeType;
+	EWeaponType mWeaponType;
 };
+
+
+

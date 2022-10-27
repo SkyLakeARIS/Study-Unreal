@@ -5,8 +5,6 @@
 #include "Blueprint/UserWidget.h"
 #include "UISelectModesWidget.generated.h"
 
-DECLARE_DELEGATE_OneParam(FOnInitGameData, FGameModeData)
-
 class UButton;
 /*
  *	게임 시작전에 무기들과 게임모드를 선택하는 UI 클래스입니다.
@@ -17,14 +15,20 @@ class VERSION_API UUISelectModesWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
+private:
 
-	void BindCharacterInfo(class  ASRPlayerCharacter* character);
+	enum eSelectFlag : uint8
+	{
+		WEAPON_SELECT_BIT = 0x1,
+		OPTIC_SELECT_BIT = 0x2,
+		GAMEMODE_SELECT_BIT = 0x4,
+		TARGET_SELECT_BIT = 0x8,
+		SELECT_ALL_FLAG = 0x0f
+	};
 
 protected:
 
 	virtual void NativeConstruct() override;
-
 	virtual void NativeDestruct() override;
 
 	UFUNCTION()
@@ -87,16 +91,13 @@ protected:
 	UPROPERTY()
 	UButton* mBtnStart;
 
-	FOnInitGameData mOnGameData;
+	/*
+	 *  select data
+	 */
 	FGameModeData mSelectedModes;
 	bool mbIsCharacterType;
-
 	int8 mSelectionFlag;
-	const int8 SELECT_ALL_FLAG = 0x1f;
-	const int8 WEAPON_SELECT_BIT = 0x1;
-	const int8 OPTIC_SELECT_BIT = 0x2;
-	const int8 GAMEMODE_SELECT_BIT = 0x4;
-	const int8 TARGET_SELECT_BIT = 0x8;
-	const int8 BIND_COMPLETE_BIT = 0x10;
 
+
+	//FOnInitGameData mOnGameData;
 };

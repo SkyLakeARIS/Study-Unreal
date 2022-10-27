@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
-#include <vector>
 #include <fstream>
 #include "Version.h"
 #include "UObject/NoExportTypes.h"
@@ -47,71 +46,79 @@ struct FWeaponStatistics
 };
 
 
-/**
+/*
  *  유저의 통계 데이터를 파일에 읽고 쓰는 클래스입니다.
- *	SRPlayerState 클래스에서 데이터를 업데이트합니다.
+ *	SRPlayerState 클래스에서 데이터를 업데이트합니다.  : public UObject 
  */
-UCLASS()
-class VERSION_API USRStatistics : public UObject
+//UCLASS()
+class VERSION_API USRStatistics final
 {
-	GENERATED_BODY()
+//	GENERATED_BODY()
 public:
 
-	USRStatistics();
+	USRStatistics() = delete;
+	~USRStatistics() = delete;
 
-	bool LoadStats();
 
-	bool SaveStats();
+	static bool LoadStats();
+	static bool SaveStats();
 
-	void UpdateWeapon(const EWeaponType selectedWeapon, const FWeaponStatistics& stats);
+	static void UpdateWeapon(const EWeaponType selectedWeapon, const FWeaponStatistics& stats);
+	static void UpdateGames(const EGameType selectedGameMode);
+	static void UpdateScores(EGameModeType EGameModeType, const uint32& score);
 
-	void UpdateGames(const EGameType selectedGameMode);
+	/*
+	 *  setter
+	 */
+	static void Initialize();
 
-	void UpdateScores(EGameModeType EGameModeType, const uint32& score);
+	/*
+	 *  getter
+	 */
+	static FWeaponStatistics GetWeaponStats(EWeaponType weapon) ;
+	static uint32 GetGameStats(EGameType game) ;
+	static uint32 GetScoresStats(EGameModeType mode) ;
+	static uint32 GetHeadshotRate(EWeaponType weapon) ;
+	static uint32 GetAccuracy(EWeaponType weapon) ;
 
-	FWeaponStatistics GetWeaponStats(EWeaponType weapon) const;
 
-	uint32 GetGameStats(EGameType game) const;
-
-	uint32 GetScoresStats(EGameModeType mode) const;
-
-	uint32 GetHeadshotRate(EWeaponType weapon) const;
-
-	uint32 GetAccuracy(EWeaponType weapon) const;
-
-	bool IsLoaded() const;
-
-private:
-
-	void createDataFile();
-
-	void parseWeapons(std::ifstream& fs, FWeaponStatistics& weapon);
-
-	void parseGames(std::ifstream& fs);
-
-	void parseScore(std::ifstream& fs);
+	static bool IsLoaded();
 
 private:
-	// stats data file path
-	const char* PATH = "..\\dplayer.srdata";
-	bool mbIsLoaded;	// 파일에서 데이터를 불러오면 true가 됩니다.
-	bool mbFail;		// 잘못된 데이터 전달로 인해 저장하면 안될 때 true입니다.
+
+	static void createDataFile();
+
+	/*
+	 *  parse data
+	 */
+	static bool parseWeapons(std::ifstream& fs, FWeaponStatistics& weapon);
+	static bool parseGames(std::ifstream& fs);
+	static bool parseScore(std::ifstream& fs);
+
+private:
+	/*
+	 *  class info
+	 */
+	static const char* PATH;
+	static bool mbIsInitialize;	// 이미 초기화된 상태인지 판단합니다.
+	static bool mbIsLoaded;		// 파일에서 데이터를 불러오면 true가 됩니다.
+	static bool mbFail;			// 잘못된 데이터 전달로 인해 저장하면 안될 때 true입니다.
 
 	// weapons
-	FWeaponStatistics mAssultRifle;
-	FWeaponStatistics mHandGun;
-	FWeaponStatistics mSniperRifle;
+	static FWeaponStatistics mAssultRifle;
+	static FWeaponStatistics mHandGun;
+	static FWeaponStatistics mSniperRifle;
 
 	// game modes
-	uint32 mSelectedBattlefield;
-	uint32 mSelectedRainbowSix;
-	uint32 mSelectedEscapeFromTarkov;
+	static uint32 mSelectedBattlefield;
+	static uint32 mSelectedRainbowSix;
+	static uint32 mSelectedEscapeFromTarkov;
 
 	// scores
-	uint32 mStaticShortRangeHighScore;
-	uint32 mStaticMidRangeHighScore;
-	uint32 mStaticLongRangeHighScore;
-	uint32 mMovableShortRangeHighScore;
-	uint32 mMovableMidRangeHighScore;
-	uint32 mMovableLongRangeHighScore;
+	static uint32 mStaticShortRangeHighScore;
+	static uint32 mStaticMidRangeHighScore;
+	static uint32 mStaticLongRangeHighScore;
+	static uint32 mMovableShortRangeHighScore;
+	static uint32 mMovableMidRangeHighScore;
+	static uint32 mMovableLongRangeHighScore;
 };

@@ -21,8 +21,8 @@ public:
 	void UpdateStatistics();
 
 private:
-	UPROPERTY()
-	USRStatistics* mStatistics;
+	//UPROPERTY()
+	//USRStatistics* mStatistics;
 
 	// ar stats
 	UPROPERTY()

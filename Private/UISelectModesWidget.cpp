@@ -1,7 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 #include "UISelectModesWidget.h"
-#include "SRPlayerController.h"
-#include "SRPlayerCharacter.h"
+#include "SRGameMode.h"
 #include "SRTargetManager.h"
 #include "Components/Button.h"
 #include "Engine/AssetManager.h"
@@ -41,13 +40,6 @@ void UUISelectModesWidget::NativeConstruct()
 void UUISelectModesWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
-	mOnGameData.Unbind();
-}
-
-void UUISelectModesWidget::BindCharacterInfo(ASRPlayerCharacter* character)
-{
-	mOnGameData.BindUObject(character, &ASRPlayerCharacter::InitGameMode);
-	mSelectionFlag |= BIND_COMPLETE_BIT;
 }
 
 
@@ -183,10 +175,11 @@ void UUISelectModesWidget::clickedStart()
 
 	if(mSelectionFlag == SELECT_ALL_FLAG)
 	{
-		auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
-		mOnGameData.Execute(mSelectedModes);
-		playerController->ShowInGameHUDAndStartTimer();
-		playerController->GetTargetManager()->SetTargetType(mbIsCharacterType);
+		ASRGameMode* gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		// 선택한 정보들을 GameMode로 전달합니다.
+		gameMode->SetGameModeData(mSelectedModes, mbIsCharacterType);
+		gameMode->SettingGameAndStartGame();
+
 		RemoveFromParent();
 	}
 	else

@@ -4,9 +4,10 @@
 #include "GameFramework/Character.h"
 #include "SRTargetCharacter.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnTargetDown)
+
 enum class EMovableAxis : uint8;
 class ASRTargetManager;
-DECLARE_MULTICAST_DELEGATE(FOnTargetDown)
 
 /*
  * 타겟 클래스입니다.

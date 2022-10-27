@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
+#include "GameModeData.h"
 #include "Version.h"
 #include "GameFramework/PlayerController.h"
 #include "SRPlayerController.generated.h"
@@ -9,7 +10,6 @@ class UUISelectModesWidget;
 class UUIResultWidget;
 class UUIHUDWidget;
 class UUIPauseWidget;
-
 
 /*
  * 플레이어 캐릭터 컨트롤러 클래스입니다.
@@ -22,91 +22,81 @@ class VERSION_API ASRPlayerController : public APlayerController
 public:
 	ASRPlayerController();
 
-	virtual void PostInitializeComponents() override;
-
-	virtual void OnPossess(APawn* InPawn) override;
-
-	void ChangeInputMode(bool bIsGameMode);
-	
-	void ResumeCountDown() const;
-
-	void ClearCountDown();
-
-	void BindStatToUI();
-
-	void ShowInGameHUDAndStartTimer();
-
-	// setter/getter
-	void SetDebugMode(bool active);
-
-	bool IsDebugging() const;
-
-	bool IsStartMainGame() const;
-
-	ASRPlayerState* GetPlayerState() const;
-
-	UUIHUDWidget* GetIngameHUD() const;
-
-	UUISelectModesWidget* GetSelectModesWidget() const;
-
-	class ASRTargetManager* GetTargetManager() const;
-
-protected:
-
-	virtual void SetupInputComponent() override;
-
-	virtual void BeginPlay() override;
-
-private:
+	void StartGame();
+	void EndGame();
 
 	UFUNCTION()
 	void PauseGame();
+	void ResumeGame();
 
-	void countDownMainTime();
+	void ChangeInputMode(const bool bIsGameMode);
+	void CreateUIWidgets();
 
-	void countReadyTime();
+	/*
+	 *  set data to character
+	 */
+	void SetMouseSensitivityAndUpdateToCharacter(const FMouseSensitivity newSetting);
+	void SetAimingTypeToCharacter(const EAimingType newSetting);
+	void InitCharacterMouseAndAimingSetting(const EScopeType scopeType) const;
 
-	void result();
+	/*
+	 *  getter
+	 */
+	ASRPlayerState* GetPlayerState() const;
+	UUIHUDWidget* GetHUDWidget() const;
+	UUISelectModesWidget* GetSelectWidget() const;
+	FMouseSensitivity GetMouseSensitivity() const;
+
+	// save/load data
+	void LoadMouseSensitivitySetting();
+	void SaveMouseSensitivitySetting() const;
 
 protected:
 
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void SetupInputComponent() override;
+	virtual void BeginPlay() override;
+
+protected:
+	/*
+	 *  ui
+	 */
 	UPROPERTY()
 	TSubclassOf<UUIPauseWidget> mPauseWidgetClass;
-		
 	UPROPERTY()
-	TSubclassOf<UUserWidget> HUDClass;
+	UUIPauseWidget* mPauseWidget;
 
 	UPROPERTY()
 	TSubclassOf<UUIResultWidget> mReusltWidgetClass;
+	UPROPERTY()
+	UUIResultWidget* mResultWidget;
 
 	UPROPERTY()
 	TSubclassOf<UUISelectModesWidget> mSelectModesWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class ASRTargetManager* mTargetManager;
-
-private:
-
-	UPROPERTY()
-	UUIHUDWidget* InGameHUD;
-	UPROPERTY()
-	UUIPauseWidget* mPauseWidget;
-	UPROPERTY()
-	UUIResultWidget* mResultWidget;
 	UPROPERTY()
 	UUISelectModesWidget* mSelectModesWidget;
 
 	UPROPERTY()
+	TSubclassOf<UUserWidget> mHUDClass;
+	UPROPERTY()
+	UUIHUDWidget* mHUDWidget;
+
+private:
+	/*
+	 *  class
+	 */
+	UPROPERTY()
 	ASRPlayerState* mPlayerState;
 
-	bool mbDebugMode;
-	bool mbStartGame;
-	FTimerHandle THCountDown;
-	uint32 remainingTime;
-	uint32 mTimeToReady;
-
+	/*
+	 *  input mode data
+	 */
 	FInputModeGameOnly GameInputMode;
 	FInputModeUIOnly UIInputMode;
 
-	float mSensitivity;
+	/*
+	 *  input data
+	 */
+	FMouseSensitivity mMouseSetting;
+	EAimingType mAimingType;
 };

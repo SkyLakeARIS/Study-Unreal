@@ -5,11 +5,27 @@
 #include "GameFramework/Character.h"
 #include "SRPlayerCharacter.generated.h"
 
+
 DECLARE_DELEGATE_OneParam(FOnCrossHairVisibility, ESlateVisibility);
 
 
-enum class EHitType : uint8;
+enum eBehaviorStateFlags : uint8
+{
+	FIRING = 0x01,
+	RELOADING = 0x02,
+	FULL_RELOADING = 0x04,
+	AIMING = 0x08,
+	BOLTACTION = 0x10,
+	EMPTY_MAG = 0x20,
+	WAIT_TO_END_ANIMATION = 0x40,
+};
+const uint8 CLEAR_STATE = 0x00;
+
+
+class ASRPlayerController;
+class ASRWeapon;
 class USRAnimInstance;
+enum class EHitType : uint8;
 
 /*
  * 플레이어 캐릭터 클래스입니다.
@@ -23,203 +39,115 @@ class ASRPlayerCharacter : public ACharacter
 public:
 	ASRPlayerCharacter();
 
-	virtual void PossessedBy(AController* NewController) override;
+	/*
+	 *  Setter
+	 */
+	UFUNCTION()
+	void InitDataFromGameMode(const FGameModeData modeData);
 
-	virtual void PostInitializeComponents() override;
+	void SetAimingType(const EAimingType newSetting);
 
-	// getter
+	inline void SetBehaviorFlag(const uint8 flag);
+	inline void UnsetBehaviorFlag(const uint8 flag);
+
+
+	void SetMouseSensitivity(const float hipYaw, const float hipPitch, const float aimYaw, const float aimPitch);
+
+	/*
+	 * getter
+	 */ 
 	UFUNCTION(BlueprintPure)
 	USkeletalMeshComponent* GetMesh1P() const { return mMesh1P; }
-
 	UFUNCTION(BlueprintPure)
 	UCameraComponent* GetFirstPersonCameraComponent() const { return mFirstPersonCameraComponent; }
-
 	UFUNCTION(BlueprintPure)
 	EWeaponType GetWeaponType() const;
-
 	UFUNCTION(BlueprintPure)
 	EScopeType GetScopeType() const;
-
 	UFUNCTION(BlueprintPure)
 	EGameType GetGameType() const;
-
 	UFUNCTION(BlueprintPure)
-	USkeletalMeshComponent* GetNewWeapon()  const { return mWeapon; }
-
-	UFUNCTION(BlueprintPure)
-	UChildActorComponent* GetNewScope() const { return mScope; }
-
+	ASRWeapon* GetWeapon() const;
 	UFUNCTION(BlueprintPure)
 	EAimingType GetAimingType() const;
-
 	UFUNCTION(BlueprintPure)
-	bool IsAimimg() const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsCanFire() const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsNeedBoltAction() const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsFiring() const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsEmptyMag() const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsReload() const;
-
-	// setter
-	void SetAimToggleOrHold(EAimingType newType);
-
+	int32 GetBehaviorFlag() const;
 	UFUNCTION(BlueprintCallable)
-	void SniperMoveSocket(bool active);
-
-	UFUNCTION(BlueprintCallable)
-	void NotifyBoltActionEnd();
-
-	UFUNCTION(BlueprintCallable)
-	void NotifyReloadEnd();
-
-	UFUNCTION()
-	void InitGameMode(FGameModeData modeData);
-
-	void SaveInGameSetting() const;
-
-	void LoadInGameSetting();
+	USRAnimInstance* GetAnimInstance() const;
 
 protected:
 
 	virtual void BeginPlay() override;
-
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-
-	void tryBindSelectModesUI();
+	virtual void PossessedBy(AController* NewController) override;
 
 	void StartFire();
-
 	void StopFire();
-
-	void BurstFire();
-
-	void FireShot();
 
 	void Reload();
 
 	void SwitchFireMode();
 
 	void SetAim();
-
 	void SetHip();
 
-	void endBehaviorDelay();
-
-	void endWeaponDelay();
-
 	void MoveForward(float Val);
-
 	void MoveRight(float Val);
 
 	void TurnAtRate(float Rate);
-
 	void LookUpAtRate(float Rate);
-
-public:
-
-	FMouseSensitivity MouseSetting;	// make getter, move protected
 
 protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Character)
 	USkeletalMeshComponent* mMesh1P;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	UCameraComponent* mFirstPersonCameraComponent;
 
 	UPROPERTY(BlueprintReadOnly)
-	USRAnimInstance* mTutAnimInstance;
+	USRAnimInstance* mAnimInstance;
 
 	UPROPERTY()
-	class ASRPlayerController* mPlayerController;
+	ASRPlayerController* mPlayerController;
 
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class ASRProjectile> mProjectileClass;
-
-	// UI
 	FOnCrossHairVisibility mOnCrossHairVisibility;
 
+	UPROPERTY()
+	ASRWeapon* mWeapon;
+
+private:
 	/*
-	 *  Weapon and scope
+	 *  behavior state
 	 */
+	int32 mBehaviorFlag;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponData)
-	TSubclassOf<class ASRWeapon> mWeaponDataClass;
-	UPROPERTY()
-	ASRWeapon* mWeaponData;
+	/*
+	 *  mouse setting
+	 */
+	float mHipYawSensitivity;
+	float mHipPitchSensitivity;
 
-	UPROPERTY()
-	USkeletalMeshComponent* mWeapon;
-	UPROPERTY()
-	UChildActorComponent* mScope;
-
-	FString mScopeLocationSocketName;
-	FString mWeaponLocationSocketName;
-
-	// sounds and effect
-	UPROPERTY()
-	USoundBase* mFireSound;
-	UPROPERTY()
-	USoundBase* mSwitchFireModeSound;
-	UPROPERTY()
-	USoundBase* mDryFireSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon | Effect")
-	class UParticleSystem* mMuzzleParticles;
-
-	// game mode data
-	FGameModeData mGameModeData;
+	float mAimYawSensitivity;
+	float mAimPitchSensitivity;
 
 	EAimingType mAimingType;
 
-
-	// character state
-	FTimerHandle mBehaviorDelayTimer;
-	const short CAN_BEHAVIOR = 1;
-	const short CAN_NOT_BEHAVIOR = 0;
-	short mBehaviorFlag;				// idle을 제외한 어떤 행동을 하고 있으면 다른 행동을 시도하는것을 막기 위한 flag입니다. flag : CAN_BEHAVIOR, CAN_NOT_BEHAVIOR
-
 	/*
-	 *  Gun state
+	 *  game setting
 	 */
-
-	const short CAN_FIRE = 1;
-	const short CAN_NOT_FIRE = 0;
-	short mFireFlag;		// 하나의 스레드만 접근하도록 하기위한  flag 변수입니다. flag : CAN_FIRE, CAN_NOT_FIRE
-	// 애님인스턴스의 스테이트머신에서 아래 5개 변수의 값을 감지합니다.
-	bool mbNeedBoltAction;
-	bool mbIsEmptyMag;
-	bool mbIsAiming;
-	bool mbFiring;
-	bool mbIsReload;
-	EWaeponFireMode mFireMode;
-
-	/*
-	 *  Gun info
-	 */
-	FTimerHandle mFireDelayTimer;
-	FTimerHandle mBurstFireTimer;
-	const int FIRE_SWITCH_MODE = 3;
-	int32 mFireModeOffset;
-	int32 mMaxMagAmount;
-	int32 mRemainAmmo;
-	int32 mCurrentBurst;
-	float mFireDelay;
-
-	// gun recoil
-	float mRecoilFactor;
-	bool mFirstShot;
-	int32 mContinuousShots;
+	EGameType mGameType;
+	EScopeType mScopeType;
+	EWeaponType mWeaponType;
 };
 
+void ASRPlayerCharacter::SetBehaviorFlag(const uint8 flag)
+{
+	mBehaviorFlag |= flag;
+}
+
+void ASRPlayerCharacter::UnsetBehaviorFlag(const uint8 flag)
+{
+	mBehaviorFlag &= ~flag;
+}

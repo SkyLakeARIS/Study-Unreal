@@ -1,6 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 #include "UIPauseWidget.h"
 #include <string>
+
+#include "SRGameMode.h"
 #include "SRPlayerController.h"
 #include "UIHUDWidget.h"
 #include "SRPlayerCharacter.h"
@@ -13,196 +15,186 @@
 void UUIPauseWidget::OnResumeClicked()
 {
 	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	playerController->ResumeGame();
 
 	RemoveFromParent();
-	playerController->ChangeInputMode(true);
-	playerController->SetPause(false);
-	playerController->GetIngameHUD()->SetVisibility(ESlateVisibility::Visible);
-	playerController->ResumeCountDown();
 }
 
 void UUIPauseWidget::OnRetryClicked()
 {
 	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
-	playerController->ClearCountDown();
 	playerController->RestartLevel();
 }
 
 void UUIPauseWidget::OnReturnMenuClicked()
 {
-	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
-	playerController->ClearCountDown();
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("MainMenu"));
 }
 
 void UUIPauseWidget::onChangeHip_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
-
 	int32 newValue = 0;
-	if (!StringToInteger(InText, &newValue)) 
+	if (!StringToInteger(InText, newValue)) 
 	{
-		mHipX->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipX)));
+		mHipX->SetText(FText::FromString(FString::FromInt(mMouseSetting.HipX)));
 		return;
 	}
 
-	player->MouseSetting.HipX = newValue;
-	player->SaveInGameSetting();
+	mMouseSetting.HipX = newValue;
+	updateMouseSetting();
 
-	mHipX->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipX)));
+	mHipX->SetText(FText::FromString(FString::FromInt(mMouseSetting.HipX)));
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onChangeHip_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 	int32 newValue = 0;
-	if (!StringToInteger(InText, &newValue)) 
+	if (!StringToInteger(InText, newValue)) 
 	{
-		mHipY->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipY)));
+		mHipY->SetText(FText::FromString(FString::FromInt(mMouseSetting.HipY)));
 		return;
 	}
 
-	player->MouseSetting.HipY = newValue;
-	player->SaveInGameSetting();
+	mMouseSetting.HipY = newValue;
+	updateMouseSetting();
 
-	mHipY->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipY)));
+	mHipY->SetText(FText::FromString(FString::FromInt(mMouseSetting.HipY)));
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onChangeScope1X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+
 	int32 newValue = 0;
-	if (!StringToInteger(InText, &newValue)) 
+	if (!StringToInteger(InText, newValue)) 
 	{
-		mScope1X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope1X_X)));
+		mScope1X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope1X_X)));
 		return;
 	}
 
-	player->MouseSetting.Scope1X_X = newValue;
-	player->SaveInGameSetting();
+	mMouseSetting.Scope1X_X = newValue;
+	updateMouseSetting();
 
-	mScope1X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope1X_X)));
+	mScope1X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope1X_X)));
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onChangeScope1X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+
 	int32 newValue = 0;
-	if (!StringToInteger(InText, &newValue))
+	if (!StringToInteger(InText, newValue))
 	{
-		mScope1X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope1X_Y)));
+		mScope1X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope1X_Y)));
 		return;
 	}
 
-	player->MouseSetting.Scope1X_Y = newValue;
-	player->SaveInGameSetting();
+	mMouseSetting.Scope1X_Y = newValue;
+	updateMouseSetting();
 
-	mScope1X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope1X_Y)));
+	mScope1X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope1X_Y)));
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onChangeScope2dot5X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+
 	int32 newValue = 0;
-	if (!StringToInteger(InText, &newValue)) 
+	if (!StringToInteger(InText, newValue)) 
 	{
-		mScope2dot5X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope2dot5X_X)));
+		mScope2dot5X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope2dot5X_X)));
 		return;
 	}
 
-	player->MouseSetting.Scope2dot5X_X = newValue;
-	player->SaveInGameSetting();
+	mMouseSetting.Scope2dot5X_X = newValue;
+	updateMouseSetting();
 
-	mScope2dot5X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope2dot5X_X)));
+	mScope2dot5X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope2dot5X_X)));
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onChangeScope2dot5X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+
 	int32 newValue = 0;
-	if (!StringToInteger(InText, &newValue)) 
+	if (!StringToInteger(InText, newValue)) 
 	{
-		mScope2dot5X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope2dot5X_Y)));
+		mScope2dot5X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope2dot5X_Y)));
 		return;
 	}
 
-	player->MouseSetting.Scope2dot5X_Y = newValue;
-	player->SaveInGameSetting();
+	mMouseSetting.Scope2dot5X_Y = newValue;
+	updateMouseSetting();
 
-	mScope2dot5X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope2dot5X_Y)));
+	mScope2dot5X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope2dot5X_Y)));
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onChangeScope6X_X(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+
 	int32 newValue = 0;
-	if (!StringToInteger(InText, &newValue))
+	if (!StringToInteger(InText, newValue))
 	{
-		mScope6X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope6X_X)));
+		mScope6X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_X)));
 		return;
 	}
 
-	player->MouseSetting.Scope6X_X = newValue;
-	player->SaveInGameSetting();
+	mMouseSetting.Scope6X_X = newValue;
+	updateMouseSetting();
 
-	mScope6X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope6X_X)));
+	mScope6X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_X)));
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onChangeScope6X_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
+
 	int32 newValue = 0;
-	if (!StringToInteger(InText, &newValue))
+	if (!StringToInteger(InText, newValue))
 	{
-		mScope6X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope6X_Y)));
+		mScope6X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_Y)));
 		return;
 	}
 	
-	player->MouseSetting.Scope6X_Y = newValue;
-	player->SaveInGameSetting();
+	mMouseSetting.Scope6X_Y = newValue;
+	updateMouseSetting();
 
-	mScope6X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope6X_Y)));
+	mScope6X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_Y)));
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onHoldClicked()
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
-	player->SetAimToggleOrHold(EAimingType::Hold);
+	mAimingType = EAimingType::Hold;
+
+	updateAimSetting();
 
 	mBtnHold->SetIsEnabled(false);
 	mBtnToggle->SetIsEnabled(true);
 
-	player->SaveInGameSetting();
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onToggleClicked()
 {
-	auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
-	player->SetAimToggleOrHold(EAimingType::Toggle);
+	mAimingType =  EAimingType::Toggle;
+	updateAimSetting();
 
 	mBtnHold->SetIsEnabled(true);
 	mBtnToggle->SetIsEnabled(false);
 
-	player->SaveInGameSetting();
 	mMessageBox->SetText(FText::FromString(TEXT("설정이 저장되었습니다.")));
 }
 
 void UUIPauseWidget::onDebugChecked(bool active)
 {
-	auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
-	playerController->SetDebugMode(active);
+	auto* const gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	gameMode->SetDebugMode(active);
 }
 
-bool UUIPauseWidget::StringToInteger(const FText& InText, int32* int_Out)
+bool UUIPauseWidget::StringToInteger(const FText& InText, int32& outInt)
 {
 	if (!InText.IsNumeric())
 	{
@@ -213,26 +205,41 @@ bool UUIPauseWidget::StringToInteger(const FText& InText, int32* int_Out)
 	int32 integer = std::stoi(*InText.ToString());
 
 	integer = FMath::Clamp(integer, MIN_SETTING_VALUE, MAX_SETTING_VALUE);
-	*int_Out = integer;
+	outInt = integer;
 
 	return true;
 }
 
+void UUIPauseWidget::updateMouseSetting()
+{
+	auto* const playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	playerController->SetMouseSensitivityAndUpdateToCharacter(mMouseSetting);
+}
+
+void UUIPauseWidget::updateAimSetting()
+{
+	auto* const playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	playerController->SetAimingTypeToCharacter(mAimingType);
+}
+
 void UUIPauseWidget::UpdateInfoWhenOpen()
 {
-	const auto* player = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
-	const auto* playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	const auto* const playerController = Cast<ASRPlayerController>(GetOwningPlayer());
+	const auto* const playerCharacter = Cast<ASRPlayerCharacter>(GetOwningPlayerPawn());
 
-	mHipX->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipX)));
-	mHipY->SetText(FText::FromString(FString::FromInt(player->MouseSetting.HipY)));
-	mScope1X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope1X_X)));
-	mScope1X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope1X_Y)));
-	mScope2dot5X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope2dot5X_X)));
-	mScope2dot5X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope2dot5X_Y)));
-	mScope6X_X->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope6X_X)));
-	mScope6X_Y->SetText(FText::FromString(FString::FromInt(player->MouseSetting.Scope6X_Y)));
+	mMouseSetting = playerController->GetMouseSensitivity();
+	mAimingType = playerCharacter->GetAimingType();
 
-	if (player->GetAimingType() == EAimingType::Toggle)
+	mHipX->SetText(FText::FromString(FString::FromInt(mMouseSetting.HipX)));
+	mHipY->SetText(FText::FromString(FString::FromInt(mMouseSetting.HipY)));
+	mScope1X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope1X_X)));
+	mScope1X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope1X_Y)));
+	mScope2dot5X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope2dot5X_X)));
+	mScope2dot5X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope2dot5X_Y)));
+	mScope6X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_X)));
+	mScope6X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_Y)));
+
+	if (mAimingType == EAimingType::Toggle)
 	{
 		mBtnToggle->SetIsEnabled(false);
 	}
@@ -243,7 +250,8 @@ void UUIPauseWidget::UpdateInfoWhenOpen()
 
 	mMessageBox->SetText(FText::FromString(TEXT("정수 값을 입력하여 감도를 변경할 수 있습니다.")));
 
-	if(playerController->IsDebugging())
+	auto* gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(gameMode->IsDebugMode())
 	{
 		mDebugMode->SetCheckedState(ECheckBoxState::Checked);
 	}
