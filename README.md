@@ -16,9 +16,10 @@
   1. 배틀필드 4     
   2. 레인보우 식스 시즈     
   3. 이스케이프 프롬 타르코프     
-선정된 각 게임들은 투사체, 히트스캔, 총알 발사 위치, 랜덤스프레드 여부 등 서로 겹치지 않는 구현을 가지기 때문에 적절하다고 판단했습니다.     
+      
+선정된 각 게임들은 투사체, 히트스캔, 총알 발사 위치, 랜덤스프레드 여부 등 서로 겹치지 않는 구현을 가지기 때문에 적절하다고 판단했습니다.      
 
-애니메이션의 경우 직접 만들었기 때문에 어색합니다.
+애니메이션의 경우 직접 만들었기 때문에 어색합니다.     
   
       
 ### 영상
@@ -48,8 +49,6 @@
         <img src="https://lh3.googleusercontent.com/fife/AAbDypBnT-F_5jS-t3b3USfj5gIEX_fVs6i7T1eV-wHrjLqKQjtD-NuEQbjHG-iEr3hKDFgZdbXsEAos0RY--JhYdl5fsVLs_gh2qPhgVquFzUF85KRYySMS6AKLKtMZz-hn5z2jypN7ACphey0S2yqrQP_5sqjd-waTGzxR7XNzWN5XQXrsivEoMVDe7L0CB-sd-HEK0hYdFUlm8zFjMC3wjpqXqVAqagyA53m41iwYH9hfh4RjKls5jYNMmnMOCJdgc1lFwRhpDSwnTiMXhItXKCLar3uR3gK3jG8C30bpU69GMomdFFtgv9w4rev8xy4h5nmy-8pK89Svj0HxZB5xK54qtxSQB8bRmwN8K1OMFB8QpWK1tS3gitdWPh_p8xTF7UI8w0_XxPn5CHcn8BR-dCf7q9FSgl8pA3iIyv8wW8j9XW-Mjc1lIvdtbRwFYO_TmQDgOWvf24sDXN4e6TjJ1wfM2wVG3UURHp1jyNxj6D-KexdqdwhQGANUmVobFZiC2HaSb4Y-i1ZbL6y4IOFW3r9fia_WrJr2i0KTAOvTaluJqkm2NMcyXB21bexqxcG6amJTEgjlikChsaDYRtNGOUC-RfgaAe2_bHJCyk6lYzdpXtB0gyEx8mo3ybdW1bJWjkvAR7ANt2EJ9X8iwRcUJ8mehJnWgyIBMZwnUDl_0IBne32lIXyxO-yaT_ytCJDJgJ30m3-UYr8xJxt6ld1IjkMpeqQZbaaTdgv7o2mCVqeaNgmt9OvzhK4PniW2P1Po0Mj5rKTF8ApUhWIDHJhwfh7tS6JTUyqXy7oUQ7z0lbytPqXXxgsmWwpYQu-_CNHvEPBDUQ39Miwr8bkYnhyp5LnwLdQiYcnqfho9AbsyU8KslfNvTAvUBeJv2tsjLrFuFV76rf1burpYKSG5l9n1-894O8TLIWRv2a3M97fdjhT1HFxBCjq39ZUEPyNPosNxn137-KxjPqTFtJT0SX6IY-VMGUjr--sSTJyRmB_b4jRHp2UN39-ZslpQxeDHX6QecGJ7OKjQ2KTXVrLgzhn8764cc8ksywAAjUlt63yJp2B-r3czDDMUSGUz91NPFQe7mlmQCBFoqanZnn1GHsQRyNIWOiYElnNH_cOyeor681BiTopVgEteqhwv0QA0UThNbi0CIhTJLJwiPHgL9nTgqJOwbo1IWSKTPRusM30XOwXGKZ0AeC7_JEXGGrCrxgfm9JF9IHj8thvczGGQW3Mcx5h47FwNCirE3dqSwidhpyA13D25Qk0TX2Yj7r0imdzxYzziKvEEeuwdx1jTdTa9QKoFL_EQ1mv4s8KUyCCTyrZvB3sZUmseN8YheEr8xBR-572VQTkxEtO59cNX4tksS0gRqsxCszEffDXEvae3elv6g-iYSaK4oXUiF2pmvW44Ez2HHjbXAZHyDYYxSFEieCR_8ByuNadGDA6FfFxwZIWujG9AkjEW34nEhS5-vFM9yBh-7RaoisjG_WpTBGg2xKrjBLg9p18JzpS8ojCKxi24I4nPZd1m2K7OK7E=w1255-h738" width="600"/>
     </div> 
 </div>
-
-## 
 
 #### 이스케이프 프롬 타르코프
 <div style="display:flex"> <!-- 타르코프 -->
