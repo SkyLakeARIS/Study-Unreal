@@ -19,7 +19,7 @@
 
 애니메이션의 경우 직접 만들었기 때문에 어색합니다.     
   
-      
+![image](https://drive.google.com/uc?export=view&id=1nsRe2RYn21QhJRpyaOew34hlI6FnhERx)
 ### 영상
 ---    
 #### 배틀필드    
