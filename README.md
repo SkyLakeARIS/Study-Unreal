@@ -27,11 +27,11 @@
 	    <tr>
          <!-- 원본 -->
     	    <td style="padding:10px">
-        	    <img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_bf%20original.gif" width="400"/>
+        	    <img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_bf%20original.gif" width="500"/>
       	    </td>
           <!-- 구현 -->
             <td style="padding:10px">
-            	<img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_bf%20implementation.gif" width="400"/>
+            	<img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_bf%20implementation.gif" width="500"/>
             </td>
         </tr>
     </table>
@@ -44,11 +44,11 @@
 	    <tr>
          <!-- 원본 -->
     	    <td style="padding:10px">
-        	    <img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_r6%20original.gif" width="400"/>
+        	    <img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_r6%20original.gif" width="500"/>
       	    </td>
           <!-- 구현 -->
             <td style="padding:10px">
-            	<img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_r6%20implementation.gif" width="400"/>
+            	<img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_r6%20implementation.gif" width="500"/>
             </td>
         </tr>
     </table>
@@ -60,11 +60,11 @@
 	    <tr>
          <!-- 원본 -->
     	    <td style="padding:10px">
-        	    <img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_tarkov%20original.gif" width="400"/>
+        	    <img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_tarkov%20original.gif" width="500"/>
       	    </td>
           <!-- 구현 -->
             <td style="padding:10px">
-            	<img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_tarkov%20implementation.gif" width="400"/>
+            	<img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_tarkov%20implementation.gif" width="500"/>
             </td>
         </tr>
     </table>
@@ -72,8 +72,7 @@
 
 [원본 영상 출처](http://youtube.com/watch?t=227&v=IBG44eHL2xg&feature=youtu.be&ab_channel=SirHansVaderEN)    
 
-##     
-##        
+       
   ### 참고
   ---
 시연 영상 : [유튜브(정리중)]()       
