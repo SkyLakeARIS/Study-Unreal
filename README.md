@@ -4,8 +4,6 @@
 현재 정상적으로 실행되는 코드는 main branch에서 확인할 수 있습니다.     
 그 외, 간간히 작업한 코드는 dev branch에 올리고 있습니다.                  
          
-##    
-     
  ### 설명     
  ---
  언리얼 엔진을 사용한 FPS 트레이닝 게임입니다.    
@@ -16,27 +14,25 @@
   1. 배틀필드 4     
   2. 레인보우 식스 시즈     
   3. 이스케이프 프롬 타르코프     
-## 
-선정된 각 게임들은 투사체, 히트스캔, 총알 발사 위치, 랜덤스프레드 여부 등 서로 겹치지 않는 구현을 가지기 때문에 적절하다고 판단했습니다.   
-
-애니메이션의 경우 직접 만들었기 때문에 어색합니다.
-##    
       
-### 영상
----
-#### 배틀필드
+선정된 각 게임들은 투사체, 히트스캔, 총알 발사 위치, 랜덤스프레드 여부 등 서로 겹치지 않는 구현을 가지기 때문에 적절하다고 판단했습니다.      
 
+애니메이션의 경우 직접 만들었기 때문에 어색합니다.     
+  
+![image](https://drive.google.com/uc?export=view&id=1nsRe2RYn21QhJRpyaOew34hlI6FnhERx = 250x250)
+### 영상
+---    
+#### 배틀필드    
 <div style="display:flex"> <!--배틀필드 -->
     <!-- 원본 -->
     <div style="flex:1;padding-right:10px;">
-      <img src="https://lh3.googleusercontent.com/fife/AAbDypDmLzi_a1TvWshqUtXOSvw8ZOXlKxRy4yoIr_zJxklyO6Kug1I2Uhir4VKzQnED_om3B7z_d0WLUoEM3Haw3q7GDPH9CtnUVOA3IT1RVS2ubPUS0N9GjAPStSY5cTfaww3R8aworwNimRm-wzvHtnA6D3IwH8Lwz-SnrpYbj2CyJ2QWC-JVotbTLhS-lHA9FmBBM63pUbpWRvNYFwLeK4ymxwcfPET5LIpT962F4Aq0YONs7Ybetakw8lMPHwALZQDFkoGjBoPcwzVSIS29At-oPDFp0ro0WOhw-EecPCWOyF6q6tNXqMSzkXnBB3dUCa3p-vwYylyu61gFOhfqOAYQ6k_H7xdTzYiCLrM0LywVEmO1TGQLQibbVifCuQjtJSpB6Sjk1fvD5fbWpTTMt2ApmM_rqud48LYJFWNnln_-jkIHELJ8NznSrPg7erg5_-FbRbAPvnjcyUR5DPis02lvB-sb4utzLY0_14Nm2b1gaF9yYeGPrIfOew7rcIDHieGFu1I_aEN4bGhWjSDA3FPrcDjHT-ugq5r73ZmQA9OILy8xA5qPlMkcM4wfGUpZfGjuJzQDuXq2h_W6i8Qdx9naz16zYm1FrctgscfVqwN8hJHaiArBKAtnm0AAJewn41VlKQhi49B89VqG0kAXcE1KrNnGxgQue5IB0smdMUkHQya1iOWgbcr4hDFs9l3PD4hgj2I-HladjjE7XwHEfpFadJvu0xJqIjGE461zJLnA-qs6AJDNTE_u1AyOFjLluvUZMd9LoIweij72oR02MY5-UoFt4GfXudk5ghNAoCAmDPWIAKdus4aCJ4Ewrf88Z9ODCYhoEGxXASc0_MLMbSe7dGjdIk-8pOEJ4LEHymreVXFtzQ3GxwbRRsLMMSCTVITRLltFD8F3gadt7I0uH5vzPcyzyEv48BZCXeaMUbuv-j4wWAl2SEWgsc0ufKVCRA6eLWx0jZfdJLPzb1wFf5CbVmwxMG1ENoDIkzI6jAhrPtIAM3Pnb5PgDB3vbDDRbxPJrjAPVxApGlwAMQXwhHfPNVf8FtbsJVhbaJL4rZaAl0T0Pafi4ZN4FzdhCHgEedOM6Suu7Bqn3GucpyKW88NgKQjFp7iA05tliVDcZ-2nKlyOqoknVZ1iu4fdoHgso-EKxk2cyX4qw7KXNCbxOw5cdSY0-U0FR03qr17eer3NltlqCDTsxCd4NAkGGjGdkKQgmtzfMqg0GGyutiMvpHlx2n8WZpSBA7VxmAHxLxA_4Apm9-PwbJfc3yT0wibi8Zr1QWrTFLtC92QdH6Ib2DeDUsF1v7VAjAhI6m0e3M8UP-rLVHjItCI2P2G7LE5c4zmggQZiBDOUaQcdOLSpzNj2znrbCEOngCLTV3xGvyZd74ewfZeVljv16SEcH1WqTYjApZmc4Jv0dOkIMYYBnxvMmk-fTurIhrIXZXmDyt2zNU5aP6JKZVhBqUSI7RDIvkjKPNJ57ea7duIjEFZE5FGd-luLC_2NSMHok8_1PtvK1tjXOQ5tJVHtRXk=w518-h738" width="600"/>
+      <img src="https://drive.google.com/uc?export=view&id=1nsRe2RYn21QhJRpyaOew34hlI6FnhERx" width="600"/>
     </div>
     <!-- 구현 -->
     <div style="flex:1;padding-left:10px;">
       <img src="https://lh3.googleusercontent.com/fife/AAbDypDbE9O7-l_i1UiUIhRb2DNXNGThV0wTFENf4f8QsMBhlPxsABXy-m0FEtQ20izoEFAtE3AemiKbPa90xCTMxhor71Tl_UqfSPyVEb0BqDZnI4irkjAlSaigt3Xpfs69BuU40sbudtI2Mh4Ve2EDJ_SKRYsGmghhPMidlyK-9ZwMQzdwGTo5g9-rB4LQThBW7Rw2Pu5xHq4CWAAZO7ld5n50gacKXe3iF-pDwUxMWRILUjvXXVIX12QqjTL_h36f6rmVaT0HnMUCr_aVUbbGRMM93uegNizQd9AHidvas1v6nIb5mgAc-2cJWpMoENNNeNwQEUfGZnfYswGISfo4T8p6Yot41qktHZDH9QAw2Zzv29F4D53KJjk8CoYh4C9Q2Aq197W_pe_0-WLTFwTX9dD7ErWNdVpB-7L_6LSB_ZkhePWuOr0PGvd66R9mzW7ZhrFrS2trDEUG3QDv9UQ2GNCaWvOhaw5thUwIaoE43gjV1ZXU7F9foZeiLyqXyCzxeOTxhyKXn4VKBWZAj5wl8Mk2ik7mboJnaDlczvHNfa0Y2BJ0QZLNnShRuFF9vl5WGz-wNi1t-r4Dbkj3UxEWspih2SaZaqe7V66EnOHBdBZIlCzRnhVuqMyxVID2CdWClyn7wh_5EOIAmXAh5T7ipd53b5uLlZ_sMrzbbIPdRXdL_sCKY0IqYTh9M-rHukyKXKDMBmyqRXOHjLtpMDKvouKXmtXUaGN6P8cpRZTtDN7y5JfeJddWH2ibNZBMBL0ZFlHK8GWpoRgGtclN516FzASBR3WoBOPb1sifZ1ik7YmZuREb2OnJ0GucQ4PFERydLE-rU0_DCZpORxd_CfxLhKZABXaxQvcW-e9z4kq3lgMM5FBRHhu6O7keBnDxLAnxxSTz8Ttq5uTg0TSl6GjdyqZq362XgrTcJZ4UX7zJf138_VV--E8up3APRlNUOO57hwk99BwtPji7tviE9iQTVH6CNVLwQP-ydcgP1DOYoAsE2zK0Zi_e4oBDL9udzKtwYoI8vHTf5UzGgmZ9p1-70xFYXFNERN-6qYqqhXm0kbaQiLCh4OV4oipXvHBM3i454UiAYw1uRwoypAKXsmFZ9FEPOedRExvD1y4X5dBEY0WMC_DGz7Wl-wNaKco0aBD27Z_Ec8zCAi9BSAEvsx61mezfm8C1c4zdfj43keT1f7wcaP1wkVpQXBuLXwQKUxGh6NrXEJ7s5fSrvPdoH1s4gsQfFp8UGehy8i0e67X24OeXEav8x1X4V5GdKLrssuPfK9cpEUSJmzAYKSk01f_2UxDgqKkGd5uP7gmYIrNiy7wNATa3OqoQwEA-ZOiOcOzi78hjQhK9FEyyLaVhIgZH4JNfZwAvlqnbrfQZYmBFxwATGuSQjLEdTpUiy8BEp_8sMP8cVKU4e52KXieUalrp8sGxR1HnvySQx4xY_SiJD1MfFXtVs5vAh_o7w-JdAHZJLHoegA2rIPqu5tl5mArRblDVvlgbF6HBWrEbwOk_BG0DqT34ZD8M1ojfDJE=w1255-h738" width="600"/>
     </div> 
 </div>
-##   
 
 #### 레인보우식스 시즈
 <div style="display:flex"> <!--레인보우 식스 시즈 -->
@@ -49,8 +45,6 @@
         <img src="https://lh3.googleusercontent.com/fife/AAbDypBnT-F_5jS-t3b3USfj5gIEX_fVs6i7T1eV-wHrjLqKQjtD-NuEQbjHG-iEr3hKDFgZdbXsEAos0RY--JhYdl5fsVLs_gh2qPhgVquFzUF85KRYySMS6AKLKtMZz-hn5z2jypN7ACphey0S2yqrQP_5sqjd-waTGzxR7XNzWN5XQXrsivEoMVDe7L0CB-sd-HEK0hYdFUlm8zFjMC3wjpqXqVAqagyA53m41iwYH9hfh4RjKls5jYNMmnMOCJdgc1lFwRhpDSwnTiMXhItXKCLar3uR3gK3jG8C30bpU69GMomdFFtgv9w4rev8xy4h5nmy-8pK89Svj0HxZB5xK54qtxSQB8bRmwN8K1OMFB8QpWK1tS3gitdWPh_p8xTF7UI8w0_XxPn5CHcn8BR-dCf7q9FSgl8pA3iIyv8wW8j9XW-Mjc1lIvdtbRwFYO_TmQDgOWvf24sDXN4e6TjJ1wfM2wVG3UURHp1jyNxj6D-KexdqdwhQGANUmVobFZiC2HaSb4Y-i1ZbL6y4IOFW3r9fia_WrJr2i0KTAOvTaluJqkm2NMcyXB21bexqxcG6amJTEgjlikChsaDYRtNGOUC-RfgaAe2_bHJCyk6lYzdpXtB0gyEx8mo3ybdW1bJWjkvAR7ANt2EJ9X8iwRcUJ8mehJnWgyIBMZwnUDl_0IBne32lIXyxO-yaT_ytCJDJgJ30m3-UYr8xJxt6ld1IjkMpeqQZbaaTdgv7o2mCVqeaNgmt9OvzhK4PniW2P1Po0Mj5rKTF8ApUhWIDHJhwfh7tS6JTUyqXy7oUQ7z0lbytPqXXxgsmWwpYQu-_CNHvEPBDUQ39Miwr8bkYnhyp5LnwLdQiYcnqfho9AbsyU8KslfNvTAvUBeJv2tsjLrFuFV76rf1burpYKSG5l9n1-894O8TLIWRv2a3M97fdjhT1HFxBCjq39ZUEPyNPosNxn137-KxjPqTFtJT0SX6IY-VMGUjr--sSTJyRmB_b4jRHp2UN39-ZslpQxeDHX6QecGJ7OKjQ2KTXVrLgzhn8764cc8ksywAAjUlt63yJp2B-r3czDDMUSGUz91NPFQe7mlmQCBFoqanZnn1GHsQRyNIWOiYElnNH_cOyeor681BiTopVgEteqhwv0QA0UThNbi0CIhTJLJwiPHgL9nTgqJOwbo1IWSKTPRusM30XOwXGKZ0AeC7_JEXGGrCrxgfm9JF9IHj8thvczGGQW3Mcx5h47FwNCirE3dqSwidhpyA13D25Qk0TX2Yj7r0imdzxYzziKvEEeuwdx1jTdTa9QKoFL_EQ1mv4s8KUyCCTyrZvB3sZUmseN8YheEr8xBR-572VQTkxEtO59cNX4tksS0gRqsxCszEffDXEvae3elv6g-iYSaK4oXUiF2pmvW44Ez2HHjbXAZHyDYYxSFEieCR_8ByuNadGDA6FfFxwZIWujG9AkjEW34nEhS5-vFM9yBh-7RaoisjG_WpTBGg2xKrjBLg9p18JzpS8ojCKxi24I4nPZd1m2K7OK7E=w1255-h738" width="600"/>
     </div> 
 </div>
-
-## 
 
 #### 이스케이프 프롬 타르코프
 <div style="display:flex"> <!-- 타르코프 -->
