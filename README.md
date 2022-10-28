@@ -22,14 +22,11 @@
       
 ### 영상
 ---    
-#### 배틀필드
- 
-    
-    
+#### 배틀필드    
 <div style="display:flex"> <!--배틀필드 -->
     <!-- 원본 -->
     <div style="flex:1;padding-right:10px;">
-      <img src="https://lh3.googleusercontent.com/fife/AAbDypDmLzi_a1TvWshqUtXOSvw8ZOXlKxRy4yoIr_zJxklyO6Kug1I2Uhir4VKzQnED_om3B7z_d0WLUoEM3Haw3q7GDPH9CtnUVOA3IT1RVS2ubPUS0N9GjAPStSY5cTfaww3R8aworwNimRm-wzvHtnA6D3IwH8Lwz-SnrpYbj2CyJ2QWC-JVotbTLhS-lHA9FmBBM63pUbpWRvNYFwLeK4ymxwcfPET5LIpT962F4Aq0YONs7Ybetakw8lMPHwALZQDFkoGjBoPcwzVSIS29At-oPDFp0ro0WOhw-EecPCWOyF6q6tNXqMSzkXnBB3dUCa3p-vwYylyu61gFOhfqOAYQ6k_H7xdTzYiCLrM0LywVEmO1TGQLQibbVifCuQjtJSpB6Sjk1fvD5fbWpTTMt2ApmM_rqud48LYJFWNnln_-jkIHELJ8NznSrPg7erg5_-FbRbAPvnjcyUR5DPis02lvB-sb4utzLY0_14Nm2b1gaF9yYeGPrIfOew7rcIDHieGFu1I_aEN4bGhWjSDA3FPrcDjHT-ugq5r73ZmQA9OILy8xA5qPlMkcM4wfGUpZfGjuJzQDuXq2h_W6i8Qdx9naz16zYm1FrctgscfVqwN8hJHaiArBKAtnm0AAJewn41VlKQhi49B89VqG0kAXcE1KrNnGxgQue5IB0smdMUkHQya1iOWgbcr4hDFs9l3PD4hgj2I-HladjjE7XwHEfpFadJvu0xJqIjGE461zJLnA-qs6AJDNTE_u1AyOFjLluvUZMd9LoIweij72oR02MY5-UoFt4GfXudk5ghNAoCAmDPWIAKdus4aCJ4Ewrf88Z9ODCYhoEGxXASc0_MLMbSe7dGjdIk-8pOEJ4LEHymreVXFtzQ3GxwbRRsLMMSCTVITRLltFD8F3gadt7I0uH5vzPcyzyEv48BZCXeaMUbuv-j4wWAl2SEWgsc0ufKVCRA6eLWx0jZfdJLPzb1wFf5CbVmwxMG1ENoDIkzI6jAhrPtIAM3Pnb5PgDB3vbDDRbxPJrjAPVxApGlwAMQXwhHfPNVf8FtbsJVhbaJL4rZaAl0T0Pafi4ZN4FzdhCHgEedOM6Suu7Bqn3GucpyKW88NgKQjFp7iA05tliVDcZ-2nKlyOqoknVZ1iu4fdoHgso-EKxk2cyX4qw7KXNCbxOw5cdSY0-U0FR03qr17eer3NltlqCDTsxCd4NAkGGjGdkKQgmtzfMqg0GGyutiMvpHlx2n8WZpSBA7VxmAHxLxA_4Apm9-PwbJfc3yT0wibi8Zr1QWrTFLtC92QdH6Ib2DeDUsF1v7VAjAhI6m0e3M8UP-rLVHjItCI2P2G7LE5c4zmggQZiBDOUaQcdOLSpzNj2znrbCEOngCLTV3xGvyZd74ewfZeVljv16SEcH1WqTYjApZmc4Jv0dOkIMYYBnxvMmk-fTurIhrIXZXmDyt2zNU5aP6JKZVhBqUSI7RDIvkjKPNJ57ea7duIjEFZE5FGd-luLC_2NSMHok8_1PtvK1tjXOQ5tJVHtRXk=w518-h738" width="600"/>
+      <img src="https://drive.google.com/uc?export=view&id=1nsRe2RYn21QhJRpyaOew34hlI6FnhERx" width="600"/>
     </div>
     <!-- 구현 -->
     <div style="flex:1;padding-left:10px;">
