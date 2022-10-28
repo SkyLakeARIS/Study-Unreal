@@ -4,8 +4,6 @@
 현재 정상적으로 실행되는 코드는 main branch에서 확인할 수 있습니다.     
 그 외, 간간히 작업한 코드는 dev branch에 올리고 있습니다.                  
          
-##    
-     
  ### 설명     
  ---
  언리얼 엔진을 사용한 FPS 트레이닝 게임입니다.    
@@ -36,7 +34,6 @@
       <img src="https://lh3.googleusercontent.com/fife/AAbDypDbE9O7-l_i1UiUIhRb2DNXNGThV0wTFENf4f8QsMBhlPxsABXy-m0FEtQ20izoEFAtE3AemiKbPa90xCTMxhor71Tl_UqfSPyVEb0BqDZnI4irkjAlSaigt3Xpfs69BuU40sbudtI2Mh4Ve2EDJ_SKRYsGmghhPMidlyK-9ZwMQzdwGTo5g9-rB4LQThBW7Rw2Pu5xHq4CWAAZO7ld5n50gacKXe3iF-pDwUxMWRILUjvXXVIX12QqjTL_h36f6rmVaT0HnMUCr_aVUbbGRMM93uegNizQd9AHidvas1v6nIb5mgAc-2cJWpMoENNNeNwQEUfGZnfYswGISfo4T8p6Yot41qktHZDH9QAw2Zzv29F4D53KJjk8CoYh4C9Q2Aq197W_pe_0-WLTFwTX9dD7ErWNdVpB-7L_6LSB_ZkhePWuOr0PGvd66R9mzW7ZhrFrS2trDEUG3QDv9UQ2GNCaWvOhaw5thUwIaoE43gjV1ZXU7F9foZeiLyqXyCzxeOTxhyKXn4VKBWZAj5wl8Mk2ik7mboJnaDlczvHNfa0Y2BJ0QZLNnShRuFF9vl5WGz-wNi1t-r4Dbkj3UxEWspih2SaZaqe7V66EnOHBdBZIlCzRnhVuqMyxVID2CdWClyn7wh_5EOIAmXAh5T7ipd53b5uLlZ_sMrzbbIPdRXdL_sCKY0IqYTh9M-rHukyKXKDMBmyqRXOHjLtpMDKvouKXmtXUaGN6P8cpRZTtDN7y5JfeJddWH2ibNZBMBL0ZFlHK8GWpoRgGtclN516FzASBR3WoBOPb1sifZ1ik7YmZuREb2OnJ0GucQ4PFERydLE-rU0_DCZpORxd_CfxLhKZABXaxQvcW-e9z4kq3lgMM5FBRHhu6O7keBnDxLAnxxSTz8Ttq5uTg0TSl6GjdyqZq362XgrTcJZ4UX7zJf138_VV--E8up3APRlNUOO57hwk99BwtPji7tviE9iQTVH6CNVLwQP-ydcgP1DOYoAsE2zK0Zi_e4oBDL9udzKtwYoI8vHTf5UzGgmZ9p1-70xFYXFNERN-6qYqqhXm0kbaQiLCh4OV4oipXvHBM3i454UiAYw1uRwoypAKXsmFZ9FEPOedRExvD1y4X5dBEY0WMC_DGz7Wl-wNaKco0aBD27Z_Ec8zCAi9BSAEvsx61mezfm8C1c4zdfj43keT1f7wcaP1wkVpQXBuLXwQKUxGh6NrXEJ7s5fSrvPdoH1s4gsQfFp8UGehy8i0e67X24OeXEav8x1X4V5GdKLrssuPfK9cpEUSJmzAYKSk01f_2UxDgqKkGd5uP7gmYIrNiy7wNATa3OqoQwEA-ZOiOcOzi78hjQhK9FEyyLaVhIgZH4JNfZwAvlqnbrfQZYmBFxwATGuSQjLEdTpUiy8BEp_8sMP8cVKU4e52KXieUalrp8sGxR1HnvySQx4xY_SiJD1MfFXtVs5vAh_o7w-JdAHZJLHoegA2rIPqu5tl5mArRblDVvlgbF6HBWrEbwOk_BG0DqT34ZD8M1ojfDJE=w1255-h738" width="600"/>
     </div> 
 </div>
-##   
 
 #### 레인보우식스 시즈
 <div style="display:flex"> <!--레인보우 식스 시즈 -->
