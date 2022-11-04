@@ -3,7 +3,7 @@
     <table>
 	    <tr>
     	    <td style="padding:10px">
-        	    <img src="https://github.com/SkyLakeARIS/shooting-range/blob/main/gifs/shooting-range_summary.gif" width="900"/>
+        	    <img src="https://github.com/SkyLakeARIS/shooting-range/blob/dev/gifs/shooting-range_summary.gif" width="900"/>
       	  </td>
         </tr>
     </table>
