@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerController.h"
 #include "SRPlayerController.generated.h"
 
+class ASRTargetManager;
 class ASRPlayerState;
 class UUISelectModesWidget;
 class UUIResultWidget;
@@ -15,7 +16,7 @@ class UUIPauseWidget;
  * 플레이어 캐릭터 컨트롤러 클래스입니다.
  */
 UCLASS()
-class VERSION_API ASRPlayerController : public APlayerController
+class VERSION_API ASRPlayerController final : public APlayerController
 {
 	GENERATED_BODY()
 
@@ -32,12 +33,15 @@ public:
 	void ChangeInputMode(const bool bIsGameMode);
 	void CreateUIWidgets();
 
+	void UpdateTargetPositionFrom(ASRTargetManager& targetManager);
+	void CalcTargetIndicatorAndShow();
+
 	/*
 	 *  set data to character
 	 */
 	void SetMouseSensitivityAndUpdateToCharacter(const FMouseSensitivity newSetting);
-	void SetAimingTypeToCharacter(const EAimingType newSetting);
-	void InitCharacterMouseAndAimingSetting(const EScopeType scopeType) const;
+	void SetAimingTypeToCharacter(const eAimingType newSetting);
+	void InitCharacterMouseAndAimingSetting(const eScopeType scopeType) const;
 
 	/*
 	 *  getter
@@ -57,6 +61,7 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 
+	void initTargetIndicator();
 protected:
 	/*
 	 *  ui
@@ -81,7 +86,34 @@ protected:
 	UPROPERTY()
 	UUIHUDWidget* mHUDWidget;
 
+	UPROPERTY()
+	TSubclassOf<UUserWidget> mTargetIndicateLine1440Class;		// 화면 크기에 따라서 수평선 위젯을 다르게 불러오기 위함. (비율 문제로 인해서.)
+	UPROPERTY()
+	TSubclassOf<UUserWidget> mTargetIndicateLine1080Class;
+	UPROPERTY()
+	TSubclassOf<UUserWidget> mTargetIndicateLine900Class;
+	UPROPERTY()
+	TSubclassOf<UUserWidget> mTargetIndicateLine720Class;
+	UPROPERTY()
+	TSubclassOf<UUserWidget> mTargetIndicateLine480Class;
+	UPROPERTY()
+	TSubclassOf<UUserWidget> mTargetIndicateLineOtherSizeClass;
+	UPROPERTY()
+	UUserWidget* mTargetIndicateLineWidget;						// 수평선 위젯
+
+	UPROPERTY()
+	TSubclassOf<UUserWidget> mTargetIndicatorClass;
+	UPROPERTY()
+	UUserWidget* mTargetIndicatorWidget[2];						// 수평선 위젯 위에서 방향을 표시해 줄 위젯
+
+
 private:
+
+	TArray<FVector, TFixedAllocator<8>> mSpawnedTargetList;
+
+	int32 mViewportX;
+	int32 mViewportY;
+	float mIndicatorScale;
 	/*
 	 *  class
 	 */
@@ -98,5 +130,5 @@ private:
 	 *  input data
 	 */
 	FMouseSensitivity mMouseSetting;
-	EAimingType mAimingType;
+	eAimingType mAimingType;
 };

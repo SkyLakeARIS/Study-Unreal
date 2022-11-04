@@ -4,10 +4,13 @@
 #include "SRInGameSetting.h"
 #include "SRPlayerCharacter.h"
 #include "SRPlayerState.h"
+#include "SRTargetManager.h"
 #include "UIPauseWidget.h"
 #include "UIHUDWidget.h"
 #include "UIResultWidget.h"
 #include "UISelectModesWidget.h"
+
+#include "Kismet/KismetMathLibrary.h"
 
 ASRPlayerController::ASRPlayerController()
 {
@@ -32,6 +35,49 @@ ASRPlayerController::ASRPlayerController()
 		mSelectModesWidgetClass = UI_SELECTMODES.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_IndicatorLine1440(TEXT("/Game/UI/UI_TargetIndicator_1440.UI_TargetIndicator_1440_C"));
+	if (UI_IndicatorLine1440.Succeeded())
+	{
+		mTargetIndicateLine1440Class = UI_IndicatorLine1440.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_IndicatorLine1080(TEXT("/Game/UI/UI_TargetIndicator_1080.UI_TargetIndicator_1080_C"));
+	if (UI_IndicatorLine1080.Succeeded())
+	{
+		mTargetIndicateLine1080Class = UI_IndicatorLine1080.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_IndicatorLine900(TEXT("/Game/UI/UI_TargetIndicator_900.UI_TargetIndicator_900_C"));
+	if (UI_IndicatorLine900.Succeeded())
+	{
+		mTargetIndicateLine900Class = UI_IndicatorLine900.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_IndicatorLine720(TEXT("/Game/UI/UI_TargetIndicator_720.UI_TargetIndicator_720_C"));
+	if (UI_IndicatorLine720.Succeeded())
+	{
+		mTargetIndicateLine720Class = UI_IndicatorLine720.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_IndicatorLine480(TEXT("/Game/UI/UI_TargetIndicator_480.UI_TargetIndicator_480_C"));
+	if (UI_IndicatorLine480.Succeeded())
+	{
+		mTargetIndicateLine480Class = UI_IndicatorLine480.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_IndicatorLineOtherSize(TEXT("/Game/UI/UI_TargetIndicator_OtherSize.UI_TargetIndicator_OtherSize_C"));
+	if (UI_IndicatorLineOtherSize.Succeeded())
+	{
+		mTargetIndicateLineOtherSizeClass = UI_IndicatorLineOtherSize.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_Indicator(TEXT("/Game/UI/UI_KillMark.UI_KillMark_C"));
+	if (UI_Indicator.Succeeded())
+	{
+		mTargetIndicatorClass = UI_Indicator.Class;
+	}
+
+	mSpawnedTargetList.Reserve(4);
 }
 
 void ASRPlayerController::OnPossess(APawn* InPawn)
@@ -64,9 +110,58 @@ void ASRPlayerController::CreateUIWidgets()
 
 	mPauseWidget = CreateWidget<UUIPauseWidget>(this, mPauseWidgetClass);
 
+	initTargetIndicator();
+
 	mHUDWidget->InitializeWidgets();
 	mHUDWidget->AddToViewport();
 	mHUDWidget->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void ASRPlayerController::UpdateTargetPositionFrom(ASRTargetManager& targetManager)
+{
+	mSpawnedTargetList.Empty();
+
+	mSpawnedTargetList = targetManager.GetSpawnedTargetPositions();
+}
+
+void ASRPlayerController::CalcTargetIndicatorAndShow()
+{
+	auto* const gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	auto* const playerCharacter = Cast<ASRPlayerCharacter>(GetCharacter());
+	ASRTargetManager* const targetManager = gameMode->GetTargetManager();
+
+	// 이동형 표적이면 매 위젯 위치 계산시 타겟의 위치를 업데이트합니다.
+	if(targetManager->IsMovableTargetMode())
+	{
+		UpdateTargetPositionFrom(*targetManager);
+	}
+
+	if(mSpawnedTargetList.Num() <= 0)
+	{
+		return;
+	}
+
+	FVector rightVector = playerCharacter->GetActorRightVector();
+	const FVector characterPosition = playerCharacter->GetActorLocation();
+
+	rightVector.Z = 0;
+	rightVector.Normalize();
+
+	for(size_t i = 0; i < mSpawnedTargetList.Num(); ++i)
+	{
+		// 타겟과 캐릭터의 벡터를 구합니다. 
+		FVector characterToTarget = mSpawnedTargetList[i] - characterPosition;
+		characterToTarget.Z = 0;
+		characterToTarget.Normalize();
+
+		// 내적을 이용하여 cos 값을 구합니다.
+		float angle = FVector::DotProduct(characterToTarget, rightVector)/(characterToTarget.Size2D()*rightVector.Size2D());
+		// cos 값을 통해 각도를 구합니다.
+		float arcCos = FMath::RadiansToDegrees(FMath::Acos(angle));
+
+		mTargetIndicatorWidget[i]->SetPositionInViewport(FVector2D(mViewportX - (arcCos * mIndicatorScale), mViewportY));
+		mTargetIndicatorWidget[i]->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 
@@ -100,7 +195,7 @@ void ASRPlayerController::SetMouseSensitivityAndUpdateToCharacter(const FMouseSe
 	SaveMouseSensitivitySetting();
 }
 
-void ASRPlayerController::SetAimingTypeToCharacter(const EAimingType newSetting)
+void ASRPlayerController::SetAimingTypeToCharacter(const eAimingType newSetting)
 {
 	ASRPlayerCharacter* const playerCharacter = Cast<ASRPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	mAimingType = newSetting;
@@ -114,6 +209,7 @@ void ASRPlayerController::StartGame()
 {
 	ChangeInputMode(true);
 	mHUDWidget->SetVisibility(ESlateVisibility::Visible);
+
 }
 
 void ASRPlayerController::EndGame()
@@ -125,19 +221,19 @@ void ASRPlayerController::EndGame()
 	SetPause(true);
 }
 
-void ASRPlayerController::InitCharacterMouseAndAimingSetting(const EScopeType scopeType) const
+void ASRPlayerController::InitCharacterMouseAndAimingSetting(const eScopeType scopeType) const
 {
 	ASRPlayerCharacter* const playerCharacter = Cast<ASRPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	switch(scopeType)
 	{
-		case EScopeType::Scope1X:
+		case eScopeType::Scope1X:
 			playerCharacter->SetMouseSensitivity(mMouseSetting.HipX, mMouseSetting.HipY, mMouseSetting.Scope1X_X, mMouseSetting.Scope1X_Y);
 			break;
-		case EScopeType::Scope2dot5X:
+		case eScopeType::Scope2dot5X:
 			playerCharacter->SetMouseSensitivity(mMouseSetting.HipX, mMouseSetting.HipY, mMouseSetting.Scope2dot5X_X, mMouseSetting.Scope2dot5X_Y);
 			break;
-		case EScopeType::Scope6X:
+		case eScopeType::Scope6X:
 			playerCharacter->SetMouseSensitivity(mMouseSetting.HipX, mMouseSetting.HipY, mMouseSetting.Scope6X_X, mMouseSetting.Scope6X_Y);
 			break;
 		default:
@@ -161,7 +257,7 @@ void ASRPlayerController::LoadMouseSensitivitySetting()
 	{
 		const FMouseSensitivity initMouseSetting;
 		mMouseSetting = initMouseSetting;
-		mAimingType = EAimingType::Hold;
+		mAimingType = eAimingType::Hold;
 	}
 }
 
@@ -184,8 +280,71 @@ void ASRPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("mSpawnedTargetList capacity = %d"), mSpawnedTargetList.GetAllocatedSize());
+
 
 	ChangeInputMode(false);
+}
+
+void ASRPlayerController::initTargetIndicator()
+{
+	/*
+	 * 타겟 표시기 수평선 위젯에 표시될 위젯을 생성합니다.
+	 */
+	mTargetIndicatorWidget[0] = CreateWidget<UUserWidget>(this, mTargetIndicatorClass);
+	mTargetIndicatorWidget[1] = CreateWidget<UUserWidget>(this, mTargetIndicatorClass);
+
+	mTargetIndicatorWidget[0]->AddToViewport();
+	mTargetIndicatorWidget[1]->AddToViewport();
+
+	mTargetIndicatorWidget[0]->SetVisibility(ESlateVisibility::Hidden);
+	mTargetIndicatorWidget[1]->SetVisibility(ESlateVisibility::Hidden);
+
+	/*
+	 * 화면 크기에 따라서 위젯이 표시될 기준점과 수평선 위젯을 결정합니다.
+	 */
+	int32 sizeX = 0;
+	int32 sizeY = 0;
+	GetViewportSize(sizeX, sizeY);
+	UE_LOG(LogTemp, Warning, TEXT("[initTargetIndicator] viewport size x = %d, size y = %d"), sizeX, sizeY);
+
+	mViewportY = sizeY * 0.92f;
+
+	switch (sizeY)
+	{
+	case 1440:
+		// 테스트할 수 없음. 
+		mViewportX = sizeX * 0.56f;
+		mIndicatorScale = 2.2f;
+		mTargetIndicateLineWidget = CreateWidget<UUserWidget>(this, mTargetIndicateLine1440Class);
+		break;
+	case 1080:
+		mViewportX = sizeX * 0.63f;		// 180|------90|-------0|  0도의 기준점을 정합니다.
+		mIndicatorScale = 2.5f;			// 뷰포트 크기마다 수직선 길이가 다르므로(블루프린트) 스케일을 지정합니다.
+		mTargetIndicateLineWidget = CreateWidget<UUserWidget>(this, mTargetIndicateLine1080Class);
+		break;
+	case 900:
+		mViewportX = sizeX * 0.65f;
+		mIndicatorScale = 1.8f;
+		mTargetIndicateLineWidget = CreateWidget<UUserWidget>(this, mTargetIndicateLine900Class);
+		break;
+	case 720:
+		mViewportX = sizeX * 0.595f;
+		mIndicatorScale = 1.5f;
+		mTargetIndicateLineWidget = CreateWidget<UUserWidget>(this, mTargetIndicateLine720Class);
+		break;
+	case 480:
+		mViewportX = sizeX * 0.58f;
+		mIndicatorScale = 0.8f;
+		mTargetIndicateLineWidget = CreateWidget<UUserWidget>(this, mTargetIndicateLine480Class);
+		break;
+	default: // in editor
+		mViewportX = sizeX * 0.615f;
+		mIndicatorScale = 1.13f;
+		mTargetIndicateLineWidget = CreateWidget<UUserWidget>(this, mTargetIndicateLineOtherSizeClass);
+		break;
+	}
+	mTargetIndicateLineWidget->AddToViewport();
 }
 
 void ASRPlayerController::PauseGame()

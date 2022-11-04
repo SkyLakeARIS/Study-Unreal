@@ -5,7 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "SRTargetManager.generated.h"
 
-enum class EGameModeType : uint8;
+class ASRTargetCharacter;
+enum class eGameModeType : uint8;
 class ASRSpawnPoint;
 
 
@@ -16,7 +17,7 @@ class ASRSpawnPoint;
  */
 
 UCLASS()
-class VERSION_API ASRTargetManager : public AActor
+class VERSION_API ASRTargetManager final : public AActor
 {
 	GENERATED_BODY()
 	
@@ -27,15 +28,25 @@ public:
 	UFUNCTION()
 	void RandomTargetSpawn();
 
-	UFUNCTION()
-	void SetMovableTargetMode(EGameModeType mode);
+	void RemoveTargetFromTargetList(FVector position);
 
+	/*
+	 *  setter
+	 */
+	UFUNCTION()
+	void SetMovableTargetMode(eGameModeType mode);
 	UFUNCTION()
 	void SetTargetType(bool isCharacter);
 
-	EGameModeType GetGameModeType() const;
+	/*
+	 *  getter
+	 */
+	TArray<FVector, TFixedAllocator<8>> GetSpawnedTargetPositions() const;
+	eGameModeType GetGameModeType() const;
+	bool IsMovableTargetMode() const;
 
 protected:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -43,19 +54,18 @@ private:
 	UPROPERTY()
 	TArray<AActor*> mSpawnPointList;
 
-	UPROPERTY()
-	TArray<ASRSpawnPoint*> mMovableSpawnPointList;
+	/*
+	 *  target lists
+	 */
+	TArray<ASRSpawnPoint*, TFixedAllocator<64>> mPlateSpawnPointList;
+	TArray<ASRSpawnPoint*, TFixedAllocator<64>> mCharacterSpawnPointList;
 
-	UPROPERTY()
-	TArray<ASRSpawnPoint*> mPlateSpawnPointList;
+	/*
+	 *  spawned target (for indicator)
+	 */
+	TArray<ASRTargetCharacter*, TFixedAllocator<8>> mSpawnedTargetList;
 
-	UPROPERTY()
-	TArray<ASRSpawnPoint*> mCharacterSpawnPointList;
-
-	UPROPERTY()
-	TArray<class ASRTargetCharacter*> mSpawnedTargetList;
-
-	EGameModeType mGameModeType;
+	eGameModeType mGameModeType;
 
 	bool mbMovableTargetMode;
 	bool mbIsCharacterType;
