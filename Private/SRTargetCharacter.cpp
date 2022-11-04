@@ -193,6 +193,7 @@ void ASRTargetCharacter::ActiveTarget()
 void ASRTargetCharacter::BindTargetManager(ASRTargetManager* targetManager)
 {
 	mOnTargetDown.AddUObject(targetManager, &ASRTargetManager::RandomTargetSpawn);
+	mOnRemoveFromSpawndTartgetList.BindUObject(targetManager, &ASRTargetManager::RemoveTargetFromTargetList);
 }
 
 void ASRTargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
@@ -206,15 +207,14 @@ void ASRTargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
  *	타겟이 다운되면 true, 그렇지 않으면 false를 반환합니다.
  *	타겟은 다운시 타겟매니저에게 알립니다.
  */
-bool ASRTargetCharacter::OnHit(int32 damage, int32* outScore)
+bool ASRTargetCharacter::OnHit(int32 damage, int32& outScore)
 {
-	checkf(outScore != nullptr, TEXT("ASRTargetCharacter-OnHit scoreOut이 null입니다."));
 	checkf(damage > 0, TEXT("ASRTargetCharacter-OnHit damage가 0이하 입니다."));
 
 	if(mHP > MIN_HP)
 	{
 		mHP -= damage;
-		*outScore = HIT_SCORE;
+		outScore = HIT_SCORE;
 	}
 
 	if (!mbIsCharacterType)
@@ -224,7 +224,7 @@ bool ASRTargetCharacter::OnHit(int32 damage, int32* outScore)
 
 	if(mHP <= MIN_HP)
 	{
-		*outScore = KILL_SCORE;
+		outScore = KILL_SCORE;
 
 		if(mbIsCharacterType)
 		{
@@ -246,7 +246,8 @@ bool ASRTargetCharacter::OnHit(int32 damage, int32* outScore)
 		changeCollisionEnabled(ECollisionEnabled::NoCollision);
 
 		mOnTargetDown.Broadcast();
-		
+		mOnRemoveFromSpawndTartgetList.Execute(GetActorLocation());
+
 		SetLifeSpan(3.0f);
 		if(mbIsMovable)
 		{
@@ -258,7 +259,7 @@ bool ASRTargetCharacter::OnHit(int32 damage, int32* outScore)
 	return false;
 }
 
-void ASRTargetCharacter::initializeMovement(FVector endLocation, float speedFactor)
+void ASRTargetCharacter::SetMovement(FVector endLocation, float speedFactor)
 {
 	checkf(speedFactor >= 1.0f, TEXT("ASRTargetCharacter - SetEndLocation : speedFactor는 1.0f이상이어야 합니다."));
 

@@ -167,7 +167,7 @@ void UUIPauseWidget::onChangeScope6X_Y(const FText& InText, ETextCommit::Type In
 
 void UUIPauseWidget::onHoldClicked()
 {
-	mAimingType = EAimingType::Hold;
+	mAimingType = eAimingType::Hold;
 
 	updateAimSetting();
 
@@ -179,7 +179,7 @@ void UUIPauseWidget::onHoldClicked()
 
 void UUIPauseWidget::onToggleClicked()
 {
-	mAimingType =  EAimingType::Toggle;
+	mAimingType =  eAimingType::Toggle;
 	updateAimSetting();
 
 	mBtnHold->SetIsEnabled(true);
@@ -239,7 +239,7 @@ void UUIPauseWidget::UpdateInfoWhenOpen()
 	mScope6X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_X)));
 	mScope6X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_Y)));
 
-	if (mAimingType == EAimingType::Toggle)
+	if (mAimingType == eAimingType::Toggle)
 	{
 		mBtnToggle->SetIsEnabled(false);
 	}

@@ -82,11 +82,11 @@ void ASRPlayerState::OnAddHeadshotCount()
 }
 
 // UI->character 게임 데이터가 세팅되면 데이터를 받아서 초기화합니다.
-void ASRPlayerState::Initialize(EWeaponType weapon, EGameType game, EGameModeType mode, UUIHUDWidget* HUD)
+void ASRPlayerState::Initialize(eWeaponType weapon, eGameType game, eGameModeType mode, UUIHUDWidget* HUD)
 {
-	checkf(weapon != EWeaponType::NONE, TEXT("EWeaponType이 none입니다."));
-	checkf(game != EGameType::NONE, TEXT("EGameType이 none입니다."));
-	checkf(mode != EGameModeType::None, TEXT("EGameModeType이 none입니다."));
+	checkf(weapon != eWeaponType::NONE, TEXT("EWeaponType이 none입니다."));
+	checkf(game != eGameType::NONE, TEXT("EGameType이 none입니다."));
+	checkf(mode != eGameModeType::None, TEXT("EGameModeType이 none입니다."));
 
 	mWeaponType = weapon;
 	mGameType = game;

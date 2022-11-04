@@ -23,7 +23,7 @@ DECLARE_DELEGATE_OneParam(FOnHitmark, EHitType)
 
 
 class ASRPlayerController;
-enum class EWeaponType : uint8;
+enum class eWeaponType : uint8;
 class USphereComponent;
 class UProjectileMovementComponent;
 
@@ -54,7 +54,7 @@ public:
 	void BindHUDWidget(UUIHUDWidget* hud);
 
 	UFUNCTION()
-	void SetBulletType(EWeaponType gunType);
+	void SetBulletType(eWeaponType gunType);
 
 	void SetStartLocation(FVector location);
 
@@ -96,7 +96,7 @@ private:
 	FOnUpdateScore mOnUpdateScore;
 	FOnUpdateKill mOnUpdateKill;
 	FOnUpdateHeatshotCount mOnUpdateHeadshotCount;
-	EWeaponType mBulletType;
+	eWeaponType mBulletType;
 	EHitType mHitType;
 	int32 mBulletDamage;
 	bool mbIsCollision;

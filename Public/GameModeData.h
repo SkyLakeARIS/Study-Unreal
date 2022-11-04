@@ -5,14 +5,14 @@
 #endif
 
 UENUM(BlueprintType)
-enum class EWaeponFireMode : uint8
+enum class eWaeponFireMode : uint8
 {
 	SINGLE_FIRE,
 	BURST_FIRE,
 	FULL_AUTO
 };
 
-enum EWeaponMagSize
+enum eWeaponMagSize
 {
 	AR = 30,
 	HG = 15,
@@ -20,7 +20,7 @@ enum EWeaponMagSize
 };
 
 UENUM(BlueprintType)
-enum class EWeaponType : uint8
+enum class eWeaponType : uint8
 {
 	NONE,
 	AR,
@@ -29,7 +29,7 @@ enum class EWeaponType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EScopeType : uint8
+enum class eScopeType : uint8
 {
 	NONE,
 	Scope1X,
@@ -38,7 +38,7 @@ enum class EScopeType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EGameType : uint8
+enum class eGameType : uint8
 {
 	NONE,
 	Battlefield,
@@ -48,7 +48,7 @@ enum class EGameType : uint8
 
 
 UENUM(BlueprintType)
-enum class EAimingType : uint8
+enum class eAimingType : uint8
 {
 	Hold,
 	Toggle
@@ -62,16 +62,16 @@ struct FGameModeData
 	//GENERATED_BODY()
 	FGameModeData()
 	{
-		weapon = EWeaponType::NONE;
-		scope = EScopeType::NONE;
-		game = EGameType::NONE;
+		weapon = eWeaponType::NONE;
+		scope = eScopeType::NONE;
+		game = eGameType::NONE;
 	}
 	UPROPERTY(EditAnywhere)
-	EWeaponType weapon;
+	eWeaponType weapon;
 	UPROPERTY(EditAnywhere)
-	EScopeType scope;
+	eScopeType scope;
 	UPROPERTY(EditAnywhere)
-	EGameType game;
+	eGameType game;
 };
 
 USTRUCT()
@@ -133,7 +133,7 @@ struct FMouseSensitivity
 };
 
 UENUM(BlueprintType)
-enum class EGameModeType : uint8
+enum class eGameModeType : uint8
 {
 	None,
 	Static_ShortRange,

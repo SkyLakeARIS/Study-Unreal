@@ -12,7 +12,7 @@ class UButton;
  *	플레이어가 획득한 점수, 전적에 대한 정보를 표시합니다.
  */
 UCLASS()
-class VERSION_API UUIResultWidget : public UUserWidget
+class VERSION_API UUIResultWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 public:

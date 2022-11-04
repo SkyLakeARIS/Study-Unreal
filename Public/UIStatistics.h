@@ -10,7 +10,7 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class VERSION_API UUIStatistics : public UUserWidget
+class VERSION_API UUIStatistics final : public UUserWidget
 {
 	GENERATED_BODY()
 public:
@@ -21,8 +21,6 @@ public:
 	void UpdateStatistics();
 
 private:
-	//UPROPERTY()
-	//USRStatistics* mStatistics;
 
 	// ar stats
 	UPROPERTY()

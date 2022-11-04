@@ -32,7 +32,7 @@ ASRPlayerCharacter::ASRPlayerCharacter()
 	mBehaviorFlag = CLEAR_STATE;
 	//mbIsPlayingAnimation = false;
 	// 조준 방식
-	mAimingType = EAimingType::Hold;
+	mAimingType = eAimingType::Hold;
 }
 
 void ASRPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -89,17 +89,17 @@ void ASRPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAxis("LookUp", this, &ASRPlayerCharacter::LookUpAtRate);
 }
 
-EWeaponType ASRPlayerCharacter::GetWeaponType() const
+eWeaponType ASRPlayerCharacter::GetWeaponType() const
 {
 	return mWeaponType;
 }
 
-EScopeType ASRPlayerCharacter::GetScopeType() const
+eScopeType ASRPlayerCharacter::GetScopeType() const
 {
 	return mScopeType;
 }
 
-EGameType ASRPlayerCharacter::GetGameType() const
+eGameType ASRPlayerCharacter::GetGameType() const
 {
 	return mGameType;
 }
@@ -109,7 +109,7 @@ ASRWeapon* ASRPlayerCharacter::GetWeapon() const
 	return mWeapon;
 }
 
-EAimingType ASRPlayerCharacter::GetAimingType() const
+eAimingType ASRPlayerCharacter::GetAimingType() const
 {
 	return mAimingType;
 }
@@ -127,7 +127,7 @@ void ASRPlayerCharacter::InitDataFromGameMode(const FGameModeData modeData)
 
 	mOnCrossHairVisibility.BindUObject(gameMode->GetHUDWidget(), &UUIHUDWidget::SetCrosshairVisibility);
 
-	if(mGameType != EGameType::Tarkov && mWeaponType != EWeaponType::SR)
+	if(mGameType != eGameType::Tarkov && mWeaponType != eWeaponType::SR)
 	{
 		mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
 	}
@@ -144,7 +144,7 @@ void ASRPlayerCharacter::InitDataFromGameMode(const FGameModeData modeData)
 /*
  *  조준 방식을 변경합니다. (hold, toggle)
  */
-void ASRPlayerCharacter::SetAimingType(const EAimingType newSetting)
+void ASRPlayerCharacter::SetAimingType(const eAimingType newSetting)
 {
 	mAimingType = newSetting;
 }
@@ -187,7 +187,7 @@ void ASRPlayerCharacter::Reload()
 	mWeapon->Reload();
 
 	mFirstPersonCameraComponent->SetFieldOfView(90.0f);
-	if(!(mWeaponType == EWeaponType::SR || mGameType == EGameType::Tarkov))
+	if(!(mWeaponType == eWeaponType::SR || mGameType == eGameType::Tarkov))
 	{
 		mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
 	}
@@ -233,7 +233,7 @@ void ASRPlayerCharacter::StartFire()
 void ASRPlayerCharacter::StopFire()
 {
 	// BurstFire 중이면 점사가 끝나지 않았으므로 무시합니다.
-	if(mWeapon->GetFireMode() == EWaeponFireMode::BURST_FIRE && !mWeapon->IsBurstShot())
+	if(mWeapon->GetFireMode() == eWaeponFireMode::BURST_FIRE && !mWeapon->IsBurstShot())
 	{
 		return;
 	}
@@ -253,7 +253,7 @@ void ASRPlayerCharacter::SetAim()
 		// (재장전은 문제없음.)
 		// 그럼 볼트액션 애니메이션 재생시에 boltaction 상태 플래그랑 같이 이부분도 조준 상태가 해제되도록 계획.
 
-		if (mWeaponType == EWeaponType::SR && (mBehaviorFlag & AIMING) && mAimingType == EAimingType::Toggle)
+		if (mWeaponType == eWeaponType::SR && (mBehaviorFlag & AIMING) && mAimingType == eAimingType::Toggle)
 		{
 			UnsetBehaviorFlag(AIMING);
 			mAnimInstance->UnsetAim();
@@ -267,13 +267,13 @@ void ASRPlayerCharacter::SetAim()
 		return;
 	}
 
-	if (mAimingType == EAimingType::Toggle)
+	if (mAimingType == eAimingType::Toggle)
 	{
 		if(mBehaviorFlag & AIMING)
 		{
 			UnsetBehaviorFlag(AIMING);
 			mAnimInstance->UnsetAim();
-			if (mScopeType != EScopeType::Scope1X && mGameType != EGameType::Tarkov)
+			if (mScopeType != eScopeType::Scope1X && mGameType != eGameType::Tarkov)
 			{
 				mFirstPersonCameraComponent->SetFieldOfView(90.0f);
 			}
@@ -284,13 +284,13 @@ void ASRPlayerCharacter::SetAim()
 			SetBehaviorFlag(AIMING);
 			mAnimInstance->SetAim();
 
-			if (mGameType != EGameType::Tarkov)
+			if (mGameType != eGameType::Tarkov)
 			{
-				if (mScopeType == EScopeType::Scope2dot5X)
+				if (mScopeType == eScopeType::Scope2dot5X)
 				{
 					mFirstPersonCameraComponent->SetFieldOfView(55.0f);
 				}
-				else if (mScopeType == EScopeType::Scope6X)
+				else if (mScopeType == eScopeType::Scope6X)
 				{
 					mFirstPersonCameraComponent->SetFieldOfView(45.0f);
 				}
@@ -298,7 +298,7 @@ void ASRPlayerCharacter::SetAim()
 		}
 
 		const ESlateVisibility visibility = (mBehaviorFlag & AIMING) ? ESlateVisibility::Hidden : ESlateVisibility::Visible;
-		if (mGameType != EGameType::Tarkov && mWeaponType != EWeaponType::SR)
+		if (mGameType != eGameType::Tarkov && mWeaponType != eWeaponType::SR)
 		{
 			mOnCrossHairVisibility.Execute(visibility);
 		}
@@ -309,13 +309,13 @@ void ASRPlayerCharacter::SetAim()
 		mAnimInstance->SetAim();
 		mOnCrossHairVisibility.Execute(ESlateVisibility::Hidden);
 
-		if (mGameType != EGameType::Tarkov)
+		if (mGameType != eGameType::Tarkov)
 		{
-			if (mScopeType == EScopeType::Scope2dot5X)
+			if (mScopeType == eScopeType::Scope2dot5X)
 			{
 				mFirstPersonCameraComponent->SetFieldOfView(55.0f);
 			}
-			else if (mScopeType == EScopeType::Scope6X)
+			else if (mScopeType == eScopeType::Scope6X)
 			{
 				mFirstPersonCameraComponent->SetFieldOfView(45.0f);
 			}
@@ -327,7 +327,7 @@ void ASRPlayerCharacter::SetAim()
 void ASRPlayerCharacter::SetHip()
 {
 	// hold의 경우. toggle방식은 SetAim함수에서 전부 처리되었습니다.
-	if (mAimingType != EAimingType::Hold)
+	if (mAimingType != eAimingType::Hold)
 	{
 		return;
 	}
@@ -336,7 +336,7 @@ void ASRPlayerCharacter::SetHip()
 
 	mFirstPersonCameraComponent->SetFieldOfView(90.0f);
 
-	if(mGameType != EGameType::Tarkov && mWeaponType != EWeaponType::SR)
+	if(mGameType != eGameType::Tarkov && mWeaponType != eWeaponType::SR)
 	{
 		mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
 	}
@@ -368,6 +368,8 @@ void ASRPlayerCharacter::TurnAtRate(float Rate)
 	{
 		AddControllerYawInput(Rate * mHipYawSensitivity* GetWorld()->GetDeltaSeconds());
 	}
+
+	mPlayerController->CalcTargetIndicatorAndShow();
 }
 
 void ASRPlayerCharacter::LookUpAtRate(float Rate)

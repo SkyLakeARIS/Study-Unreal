@@ -76,7 +76,7 @@ void USRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		SetLeftHandIK();
 	}
 
-	if (PlayerCharacter->GetGameType() != EGameType::Tarkov)
+	if (PlayerCharacter->GetGameType() != eGameType::Tarkov)
 	{
 		RecoilTick(DeltaSeconds);
 	}
@@ -124,23 +124,23 @@ void USRAnimInstance::SetSightTransform()
 	SightTransform = UKismetMathLibrary::MakeRelativeTransform(camTransform, meshTransform);
 
 	float adsDistance = 20.0f;
-	if(PlayerCharacter->GetWeaponType() != EWeaponType::HG)
+	if(PlayerCharacter->GetWeaponType() != eWeaponType::HG)
 	{
 
-		if (PlayerCharacter->GetGameType() == EGameType::Tarkov)
+		if (PlayerCharacter->GetGameType() == eGameType::Tarkov)
 		{
-			if (PlayerCharacter->GetScopeType() == EScopeType::Scope2dot5X)
+			if (PlayerCharacter->GetScopeType() == eScopeType::Scope2dot5X)
 			{
 				adsDistance = 5.0f;
 			}
-			else if (PlayerCharacter->GetScopeType() == EScopeType::Scope6X)
+			else if (PlayerCharacter->GetScopeType() == eScopeType::Scope6X)
 			{
 				adsDistance = 8.0f;
 			}
 		}
 		else
 		{
-			if (PlayerCharacter->GetScopeType() == EScopeType::Scope1X)
+			if (PlayerCharacter->GetScopeType() == eScopeType::Scope1X)
 			{
 				adsDistance = 15.0f;
 			}
@@ -295,9 +295,9 @@ void USRAnimInstance::recoveryTimerFunction()
 	mbRecoilRecovery = false;
 }
 
-void USRAnimInstance::calcRecoilFactor(EGameType gameType)
+void USRAnimInstance::calcRecoilFactor(eGameType gameType)
 {
-	const float PitchLimit = (gameType == EGameType::Battlefield) ? 13.0f : 20.0f;
+	const float PitchLimit = (gameType == eGameType::Battlefield) ? 13.0f : 20.0f;
 	const float YawLimit = 10.0f;
 
 	float pitchFactor = 0.0f;
@@ -306,16 +306,16 @@ void USRAnimInstance::calcRecoilFactor(EGameType gameType)
 
 	if (PlayerCharacter->GetBehaviorFlag() & AIMING)
 	{
-		pitchFactor = (gameType == EGameType::Battlefield) ? 0.04f : 0.15f;
-		leftRecoil = (gameType == EGameType::Battlefield) ? -0.07f : -0.08f;
-		rightRecoil = (gameType == EGameType::Battlefield) ? 0.10f : 0.12f;
+		pitchFactor = (gameType == eGameType::Battlefield) ? 0.04f : 0.15f;
+		leftRecoil = (gameType == eGameType::Battlefield) ? -0.07f : -0.08f;
+		rightRecoil = (gameType == eGameType::Battlefield) ? 0.10f : 0.12f;
 
 	}
 	else
 	{
-		pitchFactor = (gameType == EGameType::Battlefield) ? 0.04f : 0.12f;
-		leftRecoil = (gameType == EGameType::Battlefield) ? -0.07f : -0.14f;
-		rightRecoil = (gameType == EGameType::Battlefield) ? 0.20f : 0.20f;
+		pitchFactor = (gameType == eGameType::Battlefield) ? 0.04f : 0.12f;
+		leftRecoil = (gameType == eGameType::Battlefield) ? -0.07f : -0.14f;
+		rightRecoil = (gameType == eGameType::Battlefield) ? 0.20f : 0.20f;
 	}
 
 	mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? pitchFactor : 0.0f;
@@ -338,7 +338,7 @@ void USRAnimInstance::Fire()
 
 	switch(PlayerCharacter->GetWeaponType())
 	{
-		case EWeaponType::AR:
+		case eWeaponType::AR:
 		{
 			
 			if (PlayerCharacter->GetBehaviorFlag() & AIMING)
@@ -357,7 +357,7 @@ void USRAnimInstance::Fire()
 			}
 			break;
 		}
-		case EWeaponType::HG:
+		case eWeaponType::HG:
 		{
 			if (PlayerCharacter->GetBehaviorFlag() & AIMING)
 			{
@@ -371,7 +371,7 @@ void USRAnimInstance::Fire()
 			}
 			break;
 		}
-		case EWeaponType::SR:
+		case eWeaponType::SR:
 		{
 			if (PlayerCharacter->GetBehaviorFlag() & AIMING)
 			{
@@ -412,8 +412,8 @@ void USRAnimInstance::RecoilStart()
 
 void USRAnimInstance::RecoilTick(float DeltaTime)
 {
-	const EGameType gameType = PlayerCharacter->GetGameType();
-	if (gameType == EGameType::Tarkov)
+	const eGameType gameType = PlayerCharacter->GetGameType();
+	if (gameType == eGameType::Tarkov)
 	{
 		return;
 	}

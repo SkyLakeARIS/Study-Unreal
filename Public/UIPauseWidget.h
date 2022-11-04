@@ -5,8 +5,8 @@
 #include "Blueprint/UserWidget.h"
 #include "UIPauseWidget.generated.h"
 
-enum class EScopeType : uint8;
-enum class EAimingType : uint8;
+enum class eScopeType : uint8;
+enum class eAimingType : uint8;
 class UCheckBox;
 class UEditableText;
 class UTextBlock;
@@ -20,7 +20,7 @@ class UButton;
  */
 
 UCLASS()
-class VERSION_API UUIPauseWidget : public UUserWidget
+class VERSION_API UUIPauseWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -111,7 +111,7 @@ protected:
 	UCheckBox* mDebugMode;
 
 	FMouseSensitivity mMouseSetting;
-	EAimingType mAimingType;
+	eAimingType mAimingType;
 	bool mbCheckDebugMode;
 
 

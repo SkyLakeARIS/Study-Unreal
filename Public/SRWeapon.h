@@ -19,7 +19,7 @@ class UUIHUDWidget;
  * 통해서 적절한 데이터를 반환합니다.
  */
 UCLASS()
-class VERSION_API ASRWeapon : public AActor
+class VERSION_API ASRWeapon final : public AActor
 {
 	GENERATED_BODY()
 	
@@ -50,7 +50,7 @@ public:
 	 *  setter
 	 */
 
-	void Initialize(EGameType gameType, EScopeType scopeType, EWeaponType weaponType, ASRPlayerCharacter* const owner);
+	void Initialize(eGameType gameType, eScopeType scopeType, eWeaponType weaponType, ASRPlayerCharacter* const owner);
 
 	/*
 	 *  getter
@@ -59,7 +59,7 @@ public:
 	USkeletalMeshComponent* GetGun()  const { return mWeapon; }
 	UFUNCTION(BlueprintPure)
 	UChildActorComponent* GetScope() const { return mScope; }
-	EWaeponFireMode GetFireMode() const;
+	eWaeponFireMode GetFireMode() const;
 	int32 GetRemainAmmo() const;
 	bool IsBurstShot() const;
 
@@ -156,15 +156,15 @@ private:
 	int32 mCurrentBurst;
 
 	const int FIRE_SWITCH_MODE = 3;
-	EWaeponFireMode mFireMode;
+	eWaeponFireMode mFireMode;
 	int32 mFireModeOffset;
 
 	/*
 	 *  game mode info
 	 */
-	EGameType mGameType;
-	EScopeType mScopeType;
-	EWeaponType mWeaponType;
+	eGameType mGameType;
+	eScopeType mScopeType;
+	eWeaponType mWeaponType;
 };
 
 

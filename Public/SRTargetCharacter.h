@@ -5,6 +5,7 @@
 #include "SRTargetCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnTargetDown)
+DECLARE_DELEGATE_OneParam(FOnRemoveFromSpawnedTargetList, FVector);
 
 enum class EMovableAxis : uint8;
 class ASRTargetManager;
@@ -16,7 +17,7 @@ class ASRTargetManager;
  */
 
 UCLASS()
-class VERSION_API ASRTargetCharacter : public ACharacter
+class VERSION_API ASRTargetCharacter final : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -36,10 +37,10 @@ public:
 	void BindTargetManager(ASRTargetManager* targetManager);
 
 	void BindSpawnPoint(class ASRSpawnPoint* spawnPoint);
+	
+	bool OnHit(int32 damage, int32& outScore);
 
-	bool OnHit(int32 damage, int32* outScore);
-
-	void initializeMovement(FVector endLocation, float speedFactor);
+	void SetMovement(FVector endLocation, float speedFactor);
 
 protected:
 
@@ -62,15 +63,13 @@ protected:
 	UPROPERTY()
 	USkeletalMesh* mCharacterMesh;
 
+	// animations
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterStandPoseAnimation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterCrouchPoseAnimation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterStandDeadAnimation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterCrouchDeadAnimation;
 
@@ -78,18 +77,17 @@ protected:
 	UPROPERTY()
 	USkeletalMesh* mPlateMesh;
 
+	// animations
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	UAnimSequence* mPlateDownAnimation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	UAnimSequence* mPlateUpAnimation;
 
+	// sounds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	USoundBase* mPlateDownSound;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	USoundBase* mPlateUpSound;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	USoundBase* mPlateHitSound;
 
@@ -115,6 +113,7 @@ private:
 	bool mbIsCrouching;
 
 	FOnTargetDown mOnTargetDown;
+	FOnRemoveFromSpawnedTargetList mOnRemoveFromSpawndTartgetList;
 };
 
 

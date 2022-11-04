@@ -4,6 +4,13 @@
 #include "GameFramework/GameModeBase.h"
 #include "VersionGameMode.generated.h"
 
+/*
+ *
+ *                   x                  
+ *
+ *
+ */
+
 UCLASS(minimalapi)
 class AVersionGameMode : public AGameModeBase
 {

@@ -8,7 +8,7 @@
  * 적당한 속도의 탄입니다.
  */
 UCLASS()
-class VERSION_API ASRRifleBullet : public ASRProjectile
+class VERSION_API ASRRifleBullet final : public ASRProjectile
 {
 	GENERATED_BODY()
 	

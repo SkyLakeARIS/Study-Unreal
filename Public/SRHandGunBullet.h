@@ -9,7 +9,7 @@
  */
 
 UCLASS()
-class VERSION_API ASRHandGunBullet : public ASRProjectile
+class VERSION_API ASRHandGunBullet final : public ASRProjectile
 {
 	GENERATED_BODY()
 	

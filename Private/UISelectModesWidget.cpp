@@ -48,7 +48,7 @@ void UUISelectModesWidget::clickedAR()
 	mBtnAR->SetIsEnabled(false);
 	mBtnHG->SetIsEnabled(true);
 	mBtnSR->SetIsEnabled(true);
-	mSelectedModes.weapon = EWeaponType::AR;
+	mSelectedModes.weapon = eWeaponType::AR;
 
 	// AR의 경우에는 모든 조준경을 장착할 수 있음.
 	mBtn2Dot5X->SetIsEnabled(true);
@@ -71,8 +71,8 @@ void UUISelectModesWidget::clickedHG()
 	mBtn2Dot5X->SetIsEnabled(false);
 	mBtn6X->SetIsEnabled(false);
 
-	mSelectedModes.weapon = EWeaponType::HG;
-	mSelectedModes.scope = EScopeType::Scope1X;
+	mSelectedModes.weapon = eWeaponType::HG;
+	mSelectedModes.scope = eScopeType::Scope1X;
 
 	mSelectionFlag |= WEAPON_SELECT_BIT;
 	mSelectionFlag |= OPTIC_SELECT_BIT;
@@ -83,7 +83,7 @@ void UUISelectModesWidget::clickedSR()
 	mBtnAR->SetIsEnabled(true);
 	mBtnHG->SetIsEnabled(true);
 	mBtnSR->SetIsEnabled(false);
-	mSelectedModes.weapon = EWeaponType::SR;
+	mSelectedModes.weapon = eWeaponType::SR;
 
 	// SR의 경우에는 모든 조준경을 장착할 수 있음.
 	mBtn2Dot5X->SetIsEnabled(true);
@@ -97,7 +97,7 @@ void UUISelectModesWidget::clicked1X()
 	mBtn1X->SetIsEnabled(false);
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(true);
-	mSelectedModes.scope = EScopeType::Scope1X;
+	mSelectedModes.scope = eScopeType::Scope1X;
 
 	mSelectionFlag |= OPTIC_SELECT_BIT;
 }
@@ -107,7 +107,7 @@ void UUISelectModesWidget::clicked2Dot5X()
 	mBtn1X->SetIsEnabled(true);
 	mBtn2Dot5X->SetIsEnabled(false);
 	mBtn6X->SetIsEnabled(true);
-	mSelectedModes.scope = EScopeType::Scope2dot5X;
+	mSelectedModes.scope = eScopeType::Scope2dot5X;
 
 	mSelectionFlag |= OPTIC_SELECT_BIT;
 }
@@ -117,7 +117,7 @@ void UUISelectModesWidget::clicked6X()
 	mBtn1X->SetIsEnabled(true);
 	mBtn2Dot5X->SetIsEnabled(true);
 	mBtn6X->SetIsEnabled(false);
-	mSelectedModes.scope = EScopeType::Scope6X;
+	mSelectedModes.scope = eScopeType::Scope6X;
 
 	mSelectionFlag |= OPTIC_SELECT_BIT;
 }
@@ -127,7 +127,7 @@ void UUISelectModesWidget::clickedBattlefield()
 	mBtnBattlefield->SetIsEnabled(false);
 	mBtnRainbowSix->SetIsEnabled(true);
 	mBtnTarkov->SetIsEnabled(true);
-	mSelectedModes.game = EGameType::Battlefield;
+	mSelectedModes.game = eGameType::Battlefield;
 
 	mSelectionFlag |= GAMEMODE_SELECT_BIT;
 }
@@ -137,7 +137,7 @@ void UUISelectModesWidget::clickedRainbowSix()
 	mBtnBattlefield->SetIsEnabled(true);
 	mBtnRainbowSix->SetIsEnabled(false);
 	mBtnTarkov->SetIsEnabled(true);
-	mSelectedModes.game = EGameType::RainbowSix;
+	mSelectedModes.game = eGameType::RainbowSix;
 
 	mSelectionFlag |= GAMEMODE_SELECT_BIT;
 }
@@ -147,7 +147,7 @@ void UUISelectModesWidget::clickedTarkov()
 	mBtnBattlefield->SetIsEnabled(true);
 	mBtnRainbowSix->SetIsEnabled(true);
 	mBtnTarkov->SetIsEnabled(false);
-	mSelectedModes.game = EGameType::Tarkov;
+	mSelectedModes.game = eGameType::Tarkov;
 
 	mSelectionFlag |= GAMEMODE_SELECT_BIT;
 }

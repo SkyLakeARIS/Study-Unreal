@@ -57,44 +57,44 @@ void UUIStatistics::UpdateStatistics()
 		USRStatistics::LoadStats();
 	}
 
-	FWeaponStatistics weapon = USRStatistics::GetWeaponStats(EWeaponType::AR);
+	FWeaponStatistics weapon = USRStatistics::GetWeaponStats(eWeaponType::AR);
 
 	mARFireshots->SetText(FText::FromString(FString(std::to_string(weapon.FireShots).c_str())));
 	mARHits->SetText(FText::FromString(FString(std::to_string(weapon.Hits).c_str())));
-	mARAccuracy->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetAccuracy(EWeaponType::AR)).c_str() + FString("%"))));
+	mARAccuracy->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetAccuracy(eWeaponType::AR)).c_str() + FString("%"))));
 	mARHeadshots->SetText(FText::FromString(FString(std::to_string(weapon.Headshots).c_str())));
-	mARHeadshotRate->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetHeadshotRate(EWeaponType::AR)).c_str()) + FString("%")));
+	mARHeadshotRate->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetHeadshotRate(eWeaponType::AR)).c_str()) + FString("%")));
 	mARKills->SetText(FText::FromString(FString(std::to_string(weapon.Kills).c_str())));
 	mARSelected->SetText(FText::FromString(FString(std::to_string(weapon.Selected).c_str())));
 
-	weapon = USRStatistics::GetWeaponStats(EWeaponType::HG);
+	weapon = USRStatistics::GetWeaponStats(eWeaponType::HG);
 
 	mHGFireshots->SetText(FText::FromString(FString(std::to_string(weapon.FireShots).c_str())));
 	mHGHits->SetText(FText::FromString(FString(std::to_string(weapon.Hits).c_str())));
-	mHGAccuracy->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetAccuracy(EWeaponType::HG)).c_str() + FString("%"))));
+	mHGAccuracy->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetAccuracy(eWeaponType::HG)).c_str() + FString("%"))));
 	mHGHeadshots->SetText(FText::FromString(FString(std::to_string(weapon.Headshots).c_str())));
-	mHGHeadshotRate->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetHeadshotRate(EWeaponType::HG)).c_str()) + FString("%")));
+	mHGHeadshotRate->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetHeadshotRate(eWeaponType::HG)).c_str()) + FString("%")));
 	mHGKills->SetText(FText::FromString(FString(std::to_string(weapon.Kills).c_str())));
 	mHGSelected->SetText(FText::FromString(FString(std::to_string(weapon.Selected).c_str())));
 
-	weapon = USRStatistics::GetWeaponStats(EWeaponType::SR);
+	weapon = USRStatistics::GetWeaponStats(eWeaponType::SR);
 
 	mSRFireshots->SetText(FText::FromString(FString(std::to_string(weapon.FireShots).c_str())));
 	mSRHits->SetText(FText::FromString(FString(std::to_string(weapon.Hits).c_str())));
-	mSRAccuracy->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetAccuracy(EWeaponType::SR)).c_str() + FString("%"))));
+	mSRAccuracy->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetAccuracy(eWeaponType::SR)).c_str() + FString("%"))));
 	mSRHeadshots->SetText(FText::FromString(FString(std::to_string(weapon.Headshots).c_str())));
-	mSRHeadshotRate->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetHeadshotRate(EWeaponType::SR)).c_str()) + FString("%")));
+	mSRHeadshotRate->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetHeadshotRate(eWeaponType::SR)).c_str()) + FString("%")));
 	mSRKills->SetText(FText::FromString(FString(std::to_string(weapon.Kills).c_str())));
 	mSRSelected->SetText(FText::FromString(FString(std::to_string(weapon.Selected).c_str())));
 
-	mSelectedBattlefield->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetGameStats(EGameType::Battlefield)).c_str())));
-	mSelectedRainbowSix->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetGameStats(EGameType::RainbowSix)).c_str())));
-	mSelectedEscapeFromTarkov->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetGameStats(EGameType::Tarkov)).c_str())));
+	mSelectedBattlefield->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetGameStats(eGameType::Battlefield)).c_str())));
+	mSelectedRainbowSix->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetGameStats(eGameType::RainbowSix)).c_str())));
+	mSelectedEscapeFromTarkov->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetGameStats(eGameType::Tarkov)).c_str())));
 
-	mStaticShortRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(EGameModeType::Static_ShortRange)).c_str())));
-	mStaticMidRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(EGameModeType::Static_MidRange)).c_str())));
-	mStaticLongRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(EGameModeType::Static_LongRange)).c_str())));
-	mMovableShortRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(EGameModeType::Movable_ShortRange)).c_str())));
-	mMovableMidRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(EGameModeType::Movable_MidRange)).c_str())));
-	mMovableLongRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(EGameModeType::Movable_LongRange)).c_str())));
+	mStaticShortRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(eGameModeType::Static_ShortRange)).c_str())));
+	mStaticMidRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(eGameModeType::Static_MidRange)).c_str())));
+	mStaticLongRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(eGameModeType::Static_LongRange)).c_str())));
+	mMovableShortRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(eGameModeType::Movable_ShortRange)).c_str())));
+	mMovableMidRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(eGameModeType::Movable_MidRange)).c_str())));
+	mMovableLongRangeScore->SetText(FText::FromString(FString(std::to_string(USRStatistics::GetScoresStats(eGameModeType::Movable_LongRange)).c_str())));
 }

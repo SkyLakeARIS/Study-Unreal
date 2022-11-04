@@ -92,17 +92,17 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 	const FWeaponDamage damageTable;
 	switch(mBulletType)
 	{
-		case EWeaponType::AR:
+		case eWeaponType::AR:
 			mBulletDamage = FMath::Clamp(damageTable.AR - static_cast<int32>(distanceToHitPoint / 5000.0f), damageTable.AR_Min, damageTable.AR);
 			break;
-		case EWeaponType::SR:
+		case eWeaponType::SR:
 			mBulletDamage = FMath::Clamp(damageTable.SR - static_cast<int32>(distanceToHitPoint / 5000.0f), damageTable.SR_Min, damageTable.SR);
 			break;
-		case EWeaponType::HG:
+		case eWeaponType::HG:
 			mBulletDamage = FMath::Clamp(damageTable.HG - static_cast<int32>(distanceToHitPoint / 5000.0f), damageTable.HG_Min, damageTable.HG);
 			break;
 		default:
-			checkf(false, TEXT("ASRProjectile - OnHit - EWeaponType 올바르지 않은 enum 타입입니다."));
+			checkf(false, TEXT("ASRProjectile - OnHit - eWeaponType 올바르지 않은 enum 타입입니다."));
 			break;
 	}
 
@@ -116,7 +116,7 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 
 	int32 getScore = 0;
 	const auto targetCharacter = Cast<ASRTargetCharacter>(Hit.GetActor());
-	const bool bIsKill = targetCharacter->OnHit(mBulletDamage, &getScore);
+	const bool bIsKill = targetCharacter->OnHit(mBulletDamage, getScore);
 
 	getScore = mbIsHeadshot ? getScore * 1.5f : getScore;
 	mOnHitAndUpdateAcc.Execute();
@@ -124,7 +124,7 @@ void ASRProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 	if(bIsKill)
 	{
 		// 저격총의 경우에 타겟을 쓰러트렸을 때 거리에 따른 추가 점수를 얻습니다.
-		if(mBulletType == EWeaponType::SR)
+		if(mBulletType == eWeaponType::SR)
 		{
 			getScore += static_cast<int32>(distanceToHitPoint);
 		}
@@ -161,7 +161,7 @@ void ASRProjectile::BindHUDWidget(UUIHUDWidget* hud)
 /*
  * 발사된 총알의 타입을 무기타입으로부터 정하는 함수입니다.
  */
-void ASRProjectile::SetBulletType(EWeaponType gunType)
+void ASRProjectile::SetBulletType(eWeaponType gunType)
 {
 	mBulletType = gunType;
 }

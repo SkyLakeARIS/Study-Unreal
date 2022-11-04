@@ -11,7 +11,7 @@
  * 슬롯이름과 번호는 고정되어 있습니다.
  */
 UCLASS()
-class VERSION_API USRInGameSetting : public USaveGame
+class VERSION_API USRInGameSetting final : public USaveGame
 {
 	GENERATED_BODY()
 public:
@@ -27,7 +27,7 @@ public:
 	FMouseSensitivity MouseSensitivity;
 
 	UPROPERTY()
-	EAimingType AimingType;
+	eAimingType AimingType;
 
 private:
 	FString mSlotName;

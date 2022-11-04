@@ -17,7 +17,7 @@ ASRGameMode::ASRGameMode()
 	PlayerControllerClass = ASRPlayerController::StaticClass();
 	PlayerStateClass = ASRPlayerState::StaticClass();
 
-	mGameModeType = EGameModeType::None;
+	mGameModeType = eGameModeType::None;
 
 	enum{TIME_TO_READY = 5, TIME_GAMEPLAY = 90};
 	mReadyTime = TIME_TO_READY;
@@ -53,7 +53,7 @@ void ASRGameMode::PostLogin(APlayerController* NewPlayer)
 void ASRGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	checkf(mGameModeType != EGameModeType::None, TEXT("ASRGameMode : BeginPlay - EGameModeType None 타입이 될 수 없습니다."));
+	checkf(mGameModeType != eGameModeType::None, TEXT("ASRGameMode : BeginPlay - eGameModeType None 타입이 될 수 없습니다."));
 
 	mTargetManager = GetWorld()->SpawnActor<ASRTargetManager>(ASRTargetManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
@@ -81,7 +81,7 @@ void ASRGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(mTimer);
 }
 
-EScopeType ASRGameMode::GetScopeType() const
+eScopeType ASRGameMode::GetScopeType() const
 {
 	return mModeData.scope;
 }
@@ -94,6 +94,11 @@ UUIHUDWidget* ASRGameMode::GetHUDWidget() const
 ASRPlayerState* ASRGameMode::GetPlayerState() const
 {
 	return mPlayerState;
+}
+
+ASRTargetManager* ASRGameMode::GetTargetManager() const
+{
+	return mTargetManager;
 }
 
 void ASRGameMode::SetDebugMode(bool isActive)
@@ -158,13 +163,13 @@ void ASRGameMode::SetGameModeData(FGameModeData& modeData, bool isCharacterType)
 	FString gameModeString;
 	switch(mModeData.game)
 	{
-		case EGameType::Battlefield:
+		case eGameType::Battlefield:
 			gameModeString = TEXT("Battlefield Mode");
 			break;
-		case EGameType::RainbowSix:
+		case eGameType::RainbowSix:
 			gameModeString = TEXT("RainbowSix Mode");
 			break;
-		case EGameType::Tarkov:
+		case eGameType::Tarkov:
 			gameModeString = TEXT("EscapeFromTarkov Mode");
 			break;
 	}

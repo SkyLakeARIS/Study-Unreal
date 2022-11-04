@@ -15,7 +15,7 @@ class ASRPlayerState;
  *	블루프린트로 상속하여 구현합니다.
  */
 UCLASS(BlueprintType, Blueprintable)
-class VERSION_API ASRGameMode : public AGameModeBase
+class VERSION_API ASRGameMode final : public AGameModeBase
 {
 	GENERATED_BODY()
 
@@ -26,19 +26,14 @@ public:
 	void PauseGame();
 	void ResumeGame();
 
-	virtual void PostLogin(APlayerController* NewPlayer) override;
-	virtual void BeginPlay() override;
-	virtual void StartPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 	/*
 	 *  getter
 	 */
-	EScopeType GetScopeType() const;
+	eScopeType GetScopeType() const;
 	UUIHUDWidget* GetHUDWidget() const;
 	ASRPlayerState* GetPlayerState() const;
+	ASRTargetManager* GetTargetManager() const;
 	bool IsDebugMode() const;
-
 	/*
 	 *  setter
 	 */
@@ -47,6 +42,10 @@ public:
 	void SetDebugMode(bool isActive);
 
 private:
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void BeginPlay() override;
+	virtual void StartPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void countdownReadyGameTimer();
 	void countdownMainGameTimer();
@@ -73,7 +72,7 @@ protected:
 	 *  game info data
 	 */
 	UPROPERTY(BlueprintReadWrite)
-	EGameModeType mGameModeType;
+	eGameModeType mGameModeType;
 private:
 	/*
 	 *  timer

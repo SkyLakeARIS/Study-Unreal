@@ -129,32 +129,32 @@ ASRWeaponData::ASRWeaponData()
 	}
 }
 
-USkeletalMesh* ASRWeaponData::GetWeapon(EWeaponType weapon) const
+USkeletalMesh* ASRWeaponData::GetWeapon(eWeaponType weapon) const
 {
 	switch (weapon)
 	{
-	case EWeaponType::AR:
+	case eWeaponType::AR:
 		return mM4;
-	case EWeaponType::HG:
+	case eWeaponType::HG:
 		return mHandGun;
-	case EWeaponType::SR:
+	case eWeaponType::SR:
 		return mM24;
 	default:
-		checkf(false, TEXT("ASRWeaponData-GetWeapon : 잘못된 EWeaponType 타입입니다."));
+		checkf(false, TEXT("ASRWeaponData-GetWeapon : 잘못된 eWeaponType 타입입니다."));
 		break;
 	}
 	return nullptr;
 }
 
-TSubclassOf<AActor> ASRWeaponData::GetScope(EScopeType scope) const
+TSubclassOf<AActor> ASRWeaponData::GetScope(eScopeType scope) const
 {
 	switch (scope)
 	{
-	case EScopeType::Scope1X:
+	case eScopeType::Scope1X:
 		return mScope1XClass;
-	case EScopeType::Scope2dot5X:
+	case eScopeType::Scope2dot5X:
 		return mScope2dot5XClass;
-	case EScopeType::Scope6X:
+	case eScopeType::Scope6X:
 		return mScope6XClass;
 	default:
 		checkf(false, TEXT("SRWeapon : GetScope - 올바르지 않은 enum타입입니다."));
@@ -164,16 +164,16 @@ TSubclassOf<AActor> ASRWeaponData::GetScope(EScopeType scope) const
 	return nullptr;
 }
 
-UChildActorComponent* ASRWeaponData::GetScopeActor(EScopeType scope) const
+UChildActorComponent* ASRWeaponData::GetScopeActor(eScopeType scope) const
 {
 
 	switch (scope)
 	{
-	case EScopeType::Scope1X:
+	case eScopeType::Scope1X:
 		return mScope1X;
-	case EScopeType::Scope2dot5X:
+	case eScopeType::Scope2dot5X:
 		return mScope2dot5X;
-	case EScopeType::Scope6X:
+	case eScopeType::Scope6X:
 		return mScope6X;
 	default:
 		checkf(false, TEXT("SRWeapon : GetScope - 올바르지 않은 enum타입입니다."));
@@ -183,18 +183,18 @@ UChildActorComponent* ASRWeaponData::GetScopeActor(EScopeType scope) const
 }
 
 
-USoundBase* ASRWeaponData::GetFireSound(EWeaponType weapon) const
+USoundBase* ASRWeaponData::GetFireSound(eWeaponType weapon) const
 {
 	switch (weapon)
 	{
-	case EWeaponType::AR:
+	case eWeaponType::AR:
 		return mRifleFireSound;
-	case EWeaponType::HG:
+	case eWeaponType::HG:
 		return mHandGunFireSound;
-	case EWeaponType::SR:
+	case eWeaponType::SR:
 		return mSniperFireSound;
 	default:
-		checkf(false, TEXT("ASRWeaponData-GetFireSound : 잘못된 EWeaponType 타입입니다."));
+		checkf(false, TEXT("ASRWeaponData-GetFireSound : 잘못된 eWeaponType 타입입니다."));
 		break;
 	}
 	return nullptr;
@@ -212,52 +212,52 @@ USoundBase* ASRWeaponData::GetSwtichFireModeSound() const
 	return mSwitchFireModeSound;
 }
 
-TSubclassOf<UAnimInstance> ASRWeaponData::GetCharacterAnimInstance(EWeaponType weapon) const
+TSubclassOf<UAnimInstance> ASRWeaponData::GetCharacterAnimInstance(eWeaponType weapon) const
 {
 	switch (weapon)
 	{
-	case EWeaponType::AR:
+	case eWeaponType::AR:
 		return mCharacterRifleAnimInstance;
-	case EWeaponType::HG:
+	case eWeaponType::HG:
 		return mCharacterHandGunAnimInstance;
-	case EWeaponType::SR:
+	case eWeaponType::SR:
 		return mCharacterSniperAnimInstance;
 	default:
-		checkf(false, TEXT("ASRWeaponData-GetCharacterAnimInstance : 잘못된 EWeaponType 타입입니다."));
+		checkf(false, TEXT("ASRWeaponData-GetCharacterAnimInstance : 잘못된 eWeaponType 타입입니다."));
 		break;
 	}
 	return nullptr;
 }
 
-TSubclassOf<UAnimInstance> ASRWeaponData::GetWeaponAnimInstance(EWeaponType weapon) const
+TSubclassOf<UAnimInstance> ASRWeaponData::GetWeaponAnimInstance(eWeaponType weapon) const
 {
 	switch (weapon)
 	{
-	case EWeaponType::AR:
+	case eWeaponType::AR:
 		return mRifleAnimInstance;
-	case EWeaponType::HG:
+	case eWeaponType::HG:
 		return mHandGunAnimInstance;
-	case EWeaponType::SR:
+	case eWeaponType::SR:
 		return mSniperAnimInstance;
 	default:
-		checkf(false, TEXT("ASRWeaponData-GetWeaponAnimInstance : 잘못된 EWeaponType 타입입니다."));
+		checkf(false, TEXT("ASRWeaponData-GetWeaponAnimInstance : 잘못된 eWeaponType 타입입니다."));
 		break;
 	}
 	return nullptr;
 }
 
-UParticleSystem* ASRWeaponData::GetMuzzleParticles(EWeaponType weapon) const
+UParticleSystem* ASRWeaponData::GetMuzzleParticles(eWeaponType weapon) const
 {
 	switch (weapon)
 	{
-	case EWeaponType::AR:
+	case eWeaponType::AR:
 		return mRifleMuzzleParticles;
-	case EWeaponType::HG:
+	case eWeaponType::HG:
 		return mHandGunMuzzleParticles;
-	case EWeaponType::SR:
+	case eWeaponType::SR:
 		return mSniperMuzzleParticles;
 	default:
-		checkf(false, TEXT("ASRWeaponData-GetWeaponAnimInstance : 잘못된 EWeaponType 타입입니다."));
+		checkf(false, TEXT("ASRWeaponData-GetWeaponAnimInstance : 잘못된 eWeaponType 타입입니다."));
 		break;
 	}
 	return nullptr;

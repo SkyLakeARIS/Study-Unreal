@@ -54,22 +54,22 @@ void UUIHUDWidget::UpdateAccuracy(int32 accuracy)
 	mAccuracy->SetText(FText::FromString(FString::FromInt(accuracy)+FString("%")));
 }
 
-void UUIHUDWidget::UpdateFireMode(EWaeponFireMode newFireMode)
+void UUIHUDWidget::UpdateFireMode(eWaeponFireMode newFireMode)
 {
 	FString displayFireMode;
 	switch(newFireMode)
 	{
-		case EWaeponFireMode::SINGLE_FIRE:
+		case eWaeponFireMode::SINGLE_FIRE:
 			displayFireMode = "Single";
 			break;
-		case EWaeponFireMode::BURST_FIRE:
+		case eWaeponFireMode::BURST_FIRE:
 			displayFireMode = "Burst";
 			break;
-		case EWaeponFireMode::FULL_AUTO:
+		case eWaeponFireMode::FULL_AUTO:
 			displayFireMode = "Full auto";
 			break;
 		default:
-			checkf(false, TEXT("UUIHUDWidget - UpdateFireMode : 올바르지 않은 EWaeponFireMode 타입입니다."));
+			checkf(false, TEXT("UUIHUDWidget - UpdateFireMode : 올바르지 않은 eWaeponFireMode 타입입니다."));
 			break;
 	}
 	mFireMode->SetText(FText::FromString(displayFireMode));
@@ -118,11 +118,11 @@ void UUIHUDWidget::AddHitMarkToViewPort(EHitType hitType)
 
 	mCurrentMark->SetVisibility(ESlateVisibility::Visible);
 
-	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &UUIHUDWidget::HideHitMark, 0.5f, false, -1.0f);
+	GetWorld()->GetTimerManager().SetTimer(mHitMarkTimer, this, &UUIHUDWidget::hideHitMark, 0.5f, false, -1.0f);
 }
 
 // 타이머에 의해 호출되는 히트마크를 지우는 함수입니다.
-void UUIHUDWidget::HideHitMark()
+void UUIHUDWidget::hideHitMark()
 {
 	mCurrentMark->SetVisibility(ESlateVisibility::Hidden);
 
