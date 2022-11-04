@@ -8,10 +8,11 @@
         </tr>
     </table>
 </div>
- 졸업 작품용으로 만들어졌으나, 그냥 버리기는 아까운 면이 있어서 상당수의 코드를 갈아엎었습니다.      
-졸업 작품용은 old branch에서 확인할 수 있습니다.      
-현재 정상적으로 실행되는 코드는 main branch에서 확인할 수 있습니다.     
-그 외, 간간히 작업하고 있는 코드는 dev branch에 올리고 있습니다.                  
+    
+ 졸업 작품용으로 만들어졌으나, 그냥 버리기는 아까운 면이 있어서 상당수의 코드를 갈아엎었습니다.     
+졸업 작품용은 old branch에서 확인할 수 있습니다.    
+현재 정상적으로 실행되는 코드는 main branch에서 확인할 수 있습니다.    
+그 외, 간간히 작업하고 있는 코드는 dev branch에 올리고 있습니다.    
          
  ### 작품 설명     
  ---
@@ -95,7 +96,9 @@
 
 
   ### 참고
-  ---
-시연 영상 : [유튜브](https://youtu.be/zujnafqtzek)       
+  ---     
+작업 기록 : [노션](https://skylakearis.notion.site/shooting-range-de1a42e83c1c4ab2b5650aeaecad6ea2)     
+시연 영상 : [유튜브](https://youtu.be/zujnafqtzek)        
 실행 파일 : [구글 드라이브](https://drive.google.com/file/d/12ix8i4Nq4FSzWUAIyZiHRLR5q88buyeV/view?usp=sharing)      
-발표 자료: [구글 드라이브(11.07일 이후 예정)]()
+실행 파일(졸작) : [구글 드라이브](https://drive.google.com/file/d/17ltXn8je2Ny-4dfKRjk5yN_gmczoCYsO/view?usp=sharing)      
+발표 자료 : [구글 드라이브(11.07일 이후 예정)]()     
