@@ -101,4 +101,3 @@
 시연 영상 : [유튜브](https://youtu.be/zujnafqtzek)        
 실행 파일 : [구글 드라이브](https://drive.google.com/file/d/12ix8i4Nq4FSzWUAIyZiHRLR5q88buyeV/view?usp=sharing)      
 실행 파일(졸작) : [구글 드라이브](https://drive.google.com/file/d/17ltXn8je2Ny-4dfKRjk5yN_gmczoCYsO/view?usp=sharing)      
-발표 자료 : [구글 드라이브(11.07일 이후 예정)]()     
