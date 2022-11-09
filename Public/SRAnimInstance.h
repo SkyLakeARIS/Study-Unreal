@@ -4,12 +4,9 @@
 #include "Animation/AnimInstance.h"
 #include "SRAnimInstance.generated.h"
 
-
-enum class EGameType : uint8;
+enum class eGameType : uint8;
 class UCurveVector;
 class ASRPlayerCharacter;
-
-const uint8 STATE_CLEAR = 0x00;
 
 /*
  *  플레이어 캐릭터 애님인스턴스.
@@ -17,7 +14,7 @@ const uint8 STATE_CLEAR = 0x00;
  *	무기의 반동(sway, recoil)도 계산됩니다.
  */
 UCLASS()
-class VERSION_API USRAnimInstance : public UAnimInstance
+class VERSION_API USRAnimInstance final : public UAnimInstance
 {
 	GENERATED_BODY()
 
@@ -45,7 +42,7 @@ public:
 	void RecoilStart();
 
 	UFUNCTION(BlueprintCallable)
-	void RecoilTick(float DeltaTime);
+	void RecoilTick(const float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
 	void RecoilStop();
@@ -60,17 +57,17 @@ public:
 
 	void SetLeftHandIK();
 
-	void InterpAiming(float DeltaSeconds);
+	void InterpAiming(const float DeltaSeconds);
 
-	void InterpRelativeHand(float DeltaSeconds);
+	void InterpRelativeHand(const float DeltaSeconds);
 
-	void MoveVectorCurve(float DeltaSeconds);
+	void MoveVectorCurve(const float DeltaSeconds);
 
-	void RotateWithRotation(float DeltaSeconds);
+	void RotateWithRotation(const float DeltaSeconds);
 
-	void InterpFinalRecoil(float DeltaSeconds);
+	void InterpFinalRecoil(const float DeltaSeconds);
 
-	void InterpRecoil(float DeltaSeconds);
+	void InterpRecoil(const float DeltaSeconds);
 
 protected:
 
@@ -88,7 +85,7 @@ protected:
 
 private:
 
-	void calcRecoilFactor(EGameType gameType);
+	void calcRecoilFactor(const eGameType gameType);
 
 public:
 

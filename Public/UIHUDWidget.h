@@ -5,7 +5,7 @@
 #include "UIHUDWidget.generated.h"
 
 enum class EHitType : uint8;
-enum class EWaeponFireMode : uint8;
+enum class eWaeponFireMode : uint8;
 class UTextBlock;
 
 
@@ -15,7 +15,7 @@ class UTextBlock;
  */
 
 UCLASS()
-class VERSION_API UUIHUDWidget : public UUserWidget
+class VERSION_API UUIHUDWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 public:
@@ -23,36 +23,31 @@ public:
 	void InitializeWidgets();
 
 	UFUNCTION()
-	void UpdateRemainingTime(int32 remainingTime);
+	void UpdateRemainingTime(const int32 remainingTime);
+	UFUNCTION()
+	void UpdateAmmo(const int32 newAmmo);
+	UFUNCTION()
+	void UpdateAccuracy(const int32 accuracy);
+	UFUNCTION()
+	void UpdateFireMode(const eWaeponFireMode newFireMode);
+	UFUNCTION()
+	void UpdateScore(const int32 score);
+	UFUNCTION()
+	void UpdateGameMode(const FString newGameMode);
 
 	UFUNCTION()
-	void UpdateAmmo(int32 newAmmo);
+	void SetCrosshairVisibility(const ESlateVisibility option);
 
 	UFUNCTION()
-	void UpdateAccuracy(int32 accuracy);
-
-	UFUNCTION()
-	void UpdateFireMode(EWaeponFireMode newFireMode);
-
-	UFUNCTION()
-	void UpdateScore(int32 score);
-
-	UFUNCTION()
-	void UpdateGameMode(FString newGameMode);
-
-	UFUNCTION()
-	void SetCrosshairVisibility(ESlateVisibility option);
-
-	UFUNCTION()
-	void AddHitMarkToViewPort(EHitType hitType);
-
-	void HideHitMark();
-
+	void AddHitMarkToViewPort(const EHitType hitType);
 	void RemoveHitMarkFromViewport();
 
 protected:
 
 	virtual void NativeConstruct() override;
+
+	void hideHitMark();
+
 
 protected:
 

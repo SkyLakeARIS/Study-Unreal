@@ -11,7 +11,7 @@ class UButton;
  *	무기, 조준경, 게임모드 타입, 타겟 타입
  */
 UCLASS()
-class VERSION_API UUISelectModesWidget : public UUserWidget
+class VERSION_API UUISelectModesWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -98,6 +98,4 @@ protected:
 	bool mbIsCharacterType;
 	int8 mSelectionFlag;
 
-
-	//FOnInitGameData mOnGameData;
 };

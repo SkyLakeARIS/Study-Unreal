@@ -5,7 +5,7 @@ USRInGameSetting::USRInGameSetting()
 {
 	mSlotName = TEXT("MouseSetting");
 	mSlotIndex = 0;
-	AimingType = EAimingType::Hold;
+	AimingType = eAimingType::Hold;
 }
 
 FString USRInGameSetting::GetSlotName() const

@@ -3,6 +3,7 @@
 #include "SRPlayerCharacter.h"
 #include "SRPlayerController.h"
 #include "SRPlayerState.h"
+#include "SRProjectile.h"
 #include "SRStatistics.h"
 #include "SRTargetManager.h"
 #include "SRWeapon.h"
@@ -17,7 +18,7 @@ ASRGameMode::ASRGameMode()
 	PlayerControllerClass = ASRPlayerController::StaticClass();
 	PlayerStateClass = ASRPlayerState::StaticClass();
 
-	mGameModeType = EGameModeType::None;
+	mGameModeType = eGameModeType::None;
 
 	enum{TIME_TO_READY = 5, TIME_GAMEPLAY = 90};
 	mReadyTime = TIME_TO_READY;
@@ -34,7 +35,7 @@ void ASRGameMode::SettingGameAndStartGame()
 	auto* const playerCharacter = Cast<ASRPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	playerCharacter->InitDataFromGameMode(mModeData);
 
-	mPlayerState->Initialize(mModeData.weapon, mModeData.game, mGameModeType, mHUD);
+	mPlayerState->Initialize(mModeData.weapon, mModeData.game, mGameModeType, *mHUD);
 
 	mPlayerController->LoadMouseSensitivitySetting();
 	mPlayerController->InitCharacterMouseAndAimingSetting(mModeData.scope);
@@ -53,7 +54,7 @@ void ASRGameMode::PostLogin(APlayerController* NewPlayer)
 void ASRGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	checkf(mGameModeType != EGameModeType::None, TEXT("ASRGameMode : BeginPlay - EGameModeType None 타입이 될 수 없습니다."));
+	checkf(mGameModeType != eGameModeType::None, TEXT("ASRGameMode : BeginPlay - eGameModeType None 타입이 될 수 없습니다."));
 
 	mTargetManager = GetWorld()->SpawnActor<ASRTargetManager>(ASRTargetManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
@@ -81,7 +82,7 @@ void ASRGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(mTimer);
 }
 
-EScopeType ASRGameMode::GetScopeType() const
+eScopeType ASRGameMode::GetScopeType() const
 {
 	return mModeData.scope;
 }
@@ -96,10 +97,16 @@ ASRPlayerState* ASRGameMode::GetPlayerState() const
 	return mPlayerState;
 }
 
-void ASRGameMode::SetDebugMode(bool isActive)
+ASRTargetManager* ASRGameMode::GetTargetManager() const
+{
+	return mTargetManager;
+}
+
+void ASRGameMode::SetDebugMode(const bool isActive)
 {
 	mbDebugMode = isActive;
-	ASRWeapon::bIsDebugMode = isActive;
+	ASRWeapon::bIsDebugMode = mbDebugMode;
+	ASRProjectile::bIsDebugMode = mbDebugMode;
 }
 
 bool ASRGameMode::IsDebugMode() const
@@ -138,7 +145,7 @@ void ASRGameMode::startMainGame()
 	mPlayerState->SetRecordMode(true);
 }
 
-void ASRGameMode::endMainGame()
+void ASRGameMode::endMainGame() const
 {
 	// 한 게임이 끝나면 새로운 스텟을 갱신합니다.
 	mPlayerState->UpdateToStatistics();
@@ -149,7 +156,7 @@ void ASRGameMode::endMainGame()
  * Select 위젯에서 선택한 정보를 받아와 저장하고
  * 타겟 메니저를 세팅합니다.(타겟의 타입)
  */
-void ASRGameMode::SetGameModeData(FGameModeData& modeData, bool isCharacterType)
+void ASRGameMode::SetGameModeData(const FGameModeData& modeData, const bool isCharacterType)
 {
 	mModeData = modeData;
 	// setter니까 set만 하고 startgame setting으로 이동.
@@ -158,26 +165,28 @@ void ASRGameMode::SetGameModeData(FGameModeData& modeData, bool isCharacterType)
 	FString gameModeString;
 	switch(mModeData.game)
 	{
-		case EGameType::Battlefield:
+		case eGameType::Battlefield:
 			gameModeString = TEXT("Battlefield Mode");
 			break;
-		case EGameType::RainbowSix:
+		case eGameType::RainbowSix:
 			gameModeString = TEXT("RainbowSix Mode");
 			break;
-		case EGameType::Tarkov:
+		case eGameType::Tarkov:
 			gameModeString = TEXT("EscapeFromTarkov Mode");
 			break;
+		default:
+			checkf(false, TEXT("mModeData.game 값이 잘못 전달되었습니다."));
 	}
 
 	mHUD->UpdateGameMode(gameModeString);
 }
 
-void ASRGameMode::PauseGame()
+void ASRGameMode::PauseGame() const
 {
 	GetWorld()->GetTimerManager().PauseTimer(mTimer);
 }
 
-void ASRGameMode::ResumeGame()
+void ASRGameMode::ResumeGame() const
 {
 	GetWorld()->GetTimerManager().UnPauseTimer(mTimer);
 }

@@ -7,9 +7,9 @@
 DECLARE_DELEGATE_OneParam(FOnUpdateScore, int32)
 DECLARE_DELEGATE_OneParam(FOnUpdateAccuray, int32)
 
-enum class EGameType : uint8;
-enum class EWeaponType : uint8;
-enum class EGameModeType : uint8;
+enum class eGameType : uint8;
+enum class eWeaponType : uint8;
+enum class eGameModeType : uint8;
 class UUIHUDWidget;
 
 /*
@@ -17,7 +17,7 @@ class UUIHUDWidget;
  * 이 클래스의 정보들이 HUD에 표시됩니다.
  */
 UCLASS()
-class VERSION_API ASRPlayerState : public APlayerState
+class VERSION_API ASRPlayerState final : public APlayerState
 {
 	GENERATED_BODY()
 
@@ -45,9 +45,9 @@ public:
 	/*
 	 *  setter
 	 */
-	void SetRecordMode(bool isRecordable);
+	void SetRecordMode(const bool isRecordable);
 
-	void Initialize(EWeaponType weapon, EGameType game, EGameModeType mode, UUIHUDWidget* HUD);
+	void Initialize(const eWeaponType weapon, const eGameType game, const eGameModeType mode, UUIHUDWidget& HUD);
 
 	/*
 	 *  getter
@@ -86,7 +86,7 @@ private:
 	int32 mAccuracy;		// hud, result ui에서 사용
 	int32 mKills;			// result ui에서 사용.
 	int32 mHeadshotsCount;	// result ui에서 사용.
-	EWeaponType mWeaponType;
+	eWeaponType mWeaponType;
 
 	/*
 	 * score stats
@@ -96,8 +96,8 @@ private:
 	/*
 	 *  game mode data
 	 */
-	EGameModeType mModeType;
-	EGameType mGameType;
+	eGameModeType mModeType;
+	eGameType mGameType;
 
 	/*
 	 *  only record statistics in main game time

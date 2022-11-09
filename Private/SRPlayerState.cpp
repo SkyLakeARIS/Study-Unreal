@@ -38,7 +38,7 @@ void ASRPlayerState::UpdateToStatistics() const
 	USRStatistics::SaveStats();
 }
 
-void ASRPlayerState::OnAddScore(int32 getScore)
+void ASRPlayerState::OnAddScore(const int32 getScore)
 {
 	if(mbRecordable)
 	{
@@ -82,18 +82,18 @@ void ASRPlayerState::OnAddHeadshotCount()
 }
 
 // UI->character 게임 데이터가 세팅되면 데이터를 받아서 초기화합니다.
-void ASRPlayerState::Initialize(EWeaponType weapon, EGameType game, EGameModeType mode, UUIHUDWidget* HUD)
+void ASRPlayerState::Initialize(const eWeaponType weapon, const eGameType game, const eGameModeType mode, UUIHUDWidget& HUD)
 {
-	checkf(weapon != EWeaponType::NONE, TEXT("EWeaponType이 none입니다."));
-	checkf(game != EGameType::NONE, TEXT("EGameType이 none입니다."));
-	checkf(mode != EGameModeType::None, TEXT("EGameModeType이 none입니다."));
+	checkf(weapon != eWeaponType::NONE, TEXT("EWeaponType이 none입니다."));
+	checkf(game != eGameType::NONE, TEXT("EGameType이 none입니다."));
+	checkf(mode != eGameModeType::None, TEXT("EGameModeType이 none입니다."));
 
 	mWeaponType = weapon;
 	mGameType = game;
 	mModeType = mode;
 
-	mOnUpdateScore.BindUObject(HUD, &UUIHUDWidget::UpdateScore);
-	mOnUpdateAccuracy.BindUObject(HUD, &UUIHUDWidget::UpdateAccuracy);
+	mOnUpdateScore.BindUObject(&HUD, &UUIHUDWidget::UpdateScore);
+	mOnUpdateAccuracy.BindUObject(&HUD, &UUIHUDWidget::UpdateAccuracy);
 
 	USRStatistics::LoadStats();
 }
@@ -121,14 +121,14 @@ int32 ASRPlayerState::GetShotsCount() const
 // 헤드샷 수 / 맞춘 수로 계산됩니다. (소숫점은 절삭합니다.)
 int32 ASRPlayerState::GetHeadshotRate() const
 {
-	if(!mHits)
+	if(mHits == 0)
 	{
 		return 0;
 	}
 	return (mHeadshotsCount / (float)(mHits))*100.0f;
 }
 
-void ASRPlayerState::SetRecordMode(bool isRecordable)
+void ASRPlayerState::SetRecordMode(const bool isRecordable)
 {
 	mbRecordable = isRecordable;
 }

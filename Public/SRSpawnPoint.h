@@ -26,7 +26,7 @@ enum class EMovableAxis : uint8
  */
 
 UCLASS()
-class VERSION_API ASRSpawnPoint : public AActor
+class VERSION_API ASRSpawnPoint final : public AActor
 {
 	GENERATED_BODY()
 	

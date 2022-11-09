@@ -10,7 +10,7 @@ class UButton;
  *  맵을 선택하는 UI 클래스입니다.
  */
 UCLASS()
-class VERSION_API USelectWidget : public UUserWidget
+class VERSION_API USelectWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 	

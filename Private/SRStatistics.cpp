@@ -218,18 +218,18 @@ bool USRStatistics::SaveStats()
 	return true;
 }
 
-void USRStatistics::UpdateWeapon(const EWeaponType selectedWeapon, const FWeaponStatistics& stats)
+void USRStatistics::UpdateWeapon(const eWeaponType selectedWeapon, const FWeaponStatistics& stats)
 {
 	mbFail = false;
 	switch (selectedWeapon)
 	{
-		case EWeaponType::AR:
+		case eWeaponType::AR:
 			mAssultRifle += stats;
 			break;
-		case EWeaponType::HG:
+		case eWeaponType::HG:
 			mHandGun += stats;
 			break;
-		case EWeaponType::SR:
+		case eWeaponType::SR:
 			mSniperRifle += stats;
 			break;
 		default:
@@ -239,18 +239,18 @@ void USRStatistics::UpdateWeapon(const EWeaponType selectedWeapon, const FWeapon
 	}
 }
 
-void USRStatistics::UpdateGames(const EGameType selectedGameMode)
+void USRStatistics::UpdateGames(const eGameType selectedGameMode)
 {
 	mbFail = false;
 	switch (selectedGameMode)
 	{
-		case EGameType::Battlefield:
+		case eGameType::Battlefield:
 			mSelectedBattlefield += 1;
 			break;
-		case EGameType::RainbowSix:
+		case eGameType::RainbowSix:
 			mSelectedRainbowSix += 1;
 			break;
-		case EGameType::Tarkov:
+		case eGameType::Tarkov:
 			mSelectedEscapeFromTarkov += 1;
 			break;
 		default:
@@ -260,27 +260,27 @@ void USRStatistics::UpdateGames(const EGameType selectedGameMode)
 	}
 }
 
-void USRStatistics::UpdateScores(EGameModeType modeType, const uint32& score)
+void USRStatistics::UpdateScores(eGameModeType modeType, const uint32& score)
 {
 	mbFail = false;
 	switch (modeType)
 	{
-		case EGameModeType::Static_ShortRange:
+		case eGameModeType::Static_ShortRange:
 			mStaticShortRangeHighScore = (mStaticShortRangeHighScore < score) ? score : mStaticShortRangeHighScore;
 			break;
-		case EGameModeType::Static_MidRange:
+		case eGameModeType::Static_MidRange:
 			mStaticMidRangeHighScore = (mStaticMidRangeHighScore < score) ? score : mStaticMidRangeHighScore;
 			break;
-		case EGameModeType::Static_LongRange:
+		case eGameModeType::Static_LongRange:
 			mStaticLongRangeHighScore = (mStaticLongRangeHighScore < score) ? score : mStaticLongRangeHighScore;
 			break;
-		case EGameModeType::Movable_ShortRange:
+		case eGameModeType::Movable_ShortRange:
 			mMovableShortRangeHighScore = (mMovableShortRangeHighScore < score) ? score : mMovableShortRangeHighScore;
 			break;
-		case EGameModeType::Movable_MidRange:
+		case eGameModeType::Movable_MidRange:
 			mMovableMidRangeHighScore = (mMovableMidRangeHighScore < score) ? score : mMovableMidRangeHighScore;
 			break;
-		case EGameModeType::Movable_LongRange:
+		case eGameModeType::Movable_LongRange:
 			mMovableLongRangeHighScore = (mMovableLongRangeHighScore < score) ? score : mMovableLongRangeHighScore;
 			break;
 		default:
@@ -290,15 +290,15 @@ void USRStatistics::UpdateScores(EGameModeType modeType, const uint32& score)
 	}
 }
 
-FWeaponStatistics USRStatistics::GetWeaponStats(EWeaponType weapon)
+FWeaponStatistics USRStatistics::GetWeaponStats(eWeaponType weapon)
 {
 	switch (weapon)
 	{
-		case EWeaponType::AR:
+		case eWeaponType::AR:
 			return mAssultRifle;
-		case EWeaponType::HG:
+		case eWeaponType::HG:
 			return mHandGun;
-		case EWeaponType::SR:
+		case eWeaponType::SR:
 			return mSniperRifle;
 		default:
 			FWeaponStatistics wrong;
@@ -307,15 +307,15 @@ FWeaponStatistics USRStatistics::GetWeaponStats(EWeaponType weapon)
 	}
 }
 
-uint32 USRStatistics::GetGameStats(EGameType game)
+uint32 USRStatistics::GetGameStats(eGameType game)
 {
 	switch (game)
 	{
-		case EGameType::Battlefield:
+		case eGameType::Battlefield:
 			return mSelectedBattlefield;
-		case EGameType::RainbowSix:
+		case eGameType::RainbowSix:
 			return mSelectedRainbowSix;
-		case EGameType::Tarkov:
+		case eGameType::Tarkov:
 			return mSelectedEscapeFromTarkov;
 		default:
 			checkf(false, TEXT("잘못된 enum타입입니다."));
@@ -323,21 +323,21 @@ uint32 USRStatistics::GetGameStats(EGameType game)
 	}
 }
 
-uint32 USRStatistics::GetScoresStats(EGameModeType mode) 
+uint32 USRStatistics::GetScoresStats(eGameModeType mode) 
 {
 	switch (mode)
 	{
-		case EGameModeType::Static_ShortRange:
+		case eGameModeType::Static_ShortRange:
 			return mStaticShortRangeHighScore;
-		case EGameModeType::Static_MidRange:
+		case eGameModeType::Static_MidRange:
 			return mStaticMidRangeHighScore;
-		case EGameModeType::Static_LongRange:
+		case eGameModeType::Static_LongRange:
 			return mStaticLongRangeHighScore;
-		case EGameModeType::Movable_ShortRange:
+		case eGameModeType::Movable_ShortRange:
 			return mMovableShortRangeHighScore;
-		case EGameModeType::Movable_MidRange:
+		case eGameModeType::Movable_MidRange:
 			return mMovableMidRangeHighScore;
-		case EGameModeType::Movable_LongRange:
+		case eGameModeType::Movable_LongRange:
 			return mMovableLongRangeHighScore;
 		default:
 			checkf(false, TEXT("잘못된 enum타입입니다."));
@@ -345,18 +345,18 @@ uint32 USRStatistics::GetScoresStats(EGameModeType mode)
 	}
 }
 
-uint32 USRStatistics::GetHeadshotRate(EWeaponType weapon) 
+uint32 USRStatistics::GetHeadshotRate(eWeaponType weapon) 
 {
 	const FWeaponStatistics* stats = nullptr;
 	switch (weapon)
 	{
-		case EWeaponType::AR:
+		case eWeaponType::AR:
 			stats = &mAssultRifle;
 			break;
-		case EWeaponType::HG:
+		case eWeaponType::HG:
 			stats = &mHandGun;
 			break;
-		case EWeaponType::SR:
+		case eWeaponType::SR:
 			stats = &mSniperRifle;
 			break;
 		default:
@@ -373,18 +373,18 @@ uint32 USRStatistics::GetHeadshotRate(EWeaponType weapon)
 	return (stats->Headshots / (float)stats->Hits) * 100.0f;
 }
 
-uint32 USRStatistics::GetAccuracy(EWeaponType weapon) 
+uint32 USRStatistics::GetAccuracy(eWeaponType weapon) 
 {
 	const FWeaponStatistics* stats = nullptr;
 	switch (weapon)
 	{
-		case EWeaponType::AR:
+		case eWeaponType::AR:
 			stats = &mAssultRifle;
 			break;
-		case EWeaponType::HG:
+		case eWeaponType::HG:
 			stats = &mHandGun;
 			break;
-		case EWeaponType::SR:
+		case eWeaponType::SR:
 			stats = &mSniperRifle;
 			break;
 		default:

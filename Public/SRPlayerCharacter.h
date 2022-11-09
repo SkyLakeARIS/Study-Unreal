@@ -21,7 +21,6 @@ enum eBehaviorStateFlags : uint8
 };
 const uint8 CLEAR_STATE = 0x00;
 
-
 class ASRPlayerController;
 class ASRWeapon;
 class USRAnimInstance;
@@ -32,7 +31,7 @@ enum class EHitType : uint8;
  */
 
 UCLASS(config=Game)
-class ASRPlayerCharacter : public ACharacter
+class ASRPlayerCharacter final : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -45,7 +44,7 @@ public:
 	UFUNCTION()
 	void InitDataFromGameMode(const FGameModeData modeData);
 
-	void SetAimingType(const EAimingType newSetting);
+	void SetAimingType(const eAimingType newSetting);
 
 	inline void SetBehaviorFlag(const uint8 flag);
 	inline void UnsetBehaviorFlag(const uint8 flag);
@@ -61,15 +60,15 @@ public:
 	UFUNCTION(BlueprintPure)
 	UCameraComponent* GetFirstPersonCameraComponent() const { return mFirstPersonCameraComponent; }
 	UFUNCTION(BlueprintPure)
-	EWeaponType GetWeaponType() const;
+	eWeaponType GetWeaponType() const;
 	UFUNCTION(BlueprintPure)
-	EScopeType GetScopeType() const;
+	eScopeType GetScopeType() const;
 	UFUNCTION(BlueprintPure)
-	EGameType GetGameType() const;
+	eGameType GetGameType() const;
 	UFUNCTION(BlueprintPure)
 	ASRWeapon* GetWeapon() const;
 	UFUNCTION(BlueprintPure)
-	EAimingType GetAimingType() const;
+	eAimingType GetAimingType() const;
 	UFUNCTION(BlueprintPure)
 	int32 GetBehaviorFlag() const;
 	UFUNCTION(BlueprintCallable)
@@ -82,21 +81,22 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 
-	void StartFire();
-	void StopFire();
+	void startFire();
+	void stopFire();
 
-	void Reload();
+	void reload();
 
-	void SwitchFireMode();
+	void switchFireMode();
 
-	void SetAim();
-	void SetHip();
+	void setToggleAim();
+	void setAim();
+	void setHip();
 
-	void MoveForward(float Val);
-	void MoveRight(float Val);
+	void moveForward(const float Val);
+	void moveRight(const float Val);
 
-	void TurnAtRate(float Rate);
-	void LookUpAtRate(float Rate);
+	void turnAtRate(const float Rate);
+	void lookUpAtRate(const float Rate);
 
 protected:
 
@@ -132,14 +132,14 @@ private:
 	float mAimYawSensitivity;
 	float mAimPitchSensitivity;
 
-	EAimingType mAimingType;
+	eAimingType mAimingType;
 
 	/*
 	 *  game setting
 	 */
-	EGameType mGameType;
-	EScopeType mScopeType;
-	EWeaponType mWeaponType;
+	eGameType mGameType;
+	eScopeType mScopeType;
+	eWeaponType mWeaponType;
 };
 
 void ASRPlayerCharacter::SetBehaviorFlag(const uint8 flag)

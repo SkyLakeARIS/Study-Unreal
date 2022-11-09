@@ -8,8 +8,8 @@ ASRHandGunBullet::ASRHandGunBullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	mProjectileMovement->UpdatedComponent = mCollisionComp;
-	mProjectileMovement->InitialSpeed = 55000.f;
-	mProjectileMovement->MaxSpeed = 360000.f;
+	mProjectileMovement->InitialSpeed = 50000.f;
+	mProjectileMovement->MaxSpeed = 100000.f;
 	mProjectileMovement->bRotationFollowsVelocity = false;
 	mProjectileMovement->bShouldBounce = false;
 }

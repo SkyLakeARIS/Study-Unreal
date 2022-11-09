@@ -23,7 +23,7 @@ DECLARE_DELEGATE_OneParam(FOnHitmark, EHitType)
 
 
 class ASRPlayerController;
-enum class EWeaponType : uint8;
+enum class eWeaponType : uint8;
 class USphereComponent;
 class UProjectileMovementComponent;
 
@@ -42,33 +42,26 @@ public:
 
 	ASRProjectile();
 
-	virtual void Tick(float DeltaTime) override;
-
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	UFUNCTION()
-	void BindPlayerStateInfo(ASRPlayerState* playerState);
+	void BindPlayerStateInfo(ASRPlayerState& playerState);
+
+	void BindHUDWidget(UUIHUDWidget& hud);
 
 	UFUNCTION()
-	void BindHUDWidget(UUIHUDWidget* hud);
-
-	UFUNCTION()
-	void SetBulletType(EWeaponType gunType);
-
-	void SetStartLocation(FVector location);
-
-	void SetDebugMode(bool active);
+	void SetBulletType(const eWeaponType gunType);
+	void SetStartLocation(const FVector location);
 
 protected:
 
 	virtual void BeginPlay() override;
-
+	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	USphereComponent* GetCollisionComp() const;
+public:
 
-	UProjectileMovementComponent* GetProjectileMovement() const;
+	static bool bIsDebugMode;
 
 protected:
 	FOnUpdateHitCount mOnHitAndUpdateAcc;
@@ -87,7 +80,6 @@ protected:
 
 private:
 
-	bool mbDebugMode;
 	// UI
 	FOnHitmark mShowHitmark;
 
@@ -96,12 +88,10 @@ private:
 	FOnUpdateScore mOnUpdateScore;
 	FOnUpdateKill mOnUpdateKill;
 	FOnUpdateHeatshotCount mOnUpdateHeadshotCount;
-	EWeaponType mBulletType;
-	EHitType mHitType;
-	int32 mBulletDamage;
+
+
+	eWeaponType mBulletType;
 	bool mbIsCollision;
-	bool mbIsHeadshot;
-	bool mbIsTargetHit;
 };
 
 

@@ -10,7 +10,7 @@
  */
 
 UCLASS()
-class VERSION_API ASRSniperBullet : public ASRProjectile
+class VERSION_API ASRSniperBullet final : public ASRProjectile
 {
 	GENERATED_BODY()
 	

@@ -4,7 +4,9 @@
 #include "GameFramework/Character.h"
 #include "SRTargetCharacter.generated.h"
 
+class ASRSpawnPoint;
 DECLARE_MULTICAST_DELEGATE(FOnTargetDown)
+DECLARE_DELEGATE_OneParam(FOnRemoveFromSpawnedTargetList, FVector);
 
 enum class EMovableAxis : uint8;
 class ASRTargetManager;
@@ -16,7 +18,7 @@ class ASRTargetManager;
  */
 
 UCLASS()
-class VERSION_API ASRTargetCharacter : public ACharacter
+class VERSION_API ASRTargetCharacter final : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -28,18 +30,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetTarget(bool isCharacterType, bool isMovable, bool isCrouchable);
+	void SetTarget(const bool isCharacterType, const bool isMovable, const bool isCrouchable);
 
 	void ActiveTarget();
 
-	UFUNCTION()
-	void BindTargetManager(ASRTargetManager* targetManager);
+	void BindTargetManager(ASRTargetManager& targetManager);
 
-	void BindSpawnPoint(class ASRSpawnPoint* spawnPoint);
+	void BindSpawnPoint(ASRSpawnPoint& spawnPoint);
+	
+	bool OnHit(const int32 damage, int32& outScore);
 
-	bool OnHit(int32 damage, int32* outScore);
-
-	void initializeMovement(FVector endLocation, float speedFactor);
+	void SetMovement(const FVector endLocation, const float speedFactor);
 
 protected:
 
@@ -47,7 +48,7 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	void changeCollisionEnabled(ECollisionEnabled::Type newType);
+	void changeCollisionEnabled(const ECollisionEnabled::Type newType);
 
 protected:
 
@@ -62,15 +63,13 @@ protected:
 	UPROPERTY()
 	USkeletalMesh* mCharacterMesh;
 
+	// animations
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterStandPoseAnimation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterCrouchPoseAnimation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterStandDeadAnimation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterType)
 	UAnimSequence* mCharacterCrouchDeadAnimation;
 
@@ -78,18 +77,17 @@ protected:
 	UPROPERTY()
 	USkeletalMesh* mPlateMesh;
 
+	// animations
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	UAnimSequence* mPlateDownAnimation;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	UAnimSequence* mPlateUpAnimation;
 
+	// sounds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	USoundBase* mPlateDownSound;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	USoundBase* mPlateUpSound;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlateType)
 	USoundBase* mPlateHitSound;
 
@@ -115,6 +113,7 @@ private:
 	bool mbIsCrouching;
 
 	FOnTargetDown mOnTargetDown;
+	FOnRemoveFromSpawnedTargetList mOnRemoveFromSpawndTartgetList;
 };
 
 

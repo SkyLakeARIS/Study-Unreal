@@ -14,7 +14,7 @@
  */
 
 UCLASS()
-class VERSION_API ASRWeaponData : public AActor
+class VERSION_API ASRWeaponData final : public AActor
 {
 	GENERATED_BODY()
 
@@ -22,23 +22,34 @@ public:
 
 	ASRWeaponData();
 
-	USkeletalMesh* GetWeapon(EWeaponType weapon) const;
+	/*
+	 *  getter gun
+	 */
+	USkeletalMesh* GetWeapon(const eWeaponType weapon) const;
 
-	TSubclassOf<AActor> GetScope(EScopeType scope) const;
+	/*
+	 *  getter scope
+	 */
+	TSubclassOf<AActor> GetScope(const eScopeType scope) const;
+	UChildActorComponent* GetScopeActor(const eScopeType scope) const;
 
-	UChildActorComponent* GetScopeActor(EScopeType scope) const;
-
-	USoundBase* GetFireSound(EWeaponType weapon) const;
-
+	/*
+	 *  getter sound
+	 */
+	USoundBase* GetFireSound(const eWeaponType weapon) const;
 	USoundBase* GetDryFireSound() const;
-
 	USoundBase* GetSwtichFireModeSound() const;
 
-	TSubclassOf<UAnimInstance> GetCharacterAnimInstance(EWeaponType weapon) const;
+	/*
+	 *  getter AnimInstance
+	 */
+	TSubclassOf<UAnimInstance> GetCharacterAnimInstance(const eWeaponType weapon) const;
+	TSubclassOf<UAnimInstance> GetWeaponAnimInstance(const eWeaponType weapon) const;
 
-	TSubclassOf<UAnimInstance> GetWeaponAnimInstance(EWeaponType weapon) const;
-
-	UParticleSystem* GetMuzzleParticles(EWeaponType weapon) const;
+	/*
+	 *  getter effect
+	 */
+	UParticleSystem* GetMuzzleParticles(const eWeaponType weapon) const;
 
 protected:
 

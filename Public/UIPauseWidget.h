@@ -5,8 +5,8 @@
 #include "Blueprint/UserWidget.h"
 #include "UIPauseWidget.generated.h"
 
-enum class EScopeType : uint8;
-enum class EAimingType : uint8;
+enum class eScopeType : uint8;
+enum class eAimingType : uint8;
 class UCheckBox;
 class UEditableText;
 class UTextBlock;
@@ -20,7 +20,7 @@ class UButton;
  */
 
 UCLASS()
-class VERSION_API UUIPauseWidget : public UUserWidget
+class VERSION_API UUIPauseWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -28,16 +28,16 @@ public:
 
 	void UpdateInfoWhenOpen();
 
-protected:
-
-	virtual void NativeConstruct() override;
-
 	UFUNCTION()
 	void OnResumeClicked();
 	UFUNCTION()
 	void OnRetryClicked();
 	UFUNCTION()
 	void OnReturnMenuClicked();
+
+protected:
+
+	virtual void NativeConstruct() override;
 
 	UFUNCTION()
 	void onChangeHip_X(const FText& InText, ETextCommit::Type InCommitType);
@@ -67,12 +67,12 @@ protected:
 	UFUNCTION()
 	void onDebugChecked(bool active);
 
-	bool StringToInteger(const FText& InText, int32& outInt);
-
 private:
 
-	void updateAimSetting();
-	void updateMouseSetting();
+	bool stringToInteger(const FText& InText, int32& outInt);
+
+	void updateAimSetting() const;
+	void updateMouseSetting() const;
 
 protected:
 	
@@ -111,7 +111,7 @@ protected:
 	UCheckBox* mDebugMode;
 
 	FMouseSensitivity mMouseSetting;
-	EAimingType mAimingType;
+	eAimingType mAimingType;
 	bool mbCheckDebugMode;
 
 

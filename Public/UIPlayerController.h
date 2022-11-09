@@ -10,7 +10,7 @@
  */
 
 UCLASS()
-class VERSION_API AUIPlayerController : public APlayerController
+class VERSION_API AUIPlayerController final : public APlayerController
 {
 	GENERATED_BODY()
 

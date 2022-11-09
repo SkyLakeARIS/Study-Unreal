@@ -7,14 +7,14 @@
 #include "Kismet/GameplayStatics.h"
 
 
-void UUIResultWidget::UpdateStageInfo(const class ASRPlayerState* const srPlayerState)
+void UUIResultWidget::UpdateStageInfo(const ASRPlayerState& srPlayerState)
 {
-	checkf(srPlayerState != nullptr, TEXT("UUIResultWidget-UpdateStageInfo : srPlayerState이 nullptr입니다."));
-	mScores->SetText(FText::FromString(FString::FromInt(srPlayerState->GetScore())));
-	mAccuracy->SetText(FText::FromString(FString::FromInt(srPlayerState->GetAccuracy()) + FString("%")));
-	mKills->SetText(FText::FromString(FString::FromInt(srPlayerState->GetKillCount())));
-	mShots->SetText(FText::FromString(FString::FromInt(srPlayerState->GetShotsCount())));
-	mHeadshotRate->SetText(FText::FromString(FString::FromInt(srPlayerState->GetHeadshotRate()) + FString("%")));
+	//checkf(srPlayerState != nullptr, TEXT("UUIResultWidget-UpdateStageInfo : srPlayerState이 nullptr입니다."));
+	mScores->SetText(FText::FromString(FString::FromInt(srPlayerState.GetScore())));
+	mAccuracy->SetText(FText::FromString(FString::FromInt(srPlayerState.GetAccuracy()) + FString("%")));
+	mKills->SetText(FText::FromString(FString::FromInt(srPlayerState.GetKillCount())));
+	mShots->SetText(FText::FromString(FString::FromInt(srPlayerState.GetShotsCount())));
+	mHeadshotRate->SetText(FText::FromString(FString::FromInt(srPlayerState.GetHeadshotRate()) + FString("%")));
 }
 
 void UUIResultWidget::NativeConstruct()

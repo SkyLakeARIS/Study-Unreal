@@ -5,9 +5,9 @@
 #include "UObject/NoExportTypes.h"
 #include "SRStatistics.generated.h"
 
-enum class EGameModeType : uint8;
-enum class EGameType : uint8;
-enum class EWeaponType : uint8;
+enum class eGameModeType : uint8;
+enum class eGameType : uint8;
+enum class eWeaponType : uint8;
 
 USTRUCT(BlueprintType)
 struct FWeaponStatistics
@@ -63,9 +63,9 @@ public:
 	static bool LoadStats();
 	static bool SaveStats();
 
-	static void UpdateWeapon(const EWeaponType selectedWeapon, const FWeaponStatistics& stats);
-	static void UpdateGames(const EGameType selectedGameMode);
-	static void UpdateScores(EGameModeType EGameModeType, const uint32& score);
+	static void UpdateWeapon(const eWeaponType selectedWeapon, const FWeaponStatistics& stats);
+	static void UpdateGames(const eGameType selectedGameMode);
+	static void UpdateScores(eGameModeType EGameModeType, const uint32& score);
 
 	/*
 	 *  setter
@@ -75,11 +75,11 @@ public:
 	/*
 	 *  getter
 	 */
-	static FWeaponStatistics GetWeaponStats(EWeaponType weapon) ;
-	static uint32 GetGameStats(EGameType game) ;
-	static uint32 GetScoresStats(EGameModeType mode) ;
-	static uint32 GetHeadshotRate(EWeaponType weapon) ;
-	static uint32 GetAccuracy(EWeaponType weapon) ;
+	static FWeaponStatistics GetWeaponStats(eWeaponType weapon) ;
+	static uint32 GetGameStats(eGameType game) ;
+	static uint32 GetScoresStats(eGameModeType mode) ;
+	static uint32 GetHeadshotRate(eWeaponType weapon) ;
+	static uint32 GetAccuracy(eWeaponType weapon) ;
 
 
 	static bool IsLoaded();
