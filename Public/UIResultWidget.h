@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UIResultWidget.generated.h"
 
+class ASRPlayerState;
 class UTextBlock;
 class UButton;
 
@@ -17,8 +18,7 @@ class VERSION_API UUIResultWidget final : public UUserWidget
 	GENERATED_BODY()
 public:
 
-	UFUNCTION()
-	void UpdateStageInfo(const class ASRPlayerState* const srPlayerState);
+	void UpdateStageInfo(const ASRPlayerState& srPlayerState);
 		
 protected:
 

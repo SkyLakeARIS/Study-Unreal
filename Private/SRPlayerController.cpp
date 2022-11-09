@@ -10,7 +10,6 @@
 #include "UIResultWidget.h"
 #include "UISelectModesWidget.h"
 
-#include "Kismet/KismetMathLibrary.h"
 
 ASRPlayerController::ASRPlayerController()
 {
@@ -35,6 +34,15 @@ ASRPlayerController::ASRPlayerController()
 		mSelectModesWidgetClass = UI_SELECTMODES.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_Indicator(TEXT("/Game/UI/UI_KillMark.UI_KillMark_C"));
+	if (UI_Indicator.Succeeded())
+	{
+		mTargetIndicatorClass = UI_Indicator.Class;
+	}
+
+	/*
+	 *  indicator blueprint widgets
+	 */
 	static ConstructorHelpers::FClassFinder<UUserWidget> UI_IndicatorLine1440(TEXT("/Game/UI/UI_TargetIndicator_1440.UI_TargetIndicator_1440_C"));
 	if (UI_IndicatorLine1440.Succeeded())
 	{
@@ -71,13 +79,6 @@ ASRPlayerController::ASRPlayerController()
 		mTargetIndicateLineOtherSizeClass = UI_IndicatorLineOtherSize.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> UI_Indicator(TEXT("/Game/UI/UI_KillMark.UI_KillMark_C"));
-	if (UI_Indicator.Succeeded())
-	{
-		mTargetIndicatorClass = UI_Indicator.Class;
-	}
-
-	mSpawnedTargetList.Reserve(4);
 }
 
 void ASRPlayerController::OnPossess(APawn* InPawn)
@@ -117,7 +118,7 @@ void ASRPlayerController::CreateUIWidgets()
 	mHUDWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void ASRPlayerController::UpdateTargetPositionFrom(ASRTargetManager& targetManager)
+void ASRPlayerController::UpdateTargetPositionFrom(const ASRTargetManager& targetManager)
 {
 	mSpawnedTargetList.Empty();
 
@@ -155,9 +156,9 @@ void ASRPlayerController::CalcTargetIndicatorAndShow()
 		characterToTarget.Normalize();
 
 		// 내적을 이용하여 cos 값을 구합니다.
-		float angle = FVector::DotProduct(characterToTarget, rightVector)/(characterToTarget.Size2D()*rightVector.Size2D());
+		const float angle = FVector::DotProduct(characterToTarget, rightVector)/(characterToTarget.Size2D()*rightVector.Size2D());
 		// cos 값을 통해 각도를 구합니다.
-		float arcCos = FMath::RadiansToDegrees(FMath::Acos(angle));
+		const float arcCos = FMath::RadiansToDegrees(FMath::Acos(angle));
 
 		mTargetIndicatorWidget[i]->SetPositionInViewport(FVector2D(mViewportX - (arcCos * mIndicatorScale), mViewportY));
 		mTargetIndicatorWidget[i]->SetVisibility(ESlateVisibility::Visible);
@@ -167,6 +168,7 @@ void ASRPlayerController::CalcTargetIndicatorAndShow()
 
 ASRPlayerState* ASRPlayerController::GetPlayerState() const
 {
+	checkf(PlayerState != nullptr, TEXT("PlayerState가 nullptr입니다. 초기화되기 전에 호출되었을 수 있습니다."));
 	return Cast<ASRPlayerState>(PlayerState);
 }
 
@@ -216,14 +218,14 @@ void ASRPlayerController::EndGame()
 {
 	mHUDWidget->SetVisibility(ESlateVisibility::Hidden);
 	mResultWidget->AddToViewport(3);
-	mResultWidget->UpdateStageInfo(Cast<ASRPlayerState>(PlayerState));
+	mResultWidget->UpdateStageInfo(*Cast<ASRPlayerState>(PlayerState));
 	ChangeInputMode(false);
 	SetPause(true);
 }
 
 void ASRPlayerController::InitCharacterMouseAndAimingSetting(const eScopeType scopeType) const
 {
-	ASRPlayerCharacter* const playerCharacter = Cast<ASRPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	auto* const playerCharacter = Cast<ASRPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	switch(scopeType)
 	{
@@ -238,6 +240,7 @@ void ASRPlayerController::InitCharacterMouseAndAimingSetting(const eScopeType sc
 			break;
 		default:
 			checkf(false, TEXT("올바르지 않은 EScopeType입니다."));
+			break;
 	}
 
 	playerCharacter->SetAimingType(mAimingType);
@@ -280,9 +283,6 @@ void ASRPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("mSpawnedTargetList capacity = %d"), mSpawnedTargetList.GetAllocatedSize());
-
-
 	ChangeInputMode(false);
 }
 
@@ -306,7 +306,7 @@ void ASRPlayerController::initTargetIndicator()
 	int32 sizeX = 0;
 	int32 sizeY = 0;
 	GetViewportSize(sizeX, sizeY);
-	UE_LOG(LogTemp, Warning, TEXT("[initTargetIndicator] viewport size x = %d, size y = %d"), sizeX, sizeY);
+	UE_LOG(LogTemp, Warning, TEXT("[initTargetIndicator] viewport : width = %d, height = %d"), sizeX, sizeY);
 
 	mViewportY = sizeY * 0.92f;
 
@@ -344,6 +344,7 @@ void ASRPlayerController::initTargetIndicator()
 		mTargetIndicateLineWidget = CreateWidget<UUserWidget>(this, mTargetIndicateLineOtherSizeClass);
 		break;
 	}
+
 	mTargetIndicateLineWidget->AddToViewport();
 }
 
@@ -351,7 +352,7 @@ void ASRPlayerController::PauseGame()
 {
 	mPauseWidget = CreateWidget<UUIPauseWidget>(this, mPauseWidgetClass);
 
-	auto* gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	auto* const gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	gameMode->PauseGame();
 
 	mPauseWidget->AddToViewport(3);
@@ -369,7 +370,7 @@ void ASRPlayerController::ResumeGame()
 
 	mHUDWidget->SetVisibility(ESlateVisibility::Visible);
 
-	auto* gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	auto* const gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	gameMode->ResumeGame();
 }
 

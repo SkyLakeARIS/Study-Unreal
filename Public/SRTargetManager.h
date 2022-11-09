@@ -28,15 +28,15 @@ public:
 	UFUNCTION()
 	void RandomTargetSpawn();
 
-	void RemoveTargetFromTargetList(FVector position);
+	void RemoveTargetFromTargetList(const FVector position);
 
 	/*
 	 *  setter
 	 */
 	UFUNCTION()
-	void SetMovableTargetMode(eGameModeType mode);
+	void SetMovableTargetMode(const eGameModeType mode);
 	UFUNCTION()
-	void SetTargetType(bool isCharacter);
+	void SetTargetType(const bool isCharacter);
 
 	/*
 	 *  getter

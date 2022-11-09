@@ -23,8 +23,8 @@ public:
 
 	ASRGameMode();
 
-	void PauseGame();
-	void ResumeGame();
+	void PauseGame() const;
+	void ResumeGame() const;
 
 	/*
 	 *  getter
@@ -38,8 +38,8 @@ public:
 	 *  setter
 	 */
 	void SettingGameAndStartGame();
-	void SetGameModeData(FGameModeData& modeData, bool isCharacterType);
-	void SetDebugMode(bool isActive);
+	void SetGameModeData(const FGameModeData& modeData, const bool isCharacterType);
+	void SetDebugMode(const bool isActive);
 
 private:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
@@ -51,7 +51,7 @@ private:
 	void countdownMainGameTimer();
 
 	void startMainGame();
-	void endMainGame();
+	void endMainGame() const;
 
 protected:
 

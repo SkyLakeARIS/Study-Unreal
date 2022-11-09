@@ -28,16 +28,16 @@ public:
 
 	void UpdateInfoWhenOpen();
 
-protected:
-
-	virtual void NativeConstruct() override;
-
 	UFUNCTION()
 	void OnResumeClicked();
 	UFUNCTION()
 	void OnRetryClicked();
 	UFUNCTION()
 	void OnReturnMenuClicked();
+
+protected:
+
+	virtual void NativeConstruct() override;
 
 	UFUNCTION()
 	void onChangeHip_X(const FText& InText, ETextCommit::Type InCommitType);
@@ -67,12 +67,12 @@ protected:
 	UFUNCTION()
 	void onDebugChecked(bool active);
 
-	bool StringToInteger(const FText& InText, int32& outInt);
-
 private:
 
-	void updateAimSetting();
-	void updateMouseSetting();
+	bool stringToInteger(const FText& InText, int32& outInt);
+
+	void updateAimSetting() const;
+	void updateMouseSetting() const;
 
 protected:
 	

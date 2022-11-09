@@ -129,7 +129,7 @@ ASRWeaponData::ASRWeaponData()
 	}
 }
 
-USkeletalMesh* ASRWeaponData::GetWeapon(eWeaponType weapon) const
+USkeletalMesh* ASRWeaponData::GetWeapon(const eWeaponType weapon) const
 {
 	switch (weapon)
 	{
@@ -146,7 +146,7 @@ USkeletalMesh* ASRWeaponData::GetWeapon(eWeaponType weapon) const
 	return nullptr;
 }
 
-TSubclassOf<AActor> ASRWeaponData::GetScope(eScopeType scope) const
+TSubclassOf<AActor> ASRWeaponData::GetScope(const eScopeType scope) const
 {
 	switch (scope)
 	{
@@ -164,7 +164,7 @@ TSubclassOf<AActor> ASRWeaponData::GetScope(eScopeType scope) const
 	return nullptr;
 }
 
-UChildActorComponent* ASRWeaponData::GetScopeActor(eScopeType scope) const
+UChildActorComponent* ASRWeaponData::GetScopeActor(const eScopeType scope) const
 {
 
 	switch (scope)
@@ -183,7 +183,7 @@ UChildActorComponent* ASRWeaponData::GetScopeActor(eScopeType scope) const
 }
 
 
-USoundBase* ASRWeaponData::GetFireSound(eWeaponType weapon) const
+USoundBase* ASRWeaponData::GetFireSound(const eWeaponType weapon) const
 {
 	switch (weapon)
 	{
@@ -212,7 +212,7 @@ USoundBase* ASRWeaponData::GetSwtichFireModeSound() const
 	return mSwitchFireModeSound;
 }
 
-TSubclassOf<UAnimInstance> ASRWeaponData::GetCharacterAnimInstance(eWeaponType weapon) const
+TSubclassOf<UAnimInstance> ASRWeaponData::GetCharacterAnimInstance(const eWeaponType weapon) const
 {
 	switch (weapon)
 	{
@@ -229,7 +229,7 @@ TSubclassOf<UAnimInstance> ASRWeaponData::GetCharacterAnimInstance(eWeaponType w
 	return nullptr;
 }
 
-TSubclassOf<UAnimInstance> ASRWeaponData::GetWeaponAnimInstance(eWeaponType weapon) const
+TSubclassOf<UAnimInstance> ASRWeaponData::GetWeaponAnimInstance(const eWeaponType weapon) const
 {
 	switch (weapon)
 	{
@@ -246,7 +246,7 @@ TSubclassOf<UAnimInstance> ASRWeaponData::GetWeaponAnimInstance(eWeaponType weap
 	return nullptr;
 }
 
-UParticleSystem* ASRWeaponData::GetMuzzleParticles(eWeaponType weapon) const
+UParticleSystem* ASRWeaponData::GetMuzzleParticles(const eWeaponType weapon) const
 {
 	switch (weapon)
 	{

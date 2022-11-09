@@ -39,25 +39,25 @@ void UUIHUDWidget::InitializeWidgets()
 	mCurrentMark = mHitMark;
 }
 
-void UUIHUDWidget::UpdateRemainingTime(int32 remainingTime)
+void UUIHUDWidget::UpdateRemainingTime(const int32 remainingTime)
 {
 	mRemainingTime->SetText(FText::FromString(FString::FromInt(remainingTime)));
 }
 
-void UUIHUDWidget::UpdateAmmo(int32 newAmmo)
+void UUIHUDWidget::UpdateAmmo(const int32 ammo)
 {
-	mRemainingAmmo->SetText(FText::FromString(FString::FromInt(newAmmo)));
+	mRemainingAmmo->SetText(FText::FromString(FString::FromInt(ammo)));
 }
 
-void UUIHUDWidget::UpdateAccuracy(int32 accuracy)
+void UUIHUDWidget::UpdateAccuracy(const int32 accuracy)
 {
 	mAccuracy->SetText(FText::FromString(FString::FromInt(accuracy)+FString("%")));
 }
 
-void UUIHUDWidget::UpdateFireMode(eWaeponFireMode newFireMode)
+void UUIHUDWidget::UpdateFireMode(const eWaeponFireMode fireMode)
 {
 	FString displayFireMode;
-	switch(newFireMode)
+	switch(fireMode)
 	{
 		case eWaeponFireMode::SINGLE_FIRE:
 			displayFireMode = "Single";
@@ -75,17 +75,17 @@ void UUIHUDWidget::UpdateFireMode(eWaeponFireMode newFireMode)
 	mFireMode->SetText(FText::FromString(displayFireMode));
 }
 
-void UUIHUDWidget::UpdateScore(int32 score)
+void UUIHUDWidget::UpdateScore(const int32 score)
 {
 	mScore->SetText(FText::FromString(FString::FromInt(score)));
 }
 
-void UUIHUDWidget::UpdateGameMode(FString newGameMode)
+void UUIHUDWidget::UpdateGameMode(const FString gameMode)
 {
-	mDisplayGameMode->SetText(FText::FromString(newGameMode));
+	mDisplayGameMode->SetText(FText::FromString(gameMode));
 }
 
-void UUIHUDWidget::SetCrosshairVisibility(ESlateVisibility option)
+void UUIHUDWidget::SetCrosshairVisibility(const ESlateVisibility option)
 {
 	checkf(option == ESlateVisibility::Hidden || option == ESlateVisibility::Visible, TEXT("UUIHUDWidget - UpdateFireMode : Hidden 또는 Visible 타입만 전달할 수 있습니다."));
 
@@ -95,7 +95,7 @@ void UUIHUDWidget::SetCrosshairVisibility(ESlateVisibility option)
 
 // 타겟에 적중시 적절한 히트마크를 크로스헤어가 위치하는 곳에 표시하는 함수입니다.
 // 표시할 히트마크의 유형은 projectile 개체가 전달해줍니다.
-void UUIHUDWidget::AddHitMarkToViewPort(EHitType hitType)
+void UUIHUDWidget::AddHitMarkToViewPort(const EHitType hitType)
 {
 	// 이전에 보여진 히트마크를 뷰포트에서 숨깁니다.
 	mCurrentMark->SetVisibility(ESlateVisibility::Hidden);

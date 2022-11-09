@@ -23,23 +23,23 @@ public:
 	void InitializeWidgets();
 
 	UFUNCTION()
-	void UpdateRemainingTime(int32 remainingTime);
+	void UpdateRemainingTime(const int32 remainingTime);
 	UFUNCTION()
-	void UpdateAmmo(int32 newAmmo);
+	void UpdateAmmo(const int32 newAmmo);
 	UFUNCTION()
-	void UpdateAccuracy(int32 accuracy);
+	void UpdateAccuracy(const int32 accuracy);
 	UFUNCTION()
-	void UpdateFireMode(eWaeponFireMode newFireMode);
+	void UpdateFireMode(const eWaeponFireMode newFireMode);
 	UFUNCTION()
-	void UpdateScore(int32 score);
+	void UpdateScore(const int32 score);
 	UFUNCTION()
-	void UpdateGameMode(FString newGameMode);
+	void UpdateGameMode(const FString newGameMode);
 
 	UFUNCTION()
-	void SetCrosshairVisibility(ESlateVisibility option);
+	void SetCrosshairVisibility(const ESlateVisibility option);
 
 	UFUNCTION()
-	void AddHitMarkToViewPort(EHitType hitType);
+	void AddHitMarkToViewPort(const EHitType hitType);
 	void RemoveHitMarkFromViewport();
 
 protected:

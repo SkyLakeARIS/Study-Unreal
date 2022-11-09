@@ -210,7 +210,7 @@ void USRAnimInstance::SetLeftHandIK()
 	LeftHandTransform = UKismetMathLibrary::MakeRelativeTransform(gunSocketTransform, meshSocketTransform);
 }
 
-void USRAnimInstance::InterpAiming(float DeltaSeconds)
+void USRAnimInstance::InterpAiming(const float DeltaSeconds)
 {
 	AimAlpha = UKismetMathLibrary::FInterpTo(AimAlpha, mAimingAlpha, DeltaSeconds, 10.0f);
 
@@ -220,7 +220,7 @@ void USRAnimInstance::InterpAiming(float DeltaSeconds)
 	}
 }
 
-void USRAnimInstance::InterpRelativeHand(float DeltaSeconds)
+void USRAnimInstance::InterpRelativeHand(const float DeltaSeconds)
 {
 	RelativeHandTransform = UKismetMathLibrary::TInterpTo(RelativeHandTransform, FinalHandTransform, DeltaSeconds, 10.0f);
 	// 기존 부착물 위치에서 다른 부착물 위치로 손을 옮길때 보간하는데 보간이 끝나면(equals) false로.
@@ -230,7 +230,7 @@ void USRAnimInstance::InterpRelativeHand(float DeltaSeconds)
 	}
 }
 
-void USRAnimInstance::MoveVectorCurve(float DeltaSeconds)
+void USRAnimInstance::MoveVectorCurve(const float DeltaSeconds)
 {
 	FVector velocityVec = PlayerCharacter->GetMovementComponent()->Velocity;
 	velocityVec.Z = 0.0f;
@@ -245,7 +245,7 @@ void USRAnimInstance::MoveVectorCurve(float DeltaSeconds)
 }
 
 // 화면을 움직일때 무기의 상하좌우 흔들림 구현 (타르코프)
-void USRAnimInstance::RotateWithRotation(float DeltaSeconds)
+void USRAnimInstance::RotateWithRotation(const float DeltaSeconds)
 {
 	const FRotator currentRotation = PlayerCharacter->GetControlRotation();
 	TurnRotation = UKismetMathLibrary::RInterpTo(TurnRotation, currentRotation - OldRotation, DeltaSeconds, 3.0f);
@@ -261,13 +261,13 @@ void USRAnimInstance::RotateWithRotation(float DeltaSeconds)
 	OldRotation = currentRotation;
 }
 
-void USRAnimInstance::InterpFinalRecoil(float DeltaSeconds)
+void USRAnimInstance::InterpFinalRecoil(const float DeltaSeconds)
 {
 	// interp to zero
 	FinalRecoilTransform = UKismetMathLibrary::TInterpTo(FinalRecoilTransform, FTransform(), DeltaSeconds, 10.0f);
 }
 
-void USRAnimInstance::InterpRecoil(float DeltaSeconds)
+void USRAnimInstance::InterpRecoil(const float DeltaSeconds)
 {
 	//interp to finalrecoiltransform
 	RecoilTransform =  UKismetMathLibrary::TInterpTo(RecoilTransform, FinalRecoilTransform, DeltaSeconds, 10.0f);
@@ -295,10 +295,10 @@ void USRAnimInstance::recoveryTimerFunction()
 	mbRecoilRecovery = false;
 }
 
-void USRAnimInstance::calcRecoilFactor(eGameType gameType)
+void USRAnimInstance::calcRecoilFactor(const eGameType gameType)
 {
-	const float PitchLimit = (gameType == eGameType::Battlefield) ? 13.0f : 20.0f;
-	const float YawLimit = 10.0f;
+	const float PITCH_LIMIT = (gameType == eGameType::Battlefield) ? 13.0f : 20.0f;
+	const float YAW_LIMIT = 10.0f;
 
 	float pitchFactor = 0.0f;
 	float leftRecoil = 0.0f;
@@ -318,11 +318,11 @@ void USRAnimInstance::calcRecoilFactor(eGameType gameType)
 		rightRecoil = (gameType == eGameType::Battlefield) ? 0.20f : 0.20f;
 	}
 
-	mDeltaRotator.Pitch = (mSumRecoil < PitchLimit) ? pitchFactor : 0.0f;
+	mDeltaRotator.Pitch = (mSumRecoil < PITCH_LIMIT) ? pitchFactor : 0.0f;
 
 	mDeltaRotator.Yaw = (mRandomStream.FRandRange(leftRecoil, rightRecoil) >= 0.0f) ? rightRecoil : leftRecoil;
 	// 좌우반동 Limit을 넘었어도 왼쪽 반동이면 허용합니다.
-	if (mSumHorizonRecoil > YawLimit)
+	if (mSumHorizonRecoil > YAW_LIMIT)
 	{
 		mDeltaRotator.Yaw = (mDeltaRotator.Yaw <= 0.0f) ? mDeltaRotator.Yaw : 0.0f;
 	}
@@ -410,7 +410,7 @@ void USRAnimInstance::RecoilStart()
 	mbRecoilRecovery = false;
 }
 
-void USRAnimInstance::RecoilTick(float DeltaTime)
+void USRAnimInstance::RecoilTick(const float DeltaTime)
 {
 	const eGameType gameType = PlayerCharacter->GetGameType();
 	if (gameType == eGameType::Tarkov)

@@ -45,9 +45,9 @@ public:
 	/*
 	 *  setter
 	 */
-	void SetRecordMode(bool isRecordable);
+	void SetRecordMode(const bool isRecordable);
 
-	void Initialize(eWeaponType weapon, eGameType game, eGameModeType mode, UUIHUDWidget* HUD);
+	void Initialize(const eWeaponType weapon, const eGameType game, const eGameModeType mode, UUIHUDWidget& HUD);
 
 	/*
 	 *  getter

@@ -111,7 +111,7 @@ void ASRTargetCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	mOnTargetDown.Clear();
 }
 
-void ASRTargetCharacter::changeCollisionEnabled(ECollisionEnabled::Type newType)
+void ASRTargetCharacter::changeCollisionEnabled(const ECollisionEnabled::Type newType)
 {
 	mHead->SetCollisionEnabled(newType);
 	GetMesh()->SetCollisionEnabled(newType);
@@ -139,7 +139,7 @@ void ASRTargetCharacter::Tick(float DeltaTime)
 	SetActorLocation(GetActorLocation() + mDistanceToMoveEveryTime);
 }
 
-void ASRTargetCharacter::SetTarget(bool isCharacterType, bool isMovable, bool isCrouchable)
+void ASRTargetCharacter::SetTarget(const bool isCharacterType, const bool isMovable, const bool isCrouchable)
 {
 	mbIsCharacterType = isCharacterType;
 	mbIsMovable = isMovable;
@@ -190,15 +190,17 @@ void ASRTargetCharacter::ActiveTarget()
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), mPlateUpSound, GetActorLocation());
 }
 
-void ASRTargetCharacter::BindTargetManager(ASRTargetManager* targetManager)
+void ASRTargetCharacter::BindTargetManager(ASRTargetManager& targetManager)
 {
-	mOnTargetDown.AddUObject(targetManager, &ASRTargetManager::RandomTargetSpawn);
-	mOnRemoveFromSpawndTartgetList.BindUObject(targetManager, &ASRTargetManager::RemoveTargetFromTargetList);
+	//checkf(targetManager != nullptr, TEXT("targetManager는 nullptr가 아니어야 합니다."));
+
+	mOnTargetDown.AddUObject(&targetManager, &ASRTargetManager::RandomTargetSpawn);
+	mOnRemoveFromSpawndTartgetList.BindUObject(&targetManager, &ASRTargetManager::RemoveTargetFromTargetList);
 }
 
-void ASRTargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
+void ASRTargetCharacter::BindSpawnPoint(ASRSpawnPoint& spawnPoint)
 {
-	mOnTargetDown.AddUObject(spawnPoint, &ASRSpawnPoint::DeActive);
+	mOnTargetDown.AddUObject(&spawnPoint, &ASRSpawnPoint::DeActive);
 }
 
 /*
@@ -207,7 +209,7 @@ void ASRTargetCharacter::BindSpawnPoint(ASRSpawnPoint* spawnPoint)
  *	타겟이 다운되면 true, 그렇지 않으면 false를 반환합니다.
  *	타겟은 다운시 타겟매니저에게 알립니다.
  */
-bool ASRTargetCharacter::OnHit(int32 damage, int32& outScore)
+bool ASRTargetCharacter::OnHit(const int32 damage, int32& outScore)
 {
 	checkf(damage > 0, TEXT("ASRTargetCharacter-OnHit damage가 0이하 입니다."));
 
@@ -259,7 +261,7 @@ bool ASRTargetCharacter::OnHit(int32 damage, int32& outScore)
 	return false;
 }
 
-void ASRTargetCharacter::SetMovement(FVector endLocation, float speedFactor)
+void ASRTargetCharacter::SetMovement(const FVector endLocation, const float speedFactor)
 {
 	checkf(speedFactor >= 1.0f, TEXT("ASRTargetCharacter - SetEndLocation : speedFactor는 1.0f이상이어야 합니다."));
 

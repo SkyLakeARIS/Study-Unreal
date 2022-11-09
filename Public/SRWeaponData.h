@@ -25,31 +25,31 @@ public:
 	/*
 	 *  getter gun
 	 */
-	USkeletalMesh* GetWeapon(eWeaponType weapon) const;
+	USkeletalMesh* GetWeapon(const eWeaponType weapon) const;
 
 	/*
 	 *  getter scope
 	 */
-	TSubclassOf<AActor> GetScope(eScopeType scope) const;
-	UChildActorComponent* GetScopeActor(eScopeType scope) const;
+	TSubclassOf<AActor> GetScope(const eScopeType scope) const;
+	UChildActorComponent* GetScopeActor(const eScopeType scope) const;
 
 	/*
 	 *  getter sound
 	 */
-	USoundBase* GetFireSound(eWeaponType weapon) const;
+	USoundBase* GetFireSound(const eWeaponType weapon) const;
 	USoundBase* GetDryFireSound() const;
 	USoundBase* GetSwtichFireModeSound() const;
 
 	/*
 	 *  getter AnimInstance
 	 */
-	TSubclassOf<UAnimInstance> GetCharacterAnimInstance(eWeaponType weapon) const;
-	TSubclassOf<UAnimInstance> GetWeaponAnimInstance(eWeaponType weapon) const;
+	TSubclassOf<UAnimInstance> GetCharacterAnimInstance(const eWeaponType weapon) const;
+	TSubclassOf<UAnimInstance> GetWeaponAnimInstance(const eWeaponType weapon) const;
 
 	/*
 	 *  getter effect
 	 */
-	UParticleSystem* GetMuzzleParticles(eWeaponType weapon) const;
+	UParticleSystem* GetMuzzleParticles(const eWeaponType weapon) const;
 
 protected:
 

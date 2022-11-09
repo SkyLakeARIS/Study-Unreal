@@ -33,7 +33,7 @@ public:
 	void ChangeInputMode(const bool bIsGameMode);
 	void CreateUIWidgets();
 
-	void UpdateTargetPositionFrom(ASRTargetManager& targetManager);
+	void UpdateTargetPositionFrom(const ASRTargetManager& targetManager);
 	void CalcTargetIndicatorAndShow();
 
 	/*

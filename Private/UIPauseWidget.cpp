@@ -34,7 +34,7 @@ void UUIPauseWidget::OnReturnMenuClicked()
 void UUIPauseWidget::onChangeHip_X(const FText& InText, ETextCommit::Type InCommitType)
 {
 	int32 newValue = 0;
-	if (!StringToInteger(InText, newValue)) 
+	if (!stringToInteger(InText, newValue)) 
 	{
 		mHipX->SetText(FText::FromString(FString::FromInt(mMouseSetting.HipX)));
 		return;
@@ -50,7 +50,7 @@ void UUIPauseWidget::onChangeHip_X(const FText& InText, ETextCommit::Type InComm
 void UUIPauseWidget::onChangeHip_Y(const FText& InText, ETextCommit::Type InCommitType)
 {
 	int32 newValue = 0;
-	if (!StringToInteger(InText, newValue)) 
+	if (!stringToInteger(InText, newValue)) 
 	{
 		mHipY->SetText(FText::FromString(FString::FromInt(mMouseSetting.HipY)));
 		return;
@@ -67,7 +67,7 @@ void UUIPauseWidget::onChangeScope1X_X(const FText& InText, ETextCommit::Type In
 {
 
 	int32 newValue = 0;
-	if (!StringToInteger(InText, newValue)) 
+	if (!stringToInteger(InText, newValue)) 
 	{
 		mScope1X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope1X_X)));
 		return;
@@ -84,7 +84,7 @@ void UUIPauseWidget::onChangeScope1X_Y(const FText& InText, ETextCommit::Type In
 {
 
 	int32 newValue = 0;
-	if (!StringToInteger(InText, newValue))
+	if (!stringToInteger(InText, newValue))
 	{
 		mScope1X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope1X_Y)));
 		return;
@@ -101,7 +101,7 @@ void UUIPauseWidget::onChangeScope2dot5X_X(const FText& InText, ETextCommit::Typ
 {
 
 	int32 newValue = 0;
-	if (!StringToInteger(InText, newValue)) 
+	if (!stringToInteger(InText, newValue)) 
 	{
 		mScope2dot5X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope2dot5X_X)));
 		return;
@@ -118,7 +118,7 @@ void UUIPauseWidget::onChangeScope2dot5X_Y(const FText& InText, ETextCommit::Typ
 {
 
 	int32 newValue = 0;
-	if (!StringToInteger(InText, newValue)) 
+	if (!stringToInteger(InText, newValue)) 
 	{
 		mScope2dot5X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope2dot5X_Y)));
 		return;
@@ -135,7 +135,7 @@ void UUIPauseWidget::onChangeScope6X_X(const FText& InText, ETextCommit::Type In
 {
 
 	int32 newValue = 0;
-	if (!StringToInteger(InText, newValue))
+	if (!stringToInteger(InText, newValue))
 	{
 		mScope6X_X->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_X)));
 		return;
@@ -152,7 +152,7 @@ void UUIPauseWidget::onChangeScope6X_Y(const FText& InText, ETextCommit::Type In
 {
 
 	int32 newValue = 0;
-	if (!StringToInteger(InText, newValue))
+	if (!stringToInteger(InText, newValue))
 	{
 		mScope6X_Y->SetText(FText::FromString(FString::FromInt(mMouseSetting.Scope6X_Y)));
 		return;
@@ -194,7 +194,7 @@ void UUIPauseWidget::onDebugChecked(bool active)
 	gameMode->SetDebugMode(active);
 }
 
-bool UUIPauseWidget::StringToInteger(const FText& InText, int32& outInt)
+bool UUIPauseWidget::stringToInteger(const FText& InText, int32& outInt)
 {
 	if (!InText.IsNumeric())
 	{
@@ -210,13 +210,13 @@ bool UUIPauseWidget::StringToInteger(const FText& InText, int32& outInt)
 	return true;
 }
 
-void UUIPauseWidget::updateMouseSetting()
+void UUIPauseWidget::updateMouseSetting() const
 {
 	auto* const playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->SetMouseSensitivityAndUpdateToCharacter(mMouseSetting);
 }
 
-void UUIPauseWidget::updateAimSetting()
+void UUIPauseWidget::updateAimSetting() const
 {
 	auto* const playerController = Cast<ASRPlayerController>(GetOwningPlayer());
 	playerController->SetAimingTypeToCharacter(mAimingType);
@@ -250,7 +250,7 @@ void UUIPauseWidget::UpdateInfoWhenOpen()
 
 	mMessageBox->SetText(FText::FromString(TEXT("정수 값을 입력하여 감도를 변경할 수 있습니다.")));
 
-	auto* gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	auto* const gameMode = Cast<ASRGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if(gameMode->IsDebugMode())
 	{
 		mDebugMode->SetCheckedState(ECheckBoxState::Checked);

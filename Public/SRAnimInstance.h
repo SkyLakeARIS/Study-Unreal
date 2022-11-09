@@ -42,7 +42,7 @@ public:
 	void RecoilStart();
 
 	UFUNCTION(BlueprintCallable)
-	void RecoilTick(float DeltaTime);
+	void RecoilTick(const float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
 	void RecoilStop();
@@ -57,17 +57,17 @@ public:
 
 	void SetLeftHandIK();
 
-	void InterpAiming(float DeltaSeconds);
+	void InterpAiming(const float DeltaSeconds);
 
-	void InterpRelativeHand(float DeltaSeconds);
+	void InterpRelativeHand(const float DeltaSeconds);
 
-	void MoveVectorCurve(float DeltaSeconds);
+	void MoveVectorCurve(const float DeltaSeconds);
 
-	void RotateWithRotation(float DeltaSeconds);
+	void RotateWithRotation(const float DeltaSeconds);
 
-	void InterpFinalRecoil(float DeltaSeconds);
+	void InterpFinalRecoil(const float DeltaSeconds);
 
-	void InterpRecoil(float DeltaSeconds);
+	void InterpRecoil(const float DeltaSeconds);
 
 protected:
 
@@ -85,7 +85,7 @@ protected:
 
 private:
 
-	void calcRecoilFactor(eGameType gameType);
+	void calcRecoilFactor(const eGameType gameType);
 
 public:
 

@@ -28,9 +28,9 @@ void ASRTargetManager::BeginPlay()
 
 	checkf(mSpawnPointList.Num() <= mSpawnPointList.GetAllocatedSize(), TEXT("배치된 개체가 미리 할당된 사이즈보다 많습니다. "))
 
-	for(auto* spawner :mSpawnPointList)
+	for(auto& spawner :mSpawnPointList)
 	{
-		auto* castedSpawner = Cast<ASRSpawnPoint>(spawner);
+		auto* const castedSpawner = Cast<ASRSpawnPoint>(spawner);
 	 	switch(castedSpawner->GetSpawnPointType())
 	 	{
 	 		case ESpawnPointType::CharacterType:
@@ -74,8 +74,8 @@ void ASRTargetManager::RandomTargetSpawn()
 	target->SetActorRotation(spawnPoint->GetActorRotation());
 	target->SetTarget(mbIsCharacterType, mbMovableTargetMode, spawnPoint->IsCrouchable());
 	// 타겟이 다운되었을 때 delegate 실행을 위해 바인드합니다.
-	target->BindSpawnPoint(spawnPoint);
-	target->BindTargetManager(this);
+	target->BindSpawnPoint(*spawnPoint);
+	target->BindTargetManager(*this);
 	// 타겟을 활성화 시킵니다. (충돌 처리 가능)
 	target->ActiveTarget();
 	spawnPoint->Active();
@@ -121,7 +121,7 @@ void ASRTargetManager::RandomTargetSpawn()
 	mSpawnedTargetList.Add(target);
 
 	// 타겟이 새로 스폰되었으므로 컨트롤러에게 알려서 인디케이터에 타겟 정보를 반영합니다.
-	auto* playerController = Cast<ASRPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	auto* const playerController = Cast<ASRPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	playerController->UpdateTargetPositionFrom(*this);
 }
 
@@ -130,7 +130,7 @@ void ASRTargetManager::RandomTargetSpawn()
  * 이동형 타겟이 서로 겹치는 경우가 없기 때문에 위치로 비교하여
  * 구분합니다.
  */
-void ASRTargetManager::RemoveTargetFromTargetList(FVector position)
+void ASRTargetManager::RemoveTargetFromTargetList(const FVector position)
 {
 	ASRTargetCharacter* remove;
 	for(auto& target : mSpawnedTargetList)
@@ -144,11 +144,11 @@ void ASRTargetManager::RemoveTargetFromTargetList(FVector position)
 	mSpawnedTargetList.Remove(remove);
 
 	// 타겟이 새로 스폰되었으므로 컨트롤러에게 알려서 인디케이터에 타겟 정보를 반영합니다.
-	auto* playerController = Cast<ASRPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	auto* const playerController = Cast<ASRPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	playerController->UpdateTargetPositionFrom(*this);
 }
 
-void ASRTargetManager::SetMovableTargetMode(eGameModeType mode)
+void ASRTargetManager::SetMovableTargetMode(const eGameModeType mode)
 {
 	mGameModeType = mode;
 
@@ -170,9 +170,10 @@ void ASRTargetManager::SetMovableTargetMode(eGameModeType mode)
 			checkf(false, TEXT("ASRTargetManager : SetMovableTargetMode - Static or Movable 타입의 형식이 되어야합니다."));
 			break;
 	}
+
 }
 
-void ASRTargetManager::SetTargetType(bool isCharacter)
+void ASRTargetManager::SetTargetType(const bool isCharacter)
 {
 	mbIsCharacterType = isCharacter;
 }
