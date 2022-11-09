@@ -50,7 +50,7 @@ public:
 	 *  setter
 	 */
 
-	void Initialize(eGameType gameType, eScopeType scopeType, eWeaponType weaponType, ASRPlayerCharacter* const owner);
+	void Initialize(const eGameType gameType, const eScopeType scopeType, const eWeaponType weaponType, ASRPlayerCharacter& owner);
 
 	/*
 	 *  getter
@@ -73,7 +73,7 @@ private:
 
 	void fireShots();
 
-	void clearBehaviorFlagAfterAnimation();
+	void clearBehaviorFlagAfterAnimation() const;
 
 public :
 
@@ -152,6 +152,8 @@ private:
 	/*
 	 *  fire mode info
 	 */
+	FTimerHandle mBurstDelayTimer;
+	float BURST_DELAY = 0.4f;
 	const int32 BURST_COUNT = 3;
 	int32 mCurrentBurst;
 

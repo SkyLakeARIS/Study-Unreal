@@ -30,7 +30,6 @@ ASRPlayerCharacter::ASRPlayerCharacter()
 	mMesh1P->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
 
 	mBehaviorFlag = CLEAR_STATE;
-	//mbIsPlayingAnimation = false;
 	// 조준 방식
 	mAimingType = eAimingType::Hold;
 }
@@ -73,20 +72,20 @@ void ASRPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASRPlayerCharacter::StartFire);
-	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASRPlayerCharacter::StopFire);
-	PlayerInputComponent->BindAction("SwitchFireMode", IE_Pressed, this, &ASRPlayerCharacter::SwitchFireMode);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASRPlayerCharacter::startFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASRPlayerCharacter::stopFire);
+	PlayerInputComponent->BindAction("SwitchFireMode", IE_Pressed, this, &ASRPlayerCharacter::switchFireMode);
 
-	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ASRPlayerCharacter::Reload);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ASRPlayerCharacter::reload);
 
-	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ASRPlayerCharacter::SetAim);
-	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ASRPlayerCharacter::SetHip);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ASRPlayerCharacter::setAim);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ASRPlayerCharacter::setHip);
 
 	//PlayerInputComponent->BindAxis("MoveForward", this, &ASRPlayerCharacter::MoveForward);
 	//PlayerInputComponent->BindAxis("MoveRight", this, &ASRPlayerCharacter::MoveRight);
 
-	PlayerInputComponent->BindAxis("Turn", this,&ASRPlayerCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &ASRPlayerCharacter::LookUpAtRate);
+	PlayerInputComponent->BindAxis("Turn", this, &ASRPlayerCharacter::turnAtRate);
+	PlayerInputComponent->BindAxis("LookUp", this, &ASRPlayerCharacter::lookUpAtRate);
 }
 
 eWeaponType ASRPlayerCharacter::GetWeaponType() const
@@ -132,7 +131,7 @@ void ASRPlayerCharacter::InitDataFromGameMode(const FGameModeData modeData)
 		mOnCrossHairVisibility.Execute(ESlateVisibility::Visible);
 	}
 
-	mWeapon->Initialize(mGameType, mScopeType, mWeaponType, this);
+	mWeapon->Initialize(mGameType, mScopeType, mWeaponType, *this);
 
 	// 초기화된 데이터들을 업데이트 합니다.
 	mAnimInstance = Cast<USRAnimInstance>(mMesh1P->GetAnimInstance());
@@ -166,7 +165,7 @@ void ASRPlayerCharacter::SetMouseSensitivity(const float hipYaw, const float hip
  * 재장전 함수.
  * Anim blueprint에 의해서 behavior 프래그가 설정되고, 다시 사격가능한 상태가 됩니다.
  */ 
-void ASRPlayerCharacter::Reload()
+void ASRPlayerCharacter::reload()
 {
 
 	if(mBehaviorFlag & (AIMING | RELOADING | FULL_RELOADING))
@@ -199,12 +198,51 @@ void ASRPlayerCharacter::Reload()
  *  권총과 저격총의 경우 SingleFire모드 하나만 존재하므로
  *	소총만 발사모드가 작동됨.
  */
-void ASRPlayerCharacter::SwitchFireMode()
+void ASRPlayerCharacter::switchFireMode()
 {
 	mWeapon->SwitchFireMode();
 }
 
-void ASRPlayerCharacter::StartFire()
+void ASRPlayerCharacter::setToggleAim()
+{
+
+	if (mBehaviorFlag & AIMING)
+	{
+		UnsetBehaviorFlag(AIMING);
+		mAnimInstance->UnsetAim();
+		if (mScopeType != eScopeType::Scope1X && mGameType != eGameType::Tarkov)
+		{
+			mFirstPersonCameraComponent->SetFieldOfView(90.0f);
+		}
+
+	}
+	else
+	{
+		SetBehaviorFlag(AIMING);
+		mAnimInstance->SetAim();
+
+		if (mGameType != eGameType::Tarkov)
+		{
+			if (mScopeType == eScopeType::Scope2dot5X)
+			{
+				mFirstPersonCameraComponent->SetFieldOfView(55.0f);
+			}
+			else if (mScopeType == eScopeType::Scope6X)
+			{
+				mFirstPersonCameraComponent->SetFieldOfView(45.0f);
+			}
+		}
+	}
+
+	const ESlateVisibility visibility = (mBehaviorFlag & AIMING) ? ESlateVisibility::Hidden : ESlateVisibility::Visible;
+	if (mGameType != eGameType::Tarkov && mWeaponType != eWeaponType::SR)
+	{
+		mOnCrossHairVisibility.Execute(visibility);
+	}
+	
+}
+
+void ASRPlayerCharacter::startFire()
 {
 
 	if (mWeapon->GetRemainAmmo() <= 0)
@@ -230,10 +268,10 @@ void ASRPlayerCharacter::StartFire()
 	mWeapon->StartFire();
 }
 
-void ASRPlayerCharacter::StopFire()
+void ASRPlayerCharacter::stopFire()
 {
 	// BurstFire 중이면 점사가 끝나지 않았으므로 무시합니다.
-	if(mWeapon->GetFireMode() == eWaeponFireMode::BURST_FIRE && !mWeapon->IsBurstShot())
+	if(mWeapon->GetFireMode() == eWaeponFireMode::BURST_FIRE && mWeapon->IsBurstShot())
 	{
 		return;
 	}
@@ -243,21 +281,15 @@ void ASRPlayerCharacter::StopFire()
 	UnsetBehaviorFlag(FIRING);
 }
 
-void ASRPlayerCharacter::SetAim()
+void ASRPlayerCharacter::setAim()
 {
-
-	if (mBehaviorFlag & ~(FIRING | AIMING))
+	// 토글 모드시 줌 상태에서 탄이 비었을 때, 재장전 혹은 볼트 액션을 해야하지만
+	// 조준모드를 해제할 수 없어 재장전, 볼트액션 동작을 할 수 없으므로 별도 처리.
+	if ((mBehaviorFlag & AIMING) && (mBehaviorFlag & (BOLTACTION | FULL_RELOADING | RELOADING)))
 	{
-		// 저격총을 골랐을때 토글 모드에서 줌 상태에서 사격을 했을때 볼트 액션을 해야하지만
-		// 조준모드를 해제할 수 없어 볼트액션 동작도 할 수 없으므로 별도 처리.
-		// (재장전은 문제없음.)
-		// 그럼 볼트액션 애니메이션 재생시에 boltaction 상태 플래그랑 같이 이부분도 조준 상태가 해제되도록 계획.
-
-		if (mWeaponType == eWeaponType::SR && (mBehaviorFlag & AIMING) && mAimingType == eAimingType::Toggle)
+		if (mAimingType == eAimingType::Toggle)
 		{
-			UnsetBehaviorFlag(AIMING);
-			mAnimInstance->UnsetAim();
-			mFirstPersonCameraComponent->SetFieldOfView(90.0f);
+			setToggleAim();
 		}
 		return;
 	}
@@ -267,64 +299,31 @@ void ASRPlayerCharacter::SetAim()
 		return;
 	}
 
+	// toggle 방식은 따로 처리합니다.
 	if (mAimingType == eAimingType::Toggle)
 	{
-		if(mBehaviorFlag & AIMING)
-		{
-			UnsetBehaviorFlag(AIMING);
-			mAnimInstance->UnsetAim();
-			if (mScopeType != eScopeType::Scope1X && mGameType != eGameType::Tarkov)
-			{
-				mFirstPersonCameraComponent->SetFieldOfView(90.0f);
-			}
-
-		}
-		else
-		{
-			SetBehaviorFlag(AIMING);
-			mAnimInstance->SetAim();
-
-			if (mGameType != eGameType::Tarkov)
-			{
-				if (mScopeType == eScopeType::Scope2dot5X)
-				{
-					mFirstPersonCameraComponent->SetFieldOfView(55.0f);
-				}
-				else if (mScopeType == eScopeType::Scope6X)
-				{
-					mFirstPersonCameraComponent->SetFieldOfView(45.0f);
-				}
-			}
-		}
-
-		const ESlateVisibility visibility = (mBehaviorFlag & AIMING) ? ESlateVisibility::Hidden : ESlateVisibility::Visible;
-		if (mGameType != eGameType::Tarkov && mWeaponType != eWeaponType::SR)
-		{
-			mOnCrossHairVisibility.Execute(visibility);
-		}
+		setToggleAim();
+		return;
 	}
-	else // hold 방식의 조준입니다.
+
+	SetBehaviorFlag(AIMING);
+	mAnimInstance->SetAim();
+	mOnCrossHairVisibility.Execute(ESlateVisibility::Hidden);
+
+	if (mGameType != eGameType::Tarkov)
 	{
-		SetBehaviorFlag(AIMING);
-		mAnimInstance->SetAim();
-		mOnCrossHairVisibility.Execute(ESlateVisibility::Hidden);
-
-		if (mGameType != eGameType::Tarkov)
+		if (mScopeType == eScopeType::Scope2dot5X)
 		{
-			if (mScopeType == eScopeType::Scope2dot5X)
-			{
-				mFirstPersonCameraComponent->SetFieldOfView(55.0f);
-			}
-			else if (mScopeType == eScopeType::Scope6X)
-			{
-				mFirstPersonCameraComponent->SetFieldOfView(45.0f);
-			}
+			mFirstPersonCameraComponent->SetFieldOfView(55.0f);
+		}
+		else if (mScopeType == eScopeType::Scope6X)
+		{
+			mFirstPersonCameraComponent->SetFieldOfView(45.0f);
 		}
 	}
-
 }
 
-void ASRPlayerCharacter::SetHip()
+void ASRPlayerCharacter::setHip()
 {
 	// hold의 경우. toggle방식은 SetAim함수에서 전부 처리되었습니다.
 	if (mAimingType != eAimingType::Hold)
@@ -342,45 +341,45 @@ void ASRPlayerCharacter::SetHip()
 	}
 }
 
-void ASRPlayerCharacter::MoveForward(float Value)
+void ASRPlayerCharacter::moveForward(const float value)
 {
-	if (Value != 0.0f)
+	if (value != 0.0f)
 	{
-		AddMovementInput(GetActorForwardVector(), Value);
+		AddMovementInput(GetActorForwardVector(), value);
 	}
 }
 
-void ASRPlayerCharacter::MoveRight(float Value)
+void ASRPlayerCharacter::moveRight(const float value)
 {
-	if (Value != 0.0f)
+	if (value != 0.0f)
 	{
-		AddMovementInput(GetActorRightVector(), Value);
+		AddMovementInput(GetActorRightVector(), value);
 	}
 }
 
-void ASRPlayerCharacter::TurnAtRate(float Rate)
+void ASRPlayerCharacter::turnAtRate(const float rate)
 {
 	if(mBehaviorFlag & AIMING)
 	{
-		AddControllerYawInput(Rate * mAimYawSensitivity * GetWorld()->GetDeltaSeconds());
+		AddControllerYawInput(rate * mAimYawSensitivity * GetWorld()->GetDeltaSeconds());
 	}
 	else
 	{
-		AddControllerYawInput(Rate * mHipYawSensitivity* GetWorld()->GetDeltaSeconds());
+		AddControllerYawInput(rate * mHipYawSensitivity* GetWorld()->GetDeltaSeconds());
 	}
 
 	mPlayerController->CalcTargetIndicatorAndShow();
 }
 
-void ASRPlayerCharacter::LookUpAtRate(float Rate)
+void ASRPlayerCharacter::lookUpAtRate(const float rate)
 {
 	if (mBehaviorFlag & AIMING)
 	{
-		AddControllerPitchInput(Rate * mAimPitchSensitivity * GetWorld()->GetDeltaSeconds());
+		AddControllerPitchInput(rate * mAimPitchSensitivity * GetWorld()->GetDeltaSeconds());
 	}
 	else
 	{
-		AddControllerPitchInput(Rate * mHipPitchSensitivity * GetWorld()->GetDeltaSeconds());
+		AddControllerPitchInput(rate * mHipPitchSensitivity * GetWorld()->GetDeltaSeconds());
 	}
 }
 

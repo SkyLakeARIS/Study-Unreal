@@ -48,7 +48,7 @@ void ASRWeapon::BeginPlay()
 }
 
 
-void ASRWeapon::Initialize(eGameType gameType, eScopeType scopeType, eWeaponType weaponType, ASRPlayerCharacter* const owner)
+void ASRWeapon::Initialize(const eGameType gameType, const eScopeType scopeType, const eWeaponType weaponType, ASRPlayerCharacter& owner)
 {
 	bIsDebugMode = false;
 	
@@ -56,7 +56,7 @@ void ASRWeapon::Initialize(eGameType gameType, eScopeType scopeType, eWeaponType
 	mScopeType = scopeType;
 	mWeaponType = weaponType;
 
-	mOwner = owner;
+	mOwner = &owner;
 	auto* const playerController = Cast<ASRPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	mHUD = playerController->GetHUDWidget();
 
@@ -279,7 +279,7 @@ void ASRWeapon::NotifyEndBoltaction()
 	GetWorldTimerManager().SetTimer(behaviorTimer, this, &ASRWeapon::clearBehaviorFlagAfterAnimation, 0.7f, false);
 }
 
-void ASRWeapon::clearBehaviorFlagAfterAnimation()
+void ASRWeapon::clearBehaviorFlagAfterAnimation() const
 {
 	mOwner->UnsetBehaviorFlag(WAIT_TO_END_ANIMATION);
 }
@@ -327,7 +327,6 @@ void ASRWeapon::fireShots()
 		mRecoilFactor += 0.1f;
 		mRecoilFactor = FMath::Clamp(mRecoilFactor, 0.0f, 1.0f);
 
-		// 필요없는 듯?
 		if (mFireMode == eWaeponFireMode::SINGLE_FIRE)
 		{
 			mRecoilFactor = 0.15f;
@@ -414,10 +413,9 @@ void ASRWeapon::fireShots()
 	if (projectile != nullptr)
 	{
 		projectile->SetStartLocation(muzzleLocation);
-		projectile->SetDebugMode(bIsDebugMode);
 		projectile->SetBulletType(mWeaponType);
-		projectile->BindPlayerStateInfo(playerController->GetPlayerState());
-		projectile->BindHUDWidget(mHUD);
+		projectile->BindPlayerStateInfo(*playerController->GetPlayerState());
+		projectile->BindHUDWidget(*mHUD);
 	}
 
 
@@ -435,22 +433,25 @@ void ASRWeapon::fireShots()
 	{
 		animInstance->UnsetFire();
 	}
-
-	if (mFireMode == eWaeponFireMode::BURST_FIRE)
+	else if (mFireMode == eWaeponFireMode::BURST_FIRE)
 	{
 		--mCurrentBurst;
 		if (mCurrentBurst <= 0)
 		{
-			
 			animInstance->UnsetFire();
 			mOwner->UnsetBehaviorFlag(FIRING);
-			GetWorldTimerManager().ClearTimer(mFireDelayTimer);
+			StopFire();
+			// 트릭으로 딜레이 구현. (다른 행동을 하지 못하게 막았다 풀어주는 형식)
+			mOwner->SetBehaviorFlag(WAIT_TO_END_ANIMATION);
+			GetWorldTimerManager().SetTimer(mBurstDelayTimer, [&](){mOwner->UnsetBehaviorFlag(WAIT_TO_END_ANIMATION); }, BURST_DELAY, false);
 		}
 	}
 
 	if (mRemainAmmo <= 0)
 	{
 		animInstance->UnsetFire();
+		mCurrentBurst = 0;
+
 		mOwner->UnsetBehaviorFlag(FIRING);
 		mOwner->SetBehaviorFlag(FULL_RELOADING);
 		mOwner->SetBehaviorFlag(WAIT_TO_END_ANIMATION);

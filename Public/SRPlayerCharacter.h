@@ -81,21 +81,22 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 
-	void StartFire();
-	void StopFire();
+	void startFire();
+	void stopFire();
 
-	void Reload();
+	void reload();
 
-	void SwitchFireMode();
+	void switchFireMode();
 
-	void SetAim();
-	void SetHip();
+	void setToggleAim();
+	void setAim();
+	void setHip();
 
-	void MoveForward(float Val);
-	void MoveRight(float Val);
+	void moveForward(const float Val);
+	void moveRight(const float Val);
 
-	void TurnAtRate(float Rate);
-	void LookUpAtRate(float Rate);
+	void turnAtRate(const float Rate);
+	void lookUpAtRate(const float Rate);
 
 protected:
 
