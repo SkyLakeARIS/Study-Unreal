@@ -144,6 +144,8 @@ void ASRPlayerController::CalcTargetIndicatorAndShow()
 
 	FVector rightVector = playerCharacter->GetActorRightVector();
 	const FVector characterPosition = playerCharacter->GetActorLocation();
+	FVector forwardVector = playerCharacter->GetActorForwardVector();
+	forwardVector.Normalize();
 
 	rightVector.Z = 0;
 	rightVector.Normalize();
@@ -158,7 +160,14 @@ void ASRPlayerController::CalcTargetIndicatorAndShow()
 		// 내적을 이용하여 cos 값을 구합니다.
 		const float angle = FVector::DotProduct(characterToTarget, rightVector)/(characterToTarget.Size2D()*rightVector.Size2D());
 		// cos 값을 통해 각도를 구합니다.
-		const float arcCos = FMath::RadiansToDegrees(FMath::Acos(angle));
+		float arcCos = FMath::RadiansToDegrees(FMath::Acos(angle));
+
+		//  앞, 뒤를 구분하여 0도, 180도로 고정시킵니다.
+		const float angleForward = FVector::DotProduct(characterToTarget, forwardVector) / (characterToTarget.Size2D() * forwardVector.Size2D());
+		if (angleForward < 0.0f)
+		{
+			arcCos = (arcCos < 90.0f) ? 0.0f : 180.0f;
+		}
 
 		mTargetIndicatorWidget[i]->SetPositionInViewport(FVector2D(mViewportX - (arcCos * mIndicatorScale), mViewportY));
 		mTargetIndicatorWidget[i]->SetVisibility(ESlateVisibility::Visible);
