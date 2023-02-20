@@ -28,7 +28,7 @@
       
 선정된 각 게임들은 투사체, 히트스캔, 총알 발사 위치, 랜덤스프레드 여부 등 서로 겹치지 않는 구현을 가지기 때문에 적절하다고 판단했습니다.      
 
-애니메이션의 경우 직접 만들었기 때문에 어색합니다.  
+애니메이션의 경우 직접 만들었기 때문에 어색할 수 있습니다.          
    
 
 ### 구현
@@ -97,6 +97,7 @@
 
   ### 참고
   ---     
+  윈도우 64비트를 기준으로 하고 있습니다.         
 작업 기록 : [노션](https://skylakearis.notion.site/shooting-range-de1a42e83c1c4ab2b5650aeaecad6ea2)     
 시연 영상 : [유튜브](https://youtu.be/zujnafqtzek)        
 실행 파일 : [구글 드라이브](https://drive.google.com/file/d/12ix8i4Nq4FSzWUAIyZiHRLR5q88buyeV/view?usp=sharing)      
